@@ -13,17 +13,21 @@ public class BroadCastMesseage {
 
     public void randomMesseage() {
 
-        List<String> messeages = Main.getInstance().getConfig().getStringList("Messeages");
-
-        Random random = new Random();
-        int index = random.nextInt(messeages.size());
-        String result = messeages.get(index).toString();
+        final String messeage = random(null);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage(prefix + ChatColor.translateAlternateColorCodes('&', result));
+                Bukkit.broadcastMessage(prefix + ChatColor.translateAlternateColorCodes('&', random(messeage)));
             }
         }.runTaskTimer(Main.getInstance(), 0L, 20 * 60 * 4);
+    }
+
+    private String random(String msg) {
+        List<String> messeages = Main.getInstance().getConfig().getStringList("Messeages");
+
+        int index = (new Random()).nextInt(messeages.size());
+        msg = messeages.get(index);
+        return msg;
     }
 }
