@@ -42,7 +42,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
         Bukkit.getServer().getPluginManager().registerEvents(new RankingCommand(), this);
 
-        broadCastMesseage.randomBroadCast();
+        broadCastMesseage.randomMesseage();
     }
 
     private void ConnectMySQL() {

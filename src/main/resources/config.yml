@@ -4,3 +4,6 @@ MySQL:
   User: ""
   Password: ""
   Port: 3306 #default
+
+Messeages:
+  - "" # Messeages
