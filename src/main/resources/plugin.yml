@@ -1,0 +1,21 @@
+name: Mixed
+version: 1.0
+author: XPS
+main: xps.Main
+commands:
+  stats:
+    description: stats
+    usage: /<command>
+    default: true
+  ranking:
+    description: ranking
+    usage: /<command>
+    default: true
+  tops:
+    description: ranking
+    usage: /<command>
+    default: true
+  ping:
+    description: ping
+    usage: /<command>
+    default: true
