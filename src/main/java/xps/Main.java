@@ -16,6 +16,10 @@ import xps.Database.MySQLSetterGetter;
 import xps.Database.PlayerStats;
 import xps.Task.BroadCastMesseage;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 
 public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
@@ -47,7 +51,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
     private void ConnectMySQL() {
         (mysql = new MySQL(MySQL.getHost(), MySQL.getDatabase(), MySQL.getUser(), MySQL.getPassword(), MySQL.getPort()))
-                .update("CREATE TABLE IF NOT EXISTS STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, NAME varchar(64));");
+                .update("CREATE TABLE IF NOT EXISTS STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64), DATE varchar(10));");
     }
 
     public static Main getInstance() {
@@ -59,5 +63,12 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         Player p = e.getPlayer();
         MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
         MySQLSetterGetter.addName(p.getUniqueId().toString(), p.getName());
+        MySQLSetterGetter.addDate(p.getUniqueId().toString(), getTime());
+    }
+
+    private String getTime() {
+        Date now = new Date();
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+      return   df.format(now);
     }
 }

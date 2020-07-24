@@ -1,5 +1,6 @@
 package xps.Database;
 
+import sun.tools.tree.ShiftRightExpression;
 import xps.Main;
 
 import java.sql.ResultSet;
@@ -19,7 +20,8 @@ public class MySQLSetterGetter {
 
     public static void createPlayer(String uuid) {
         if (!playerExists(uuid)) {
-            Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', 'Null');"); // uuid, kills, deaths, flags, cores, wools, name
+            Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME, DATE) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null', 'Null');");
+            // uuid, kills, deaths, flags, cores, wools, name, date
         }
     }
 
@@ -48,6 +50,24 @@ public class MySQLSetterGetter {
             createPlayer(uuid);
             setName(uuid, name);
         }
+    }
+
+    public static Integer getMonuments(String uuid) {
+        int i = 0;
+        if(playerExists(uuid)) {
+            try {
+                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+                if(rs.next())
+                    rs.getInt("MONUMENTS");
+                i = rs.getInt("MONUMENTS");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            createPlayer(uuid);
+            getMonuments(uuid);
+        }
+        return i;
     }
 
     public static Integer getFlags(String uuid) {
@@ -140,6 +160,24 @@ public class MySQLSetterGetter {
         return i;
     }
 
+    public static void setMonuments(String uuid, int monuments) {
+        if(playerExists(uuid)) {
+            Main.mysql.update("UPDATE STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
+        } else {
+            createPlayer(uuid);
+            setMonuments(uuid, monuments);
+        }
+    }
+
+    public static void setDate(String uuid, String date) {
+        if(playerExists(uuid)) {
+            Main.mysql.update("UPDATE STATS SET DATE= '" + date + "' WHERE UUID= '" + uuid + "';");
+        } else {
+            createPlayer(uuid);
+            setDate(uuid, date);
+        }
+    }
+
     public static void setWools(String uuid, Integer wools) {
         if (playerExists(uuid)) {
             Main.mysql.update("UPDATE STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
@@ -183,6 +221,24 @@ public class MySQLSetterGetter {
         } else {
             createPlayer(uuid);
             setDeaths(uuid, deaths);
+        }
+    }
+
+    public static void addMonuments(String uuid, int monuments) {
+        if(playerExists(uuid)) {
+            setMonuments(uuid, getMonuments(uuid) + monuments);
+        } else {
+            createPlayer(uuid);
+            addMonuments(uuid, monuments);
+        }
+    }
+
+    public static void addDate(String uuid, String date) {
+        if(playerExists(uuid)) {
+            setDate(uuid, date);
+        } else {
+            createPlayer(uuid);
+            addDate(uuid, date);
         }
     }
 

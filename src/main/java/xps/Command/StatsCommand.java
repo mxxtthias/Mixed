@@ -23,8 +23,11 @@ public class StatsCommand implements CommandExecutor {
             int flags = MySQLSetterGetter.getFlags(p.getUniqueId().toString());
             int cores = MySQLSetterGetter.getCores(p.getUniqueId().toString());
             int wools = MySQLSetterGetter.getWools(p.getUniqueId().toString());
+            int dtm = MySQLSetterGetter.getMonuments(p.getUniqueId().toString());
 
-            String mouments = ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores + " " + ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags;
+            String monuments = ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores;
+            String monuments_2 = ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm;
+
             try {
                 BigDecimal bd1 = new BigDecimal(String.valueOf(kills));
                 BigDecimal bd2 = new BigDecimal(String.valueOf(deaths));
@@ -32,14 +35,14 @@ public class StatsCommand implements CommandExecutor {
 
                 p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + p.getName() + ChatColor.RED + " ────");
                 p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd.doubleValue());
-                p.sendMessage(" ");
-                p.sendMessage(mouments);
+                p.sendMessage(monuments);
+                p.sendMessage(monuments_2);
 
             } catch (ArithmeticException e) {
                 p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + p.getName() + ChatColor.RED + " ────");
                 p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths);
-                p.sendMessage(" ");
-                p.sendMessage(mouments);
+                p.sendMessage(monuments);
+                p.sendMessage(monuments_2);
             }
         } else {
             if (args.length == 1) {
@@ -53,23 +56,25 @@ public class StatsCommand implements CommandExecutor {
                     int flags_2 = MySQLSetterGetter.getFlags(target.getUniqueId().toString());
                     int cores_2 = MySQLSetterGetter.getCores(target.getUniqueId().toString());
                     int wools_2 = MySQLSetterGetter.getWools(target.getUniqueId().toString());
+                    int dtm_2 = MySQLSetterGetter.getMonuments(target.getUniqueId().toString());
 
-                    String monuments = ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools_2 + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores_2 + " " + ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags_2;
+                    String monuments = ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools_2 + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores_2;
+                    String monuments_2 = ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags_2 + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm_2;
+
                     try {
                         BigDecimal bd1 = new BigDecimal(String.valueOf(kills_2));
                         BigDecimal bd2 = new BigDecimal(String.valueOf(deaths_2));
                         BigDecimal kd_2 =(bd1.divide(bd2,2, RoundingMode.HALF_UP));
 
-
                         p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + target.getName() + ChatColor.RED + " ────");
                         p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills_2 + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths_2 + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd_2.doubleValue());
-                        p.sendMessage(" ");
                         p.sendMessage(monuments);
+                        p.sendMessage(monuments_2);
                     } catch (ArithmeticException e) {
                         p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + target.getName() + ChatColor.RED + " ────");
                         p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills_2 + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths_2);
-                        p.sendMessage(" ");
                         p.sendMessage(monuments);
+                        p.sendMessage(monuments_2);
                     }
                 }
             }

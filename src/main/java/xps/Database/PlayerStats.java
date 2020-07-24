@@ -10,6 +10,8 @@ import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.MatchPlayerState;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 import tc.oc.pgm.core.CoreBlockBreakEvent;
+import tc.oc.pgm.destroyable.DestroyableContribution;
+import tc.oc.pgm.destroyable.DestroyableDestroyedEvent;
 import tc.oc.pgm.destroyable.DestroyableEvent;
 import tc.oc.pgm.destroyable.DestroyableHealthChangeEvent;
 import tc.oc.pgm.events.ListenerScope;
@@ -60,6 +62,13 @@ public class PlayerStats implements Listener, MatchModule {
 
         if(player.getId() != null) {
             MySQLSetterGetter.addFlags(player.getId().toString(), 1);
+        }
+    }
+
+    @EventHandler
+    public void dtm(DestroyableDestroyedEvent e) {
+        for (DestroyableContribution dc : e.getDestroyable().getContributions()) {
+            MySQLSetterGetter.addMonuments(dc.getPlayerState().getId().toString(), 1);
         }
     }
 
