@@ -87,7 +87,7 @@ public class RankingCommand implements CommandExecutor, Listener {
 
                 String rank = ChatColor.RED + "" + id + " ";
 
-                if (i == 0) {
+                if (id == 1) {
                     kill_lores.add(rank + name + kills);
                     death_lores.add(rank + name_2 + deaths);
                     wools_lores.add(rank + name_3 + wools);
@@ -95,7 +95,7 @@ public class RankingCommand implements CommandExecutor, Listener {
                     cores_lores.add(rank + name_5 + cores);
                     monuments_lores.add(rank + name_6 + monuments);
                 }
-                if (i == 1) {
+                if (id == 2) {
                     kill_lores.add(rank + name + kills);
                     death_lores.add(rank + name_2 + deaths);
                     wools_lores.add(rank + name_3 + wools);
@@ -103,7 +103,7 @@ public class RankingCommand implements CommandExecutor, Listener {
                     cores_lores.add(rank + name_5 + cores);
                     monuments_lores.add(rank + name_6 + monuments);
                 }
-                if(i == 2) {
+                if(id == 3) {
                     kill_lores.add(rank + name + kills);
                     death_lores.add(rank + name_2 + deaths);
                     wools_lores.add(rank + name_3 + wools);
@@ -111,7 +111,7 @@ public class RankingCommand implements CommandExecutor, Listener {
                     cores_lores.add(rank + name_5 + cores);
                     monuments_lores.add(rank + name_6 + monuments);
                 }
-                if(i == 3) {
+                if(id == 4) {
                     kill_lores.add(rank + name + kills);
                     death_lores.add(rank + name_2 + deaths);
                     wools_lores.add(rank + name_3 + wools);
@@ -119,7 +119,7 @@ public class RankingCommand implements CommandExecutor, Listener {
                     cores_lores.add(rank + name_5 + cores);
                     monuments_lores.add(rank + name_6 + monuments);
                 }
-                if (i == 4) {
+                if (id == 5) {
                     kill_lores.add(rank + name + kills);
                     death_lores.add(rank + name_2 + deaths);
                     wools_lores.add(rank + name_3 + wools);
@@ -127,7 +127,6 @@ public class RankingCommand implements CommandExecutor, Listener {
                     cores_lores.add(rank + name_5 + cores);
                     monuments_lores.add(rank + name_6 + monuments);
                 }
-                kill_lores.clear(); death_lores.clear(); wools_lores.clear(); flags_lores.clear(); cores_lores.clear();
             }
             inv.setItem(0, meta(material(Material.STONE_SWORD), ChatColor.AQUA + "TOP 5 KILLS", kill_lores));
             inv.setItem(2, meta(material(Material.REDSTONE), ChatColor.AQUA + "TOP 5 DEATHS", death_lores));
@@ -137,6 +136,7 @@ public class RankingCommand implements CommandExecutor, Listener {
             inv.setItem(18, meta(material(Material.DIAMOND_PICKAXE), ChatColor.AQUA + "TOP 5 Monuments", monuments_lores));
 
             p.openInventory(inv);
+            kill_lores.clear(); death_lores.clear(); wools_lores.clear(); flags_lores.clear(); cores_lores.clear(); monuments_lores.clear();
         }
         return true;
     }
