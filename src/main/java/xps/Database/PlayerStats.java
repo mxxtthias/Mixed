@@ -8,8 +8,10 @@ import tc.oc.pgm.api.match.MatchModule;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.MatchPlayerState;
+import tc.oc.pgm.api.player.ParticipantState;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 import tc.oc.pgm.core.CoreBlockBreakEvent;
+import tc.oc.pgm.core.CoreLeakEvent;
 import tc.oc.pgm.destroyable.DestroyableContribution;
 import tc.oc.pgm.destroyable.DestroyableDestroyedEvent;
 import tc.oc.pgm.destroyable.DestroyableEvent;
@@ -48,11 +50,9 @@ public class PlayerStats implements Listener, MatchModule {
     }
 
     @EventHandler
-    public void dtc(CoreBlockBreakEvent e) {
-        MatchPlayerState player = e.getPlayer();
-
-        if(player.getId() != null) {
-            MySQLSetterGetter.addCores(player.getId().toString(), 1);
+    public void dtc(CoreLeakEvent e) {
+        for (ParticipantState ps : e.getCore().getTouchingPlayers()) {
+            MySQLSetterGetter.addCores(ps.getId().toString(), 1);
         }
     }
 
