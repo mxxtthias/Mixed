@@ -61,9 +61,12 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
-        MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
-        MySQLSetterGetter.addName(p.getUniqueId().toString(), p.getName());
-        MySQLSetterGetter.addDate(p.getUniqueId().toString(), getTime());
+
+        if (!(p.hasPlayedBefore())) {
+            MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
+            MySQLSetterGetter.addName(p.getUniqueId().toString(), p.getName());
+            MySQLSetterGetter.addDate(p.getUniqueId().toString(), getTime());
+        }
     }
 
     private String getTime() {

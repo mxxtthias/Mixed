@@ -1,7 +1,9 @@
 package xps.Database;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.api.match.Match;
 import tc.oc.pgm.api.match.MatchModule;
@@ -20,6 +22,7 @@ import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.flag.event.FlagCaptureEvent;
 import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
 import xps.Database.MySQLSetterGetter;
+import xps.Main;
 
 import java.util.Optional;
 
@@ -69,6 +72,13 @@ public class PlayerStats implements Listener, MatchModule {
     public void dtm(DestroyableDestroyedEvent e) {
         for (DestroyableContribution dc : e.getDestroyable().getContributions()) {
             MySQLSetterGetter.addMonuments(dc.getPlayerState().getId().toString(), 1);
+        }
+    }
+
+    @EventHandler
+    public void removeBannedPlayerStats(PlayerQuitEvent e) {
+        if(e.getPlayer().isBanned()) {
+            Main.mysql.query("DELETE FROM STATS WHERE UUID= '" + e.getPlayer().getUniqueId() + "'");
         }
     }
 
