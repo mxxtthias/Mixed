@@ -2,6 +2,7 @@ package xps.Command;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -10,6 +11,7 @@ import xps.Database.MySQLSetterGetter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.UUID;
 
 public class StatsCommand implements CommandExecutor {
 
@@ -31,7 +33,7 @@ public class StatsCommand implements CommandExecutor {
             try {
                 BigDecimal bd1 = new BigDecimal(String.valueOf(kills));
                 BigDecimal bd2 = new BigDecimal(String.valueOf(deaths));
-                BigDecimal kd =(bd1.divide(bd2,2, RoundingMode.HALF_UP));
+                BigDecimal kd = (bd1.divide(bd2, 2, RoundingMode.HALF_UP));
 
                 p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + p.getName() + ChatColor.RED + " ────");
                 p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd.doubleValue());
@@ -47,32 +49,62 @@ public class StatsCommand implements CommandExecutor {
         } else {
             if (args.length == 1) {
                 Player target = Bukkit.getPlayer(args[0]);
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[0]);
                 if (target == null) {
-                    p.sendMessage("そのプレイヤーは現在オンラインではありません");
+                    if(MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
+                        int deaths = MySQLSetterGetter.getDeaths(offlinePlayer.getUniqueId().toString());
+                        int kills = MySQLSetterGetter.getKills(offlinePlayer.getUniqueId().toString());
+                        int flags = MySQLSetterGetter.getFlags(offlinePlayer.getUniqueId().toString());
+                        int cores = MySQLSetterGetter.getCores(offlinePlayer.getUniqueId().toString());
+                        int wools = MySQLSetterGetter.getWools(offlinePlayer.getUniqueId().toString());
+                        int dtm = MySQLSetterGetter.getMonuments(offlinePlayer.getUniqueId().toString());
+
+                        String name = MySQLSetterGetter.getName(offlinePlayer.getUniqueId().toString());
+
+                        String monuments = ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores;
+                        String monuments_2 = ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm;
+
+                        try {
+                            BigDecimal bd1 = new BigDecimal(String.valueOf(kills));
+                            BigDecimal bd2 = new BigDecimal(String.valueOf(deaths));
+                            BigDecimal kd_2 = (bd1.divide(bd2, 2, RoundingMode.HALF_UP));
+
+                            p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + name + ChatColor.RED + " ────");
+                            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd_2.doubleValue());
+                            p.sendMessage(monuments);
+                            p.sendMessage(monuments_2);
+                        } catch (ArithmeticException e) {
+                            p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + name + ChatColor.RED + " ────");
+                            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths);
+                            p.sendMessage(monuments);
+                            p.sendMessage(monuments_2);
+                        }
+                    } else {
+                        p.sendMessage("The player not found");
+                    }
                 } else {
+                    int deaths = MySQLSetterGetter.getDeaths(target.getUniqueId().toString());
+                    int kills = MySQLSetterGetter.getKills(target.getUniqueId().toString());
+                    int flags = MySQLSetterGetter.getFlags(target.getUniqueId().toString());
+                    int cores = MySQLSetterGetter.getCores(target.getUniqueId().toString());
+                    int wools = MySQLSetterGetter.getWools(target.getUniqueId().toString());
+                    int dtm = MySQLSetterGetter.getMonuments(target.getUniqueId().toString());
 
-                    int deaths_2 = MySQLSetterGetter.getDeaths(target.getUniqueId().toString());
-                    int kills_2 = MySQLSetterGetter.getKills(target.getUniqueId().toString());
-                    int flags_2 = MySQLSetterGetter.getFlags(target.getUniqueId().toString());
-                    int cores_2 = MySQLSetterGetter.getCores(target.getUniqueId().toString());
-                    int wools_2 = MySQLSetterGetter.getWools(target.getUniqueId().toString());
-                    int dtm_2 = MySQLSetterGetter.getMonuments(target.getUniqueId().toString());
-
-                    String monuments = ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools_2 + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores_2;
-                    String monuments_2 = ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags_2 + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm_2;
+                    String monuments = ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores;
+                    String monuments_2 = ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm;
 
                     try {
-                        BigDecimal bd1 = new BigDecimal(String.valueOf(kills_2));
-                        BigDecimal bd2 = new BigDecimal(String.valueOf(deaths_2));
-                        BigDecimal kd_2 =(bd1.divide(bd2,2, RoundingMode.HALF_UP));
+                        BigDecimal bd1 = new BigDecimal(String.valueOf(kills));
+                        BigDecimal bd2 = new BigDecimal(String.valueOf(deaths));
+                        BigDecimal kd_2 = (bd1.divide(bd2, 2, RoundingMode.HALF_UP));
 
                         p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + target.getName() + ChatColor.RED + " ────");
-                        p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills_2 + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths_2 + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd_2.doubleValue());
+                        p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd_2.doubleValue());
                         p.sendMessage(monuments);
                         p.sendMessage(monuments_2);
                     } catch (ArithmeticException e) {
                         p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + target.getName() + ChatColor.RED + " ────");
-                        p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills_2 + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths_2);
+                        p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths);
                         p.sendMessage(monuments);
                         p.sendMessage(monuments_2);
                     }
