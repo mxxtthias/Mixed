@@ -7,14 +7,6 @@ commands:
     description: stats
     usage: /<command>
     default: true
-  ranking:
-    description: ranking
-    usage: /<command>
-    default: true
-  tops:
-    description: ranking
-    usage: /<command>
-    default: true
   ping:
     description: ping
     usage: /<command>

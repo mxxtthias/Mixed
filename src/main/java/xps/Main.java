@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xps.Command.PingCommand;
-import xps.Command.RankingCommand;
 import xps.Command.StatsCommand;
 import xps.Database.MySQL;
 import xps.Database.MySQLSetterGetter;
@@ -40,11 +39,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         new PlayerStats(this);
 
         getCommand("stats").setExecutor(new StatsCommand());
-        getCommand("ranking").setExecutor(new RankingCommand());
         getCommand("ping").setExecutor(new PingCommand());
-        getCommand("tops").setExecutor(new RankingCommand());
-
-        Bukkit.getServer().getPluginManager().registerEvents(new RankingCommand(), this);
 
         broadCastMesseage.randomMesseage();
     }
