@@ -59,7 +59,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
         if (!p.hasPlayedBefore()) {
             MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
-            MySQLSetterGetter.addName(p.getUniqueId().toString(), p.getName());
+            MySQLSetterGetter.setName(p.getUniqueId().toString(), p.getName());
             MySQLSetterGetter.addDate(p.getUniqueId().toString(), getTime());
         }
     }
