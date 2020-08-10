@@ -11,3 +11,11 @@ commands:
     description: ping
     usage: /<command>
     default: true
+  ranks:
+    description: ranks
+    usage: /<command>
+    default: true
+  rankup:
+    description: rankup
+    usage: /<command>
+    default: true

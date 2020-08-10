@@ -6,7 +6,6 @@ import java.sql.*;
 
 public class MySQL {
 
-    public final String host;
     public final String database;
     public final String user;
     public final String password;
@@ -14,8 +13,7 @@ public class MySQL {
 
     private Connection connection;
 
-    public MySQL(String host, String database, String user, String password, int port) {
-        this.host = host;
+    public MySQL(String database, String user, String password, int port) {
         this.database = database;
         this.user = user;
         this.password = password;
@@ -26,7 +24,7 @@ public class MySQL {
 
     public void connect() {
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://" + getHost() + ":" +
+            this.connection = DriverManager.getConnection("jdbc:mysql://45.32.51.223:" +
                             getPort() + "/" + getDatabase() + "?autoReconnect=true",
                     getUser(), getPassword());
         } catch (SQLException e) {
@@ -67,8 +65,8 @@ public class MySQL {
         return rs;
     }
 
-    public static String getHost() {
-        return Main.getInstance().getConfig().getString("MySQL.Host");
+    public static Integer getHost() {
+        return Main.getInstance().getConfig().getInt("MySQL.Host");
     }
 
     public static String getDatabase() {

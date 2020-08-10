@@ -9,15 +9,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import xps.Command.PingCommand;
+import xps.Command.RankUPCommand;
 import xps.Command.StatsCommand;
-import xps.Database.MySQL;
-import xps.Database.MySQLSetterGetter;
-import xps.Database.PlayerStats;
+import xps.Database.*;
 import xps.Task.BroadCastMesseage;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 
 public class Main extends JavaPlugin implements Listener, CommandExecutor {
@@ -29,24 +24,43 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
     @Override
     public void onEnable() {
+        instance = this;
+
         config.options().copyDefaults(true);
         saveConfig();
 
-        BroadCastMesseage broadCastMesseage = new BroadCastMesseage();
-        instance = this;
         ConnectMySQL();
+        tableCreate();
+
         Bukkit.getServer().getPluginManager().registerEvents(this, this);
         new PlayerStats(this);
+        // new RankUp(this);
+        new Weekly(this);
 
         getCommand("stats").setExecutor(new StatsCommand());
         getCommand("ping").setExecutor(new PingCommand());
+        // getCommand("rankup").setExecutor(new RankUPCommand());
 
+        BroadCastMesseage broadCastMesseage = new BroadCastMesseage();
         broadCastMesseage.randomMesseage();
     }
 
     private void ConnectMySQL() {
-        (mysql = new MySQL(MySQL.getHost(), MySQL.getDatabase(), MySQL.getUser(), MySQL.getPassword(), MySQL.getPort()))
+        (mysql = new MySQL(MySQL.getDatabase(), MySQL.getUser(), MySQL.getPassword(), MySQL.getPort()))
                 .update("CREATE TABLE IF NOT EXISTS STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64), DATE varchar(10));");
+    }
+
+    private void tableCreate() {
+        Main.mysql.update("CREATE TABLE IF NOT EXISTS WEEK_STATS(" +
+                "UUID varchar(64), " +
+                "KILLS int, " +
+                "DEATHS int, " +
+                "FLAGS int, " +
+                "CORES int, " +
+                "WOOLS int, " +
+                "MONUMENTS int, " +
+                "NAME varchar(64), " +
+                "DATE varchar(12);");
     }
 
     public static Main getInstance() {
@@ -59,14 +73,8 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
         if (!p.hasPlayedBefore()) {
             MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
-            MySQLSetterGetter.addName(p.getUniqueId().toString(), p.getName());
-            MySQLSetterGetter.addDate(p.getUniqueId().toString(), getTime());
+            MySQLSetterGetter.setName(p.getUniqueId().toString(), p.getName());
+            // MySQLSetterGetter.addRank(p.getUniqueId().toString(), getConfig().getString("Ranks.Default"));
         }
-    }
-
-    private String getTime() {
-        Date now = new Date();
-        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-      return   df.format(now);
     }
 }

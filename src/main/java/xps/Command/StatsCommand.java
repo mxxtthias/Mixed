@@ -19,14 +19,9 @@ public class StatsCommand implements CommandExecutor {
         Player p = (Player) s;
 
         if (args.length == 0) {
-            int deaths = MySQLSetterGetter.getDeaths(p.getUniqueId().toString());
-            int kills = MySQLSetterGetter.getKills(p.getUniqueId().toString());
-            int flags = MySQLSetterGetter.getFlags(p.getUniqueId().toString());
-            int cores = MySQLSetterGetter.getCores(p.getUniqueId().toString());
-            int wools = MySQLSetterGetter.getWools(p.getUniqueId().toString());
-            int dtm = MySQLSetterGetter.getMonuments(p.getUniqueId().toString());
+            String uuid = p.getUniqueId().toString();
 
-            stats(p, p.getName(), kills, deaths, flags, cores, wools, dtm);
+            stats(p, p.getName(), getKillStats(uuid), getDeathStats(uuid), getFlagStats(uuid), getCoreStats(uuid), getWoolStats(uuid), getMonumentStats(uuid));
 
         } else {
             if (args.length == 1) {
@@ -34,28 +29,19 @@ public class StatsCommand implements CommandExecutor {
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[0]);
                 if (target == null) {
                     if (MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
-                        int deaths = MySQLSetterGetter.getDeaths(offlinePlayer.getUniqueId().toString());
-                        int kills = MySQLSetterGetter.getKills(offlinePlayer.getUniqueId().toString());
-                        int flags = MySQLSetterGetter.getFlags(offlinePlayer.getUniqueId().toString());
-                        int cores = MySQLSetterGetter.getCores(offlinePlayer.getUniqueId().toString());
-                        int wools = MySQLSetterGetter.getWools(offlinePlayer.getUniqueId().toString());
-                        int dtm = MySQLSetterGetter.getMonuments(offlinePlayer.getUniqueId().toString());
-                        String name = MySQLSetterGetter.getName(offlinePlayer.getUniqueId().toString());
 
-                        stats(p, name, kills, deaths, flags, cores, wools, dtm);
+                        String uuid = offlinePlayer.getUniqueId().toString();
+
+                        stats(p, getName(uuid), getKillStats(uuid), getDeathStats(uuid), getFlagStats(uuid), getCoreStats(uuid), getWoolStats(uuid), getMonumentStats(uuid));
 
                     } else {
                         p.sendMessage("The player not found");
                     }
                 } else {
-                    int deaths = MySQLSetterGetter.getDeaths(target.getUniqueId().toString());
-                    int kills = MySQLSetterGetter.getKills(target.getUniqueId().toString());
-                    int flags = MySQLSetterGetter.getFlags(target.getUniqueId().toString());
-                    int cores = MySQLSetterGetter.getCores(target.getUniqueId().toString());
-                    int wools = MySQLSetterGetter.getWools(target.getUniqueId().toString());
-                    int dtm = MySQLSetterGetter.getMonuments(target.getUniqueId().toString());
 
-                    stats(p, target.getName(), kills, deaths, flags, cores, wools, dtm);
+                    String uuid = target.getUniqueId().toString();
+
+                    stats(p, target.getName(), getKillStats(uuid), getDeathStats(uuid), getFlagStats(uuid), getCoreStats(uuid), getWoolStats(uuid), getMonumentStats(uuid));
                 }
             }
         }
@@ -75,8 +61,40 @@ public class StatsCommand implements CommandExecutor {
 
     private void stats(Player p, String name, int kills, int deaths, int flags, int cores, int wools, int dtm) {
         p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + name + ChatColor.RED + " ────");
-        p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd(kills, deaths).doubleValue());
+        try {
+            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd(kills, deaths).doubleValue());
+        } catch (NullPointerException ignored) {
+            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + 0 + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + 0);
+        }
         p.sendMessage(ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores);
         p.sendMessage(ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm);
+    }
+
+    private Integer getKillStats(String uuid) {
+        return MySQLSetterGetter.getKills(uuid);
+    }
+
+    private Integer getDeathStats(String uuid) {
+        return MySQLSetterGetter.getDeaths(uuid);
+    }
+
+    private Integer getFlagStats(String uuid) {
+        return MySQLSetterGetter.getFlags(uuid);
+    }
+
+    private Integer getCoreStats(String uuid) {
+        return MySQLSetterGetter.getCores(uuid);
+    }
+
+    private Integer getWoolStats(String uuid) {
+        return MySQLSetterGetter.getWools(uuid);
+    }
+
+    private Integer getMonumentStats(String uuid) {
+        return MySQLSetterGetter.getMonuments(uuid);
+    }
+
+    private String getName(String uuid) {
+        return MySQLSetterGetter.getName(uuid);
     }
 }
