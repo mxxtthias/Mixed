@@ -22,7 +22,7 @@ public class MySQLSetterGetter {
     public static void createPlayer(String uuid) {
         if (!playerExists(uuid)) {
             Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
+            Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME, DATE) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null', 'Null');");
             Main.mysql.update("INSERT INTO RANK(UUID, NAME, POINTS, RANK) VALUES ('" + uuid + "', 'Null', '0', 'Null');");
         }
     }
@@ -51,15 +51,6 @@ public class MySQLSetterGetter {
         } else {
             createPlayer(uuid);
             setName(uuid, name);
-        }
-    }
-
-    public static void addName(String uuid, String name) {
-        if(playerExists(uuid)) {
-            setName(uuid, name);
-        } else {
-            createPlayer(uuid);
-            addName(uuid, name);
         }
     }
 

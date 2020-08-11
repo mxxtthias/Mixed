@@ -28,7 +28,7 @@ public class Weekly implements Listener {
     @EventHandler
     public void addStatsOnJoinServer(PlayerJoinEvent e) {
         UUID uuid = e.getPlayer().getUniqueId();
-        Main.mysql.update("INSERT INTO mixed.WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME)" +
+        Main.mysql.update("INSERT INTO mixed.STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME)" +
                 "SELECT UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME" +
                 "FROM mixed.STATS WHERE UUID = '" + uuid +"'" +
                 "AND UUID = (SELECT UUID FROM mixed.WEEK_STATS WHERE UUID = '" + uuid + "');");
@@ -38,7 +38,7 @@ public class Weekly implements Listener {
     public void addStatsOnJoinMatch(PlayerJoinMatchEvent e) {
         UUID uuid = e.getPlayer().getId();
 
-        Main.mysql.update("INSERT INTO mixed.WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME)" +
+        Main.mysql.update("INSERT INTO mixed.STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME)" +
                 "SELECT UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME" +
                 "FROM mixed.STATS WHERE UUID = '" + uuid +"'" +
                 "AND UUID = (SELECT UUID FROM mixed.WEEK_STATS WHERE UUID = '" + uuid + "');");

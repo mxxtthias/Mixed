@@ -34,12 +34,12 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
         Bukkit.getServer().getPluginManager().registerEvents(this, this);
         new PlayerStats(this);
-        // new RankUp(this);
+        new RankUp(this);
         new Weekly(this);
 
         getCommand("stats").setExecutor(new StatsCommand());
         getCommand("ping").setExecutor(new PingCommand());
-        // getCommand("rankup").setExecutor(new RankUPCommand());
+        getCommand("rankup").setExecutor(new RankUPCommand());
 
         BroadCastMesseage broadCastMesseage = new BroadCastMesseage();
         broadCastMesseage.randomMesseage();
@@ -47,7 +47,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
     private void ConnectMySQL() {
         (mysql = new MySQL(MySQL.getDatabase(), MySQL.getUser(), MySQL.getPassword(), MySQL.getPort()))
-                .update("CREATE TABLE IF NOT EXISTS STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64), DATE varchar(10));");
+                .update("CREATE TABLE IF NOT EXISTS STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64));");
     }
 
     private void tableCreate() {
@@ -74,7 +74,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         if (!p.hasPlayedBefore()) {
             MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
             MySQLSetterGetter.setName(p.getUniqueId().toString(), p.getName());
-            // MySQLSetterGetter.addRank(p.getUniqueId().toString(), getConfig().getString("Ranks.Default"));
+            MySQLSetterGetter.addRank(p.getUniqueId().toString(), getConfig().getString("Ranks.Default"));
         }
     }
 }

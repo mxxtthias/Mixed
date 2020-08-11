@@ -24,7 +24,7 @@ public class MySQL {
 
     public void connect() {
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://45.32.51.223:" +
+            this.connection = DriverManager.getConnection("jdbc:mysql://" +  getHost() + ":" +
                             getPort() + "/" + getDatabase() + "?autoReconnect=true",
                     getUser(), getPassword());
         } catch (SQLException e) {
