@@ -9,18 +9,19 @@ import xps.Main;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class Weekly implements Listener {
 
     public void WeeklyRanking() {
 
-        LocalDate whenRankingWeekStarted = LocalDate.parse(MySQLSetterGetter.getDate());
+        LocalDate whenRankingWeekStarted = toLocalDate(Main.getInstance().getConfig().getString("WEEKLY.START"));
         LocalDate now = LocalDate.now();
         Period interval = Period.between(whenRankingWeekStarted, now);
 
         if (interval.getDays() > 7) {
-            MySQLSetterGetter.setDate(now.toString());
+            Main.getInstance().getConfig().set("WEEKLY.START", now);
             Main.mysql.update("UPDATE mixed.WEEK_STATS SET KILLS = FLAGS = CORES = WOOLS = MONUMENTS = 0;");
         }
     }
@@ -47,5 +48,11 @@ public class Weekly implements Listener {
     public Weekly(Plugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         WeeklyRanking();
+    }
+
+    private static LocalDate toLocalDate(String date) {
+
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        return LocalDate.parse(date, dtf);
     }
 }
