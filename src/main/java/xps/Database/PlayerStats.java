@@ -29,6 +29,7 @@ public class PlayerStats implements Listener, MatchModule {
         if (e.getKiller() != null) {
             murder = e.getKiller().getParty().getPlayer(e.getKiller().getId());
             MySQLSetterGetter.addKills(murder.getId().toString(), 1);
+            MySQLSetterGetter.addPoints(murder.getId().toString(), ready());
             MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
         } else {
             MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
@@ -41,6 +42,7 @@ public class PlayerStats implements Listener, MatchModule {
 
         if (player.getId() != null) {
             MySQLSetterGetter.addWools(player.getId().toString(), 1);
+            MySQLSetterGetter.addPoints(player.getId().toString(), ready());
         }
     }
 
@@ -48,6 +50,7 @@ public class PlayerStats implements Listener, MatchModule {
     public void dtc(CoreLeakEvent e) {
         for (ParticipantState ps : e.getCore().getTouchingPlayers()) {
             MySQLSetterGetter.addCores(ps.getId().toString(), 1);
+            MySQLSetterGetter.addPoints(ps.getId().toString(), ready());
         }
     }
 
@@ -57,6 +60,7 @@ public class PlayerStats implements Listener, MatchModule {
 
         if(player.getId() != null) {
             MySQLSetterGetter.addFlags(player.getId().toString(), 1);
+            MySQLSetterGetter.addPoints(player.getId().toString(), ready());
         }
     }
 
@@ -64,6 +68,7 @@ public class PlayerStats implements Listener, MatchModule {
     public void dtm(DestroyableDestroyedEvent e) {
         for (DestroyableContribution dc : e.getDestroyable().getContributions()) {
             MySQLSetterGetter.addMonuments(dc.getPlayerState().getId().toString(), 1);
+            MySQLSetterGetter.addPoints(dc.getPlayerState().getId().toString(), ready());
         }
     }
 
@@ -72,6 +77,10 @@ public class PlayerStats implements Listener, MatchModule {
         if(e.getPlayer().isBanned()) {
             Main.mysql.update("DELETE FROM STATS WHERE UUID= '" + e.getPlayer().getUniqueId() + "'");
         }
+    }
+
+    private Integer ready() {
+        return 0;
     }
 
     public PlayerStats(Plugin plugin) {
