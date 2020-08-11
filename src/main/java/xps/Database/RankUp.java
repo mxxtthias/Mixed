@@ -17,9 +17,9 @@ import java.util.*;
 public class RankUp implements Listener {
 
     public final Map<Integer, String> ranks = new HashMap<>();
+    private final FileConfiguration config = Main.getInstance().getCustomConfig();
 
     private void setRanks() {
-        FileConfiguration config = Main.getInstance().getConfig();
         // WOOD Rank
         ranks.put(config.getInt("Ranks.WOOD.III.Points"), config.getString("Ranks.WOOD.III"));
         ranks.put(config.getInt("Ranks.WOOD.II.Points"), config.getString("Ranks.WOOD.II"));
@@ -90,38 +90,38 @@ public class RankUp implements Listener {
         String nowRank = MySQLSetterGetter.getRank(player.getUniqueId().toString());
         String prefix = "";
 
-        for(String wood : Main.getInstance().getConfig().getConfigurationSection("Ranks.WOOD").getKeys(false)) {
+        for(String wood : config.getConfigurationSection("Ranks.WOOD").getKeys(false)) {
             if(nowRank.equals(wood)) {
                 prefix = ChatColor.GRAY + wood;
             }
         }
-        for(String stone : Main.getInstance().getConfig().getConfigurationSection("Ranks.STONE").getKeys(false)) {
+        for(String stone : config.getConfigurationSection("Ranks.STONE").getKeys(false)) {
             if(nowRank.equals(stone)) {
                 prefix = ChatColor.GRAY + stone;
             }
         }
-        for(String iron : Main.getInstance().getConfig().getConfigurationSection("Ranks.IRON").getKeys(false)) {
+        for(String iron : config.getConfigurationSection("Ranks.IRON").getKeys(false)) {
             if(nowRank.equals(iron)) {
                 prefix = ChatColor.WHITE + iron;
             }
         }
-        for(String gold : Main.getInstance().getConfig().getConfigurationSection("Ranks.GOLD").getKeys(false)) {
+        for(String gold : config.getConfigurationSection("Ranks.GOLD").getKeys(false)) {
             if(nowRank.equals(gold)) {
                 prefix = ChatColor.YELLOW + gold;
             }
         }
-        for(String emerald : Main.getInstance().getConfig().getConfigurationSection("Ranks.EMERALD").getKeys(false)) {
+        for(String emerald : config.getConfigurationSection("Ranks.EMERALD").getKeys(false)) {
             if(nowRank.equals(emerald)) {
                 prefix = ChatColor.GREEN + emerald;
             }
         }
-        for(String diamond : Main.getInstance().getConfig().getConfigurationSection("Ranks.DIAMOND").getKeys(false)) {
+        for(String diamond : config.getConfigurationSection("Ranks.DIAMOND").getKeys(false)) {
             if(nowRank.equals(diamond)) {
                 prefix = ChatColor.AQUA + diamond;
             }
         }
-        if(nowRank.equals(Main.getInstance().getConfig().getString("Ranks.OBSIDIAN"))) {
-            String obsidian = Main.getInstance().getConfig().getString("Ranks.OBSIDIAN");
+        if(nowRank.equals(config.getString("Ranks.OBSIDIAN"))) {
+            String obsidian = config.getString("Ranks.OBSIDIAN");
             prefix = ChatColor.DARK_PURPLE + obsidian;
         }
         return prefix;

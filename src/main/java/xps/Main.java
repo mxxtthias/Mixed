@@ -2,7 +2,9 @@ package xps;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +16,9 @@ import xps.Command.StatsCommand;
 import xps.Database.*;
 import xps.Task.BroadCastMesseage;
 
+import java.io.File;
+import java.io.IOException;
+
 
 public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
@@ -22,10 +27,14 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
     FileConfiguration config = getConfig();
 
+    private File customConfigFile;
+    private FileConfiguration customConfig;
+
     @Override
     public void onEnable() {
         instance = this;
 
+        createCustomConfig();
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -59,8 +68,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
                 "CORES int, " +
                 "WOOLS int, " +
                 "MONUMENTS int, " +
-                "NAME varchar(64), " +
-                "DATE varchar(12);");
+                "NAME varchar(64)");
     }
 
     public static Main getInstance() {
@@ -75,6 +83,22 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
             MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
             MySQLSetterGetter.setName(p.getUniqueId().toString(), p.getName());
             MySQLSetterGetter.addRank(p.getUniqueId().toString(), getConfig().getString("Ranks.Default"));
+        }
+    }
+
+    public FileConfiguration getCustomConfig() {
+        return this.customConfig;
+    }
+
+    private void createCustomConfig() {
+        customConfigFile = new File(getDataFolder(), "ranks.yml");
+
+        customConfig = new YamlConfiguration();
+
+        try {
+            customConfig.load(customConfigFile);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
         }
     }
 }

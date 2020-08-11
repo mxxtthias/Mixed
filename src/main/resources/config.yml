@@ -8,49 +8,6 @@ MySQL:
 Messeages:
   - "" # Messeages
 
-Ranks:
-  WOOD:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  STONE:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  IRON:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  GOLD:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  EMERALD:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  DIAMOND:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  OBSIDIAN:
-    Points:
+WEEKLY:
+  START: ""
 
