@@ -22,7 +22,7 @@ public class MySQLSetterGetter {
     public static void createPlayer(String uuid) {
         if (!playerExists(uuid)) {
             Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME, DATE) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null', 'Null');");
+            Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
             Main.mysql.update("INSERT INTO RANK(UUID, NAME, POINTS, RANK) VALUES ('" + uuid + "', 'Null', '0', 'Null');");
         }
     }
@@ -198,19 +198,6 @@ public class MySQLSetterGetter {
         return i;
     }
 
-    public static String getDate() {
-        String i = "";
-        try {
-            ResultSet rs = Main.mysql.query("SELECT * FROM WEEK_STATS");
-            if (rs.next())
-                rs.getString("DATE");
-            i = rs.getString("DATE");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return i;
-    }
-
     /* Monuments */
 
     public static void setMonuments(String uuid, int monuments) {
@@ -369,11 +356,5 @@ public class MySQLSetterGetter {
             createPlayer(uuid);
             addRank(uuid, rank);
         }
-    }
-
-    /* Date */
-
-    public static void setDate(String date) {
-        Main.mysql.update("UPDATE WEEK_STATS SET DATE= '" + date + "';");
     }
 }
