@@ -20,7 +20,7 @@ public class BroadCastMesseage {
             public void run() {
                 Bukkit.broadcastMessage(prefix + ChatColor.translateAlternateColorCodes('&', random(messeage)));
             }
-        }.runTaskTimer(Main.getInstance(), 0L, 20 * 60 * 4);
+        }.runTaskTimer(Main.getInstance(), 0L, 20 * 60 * 5);
     }
 
     private String random(String msg) {

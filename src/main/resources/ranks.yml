@@ -1,45 +1,58 @@
 Ranks:
-  WOOD:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  STONE:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  IRON:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  GOLD:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  EMERALD:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
-  DIAMOND:
-    III:
-      Points:
-    II:
-      Points:
-    I:
-      Points:
+  WOOD_III:
+    prefix: "&7III"
+    Points: 0
+  WOOD_II:
+    prefix: "&7II"
+    Points: 250
+  WOOD_I:
+    prefix: "&7I"
+    Points: 500
+  STONE_III:
+    prefix: "&7III"
+    Points: 1000
+  STONE_II:
+    prefix: "&7II"
+    Points: 1500
+  STONE_I:
+    prefix: "&7I"
+    Points: 2000
+  IRON_III:
+    prefix: "&fIII"
+    Points: 3000
+  IRON_II:
+    prefix: "&fII"
+    Points: 4000
+  IRON_I:
+    prefix: "&fI"
+    Points: 5000
+  GOLD_III:
+    prefix: "&eIII"
+    Points: 6000
+  GOLD_II:
+    prefix: "&eII"
+    Points: 8000
+  GOLD_I:
+    prefix: "&eI"
+    Points: 10000
+  EMERALD_III:
+    prefix: "&aIII"
+    Points: 12000
+  EMERALD_II:
+    prefix: "&aII"
+    Points: 15000
+  EMERALD_I:
+    prefix: "&aI"
+    Points: 20000
+  DIAMOND_III:
+    prefix: "&bIII"
+    Points: 30000
+  DIAMOND_II:
+    prefix: "&bII"
+    Points: 40000
+  DIAMOND_I:
+    prefix: "&bI"
+    Points: 50000
   OBSIDIAN:
-    Points:
+    prefix: "&5O"
+    Points: 100000

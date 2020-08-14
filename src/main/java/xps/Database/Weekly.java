@@ -7,13 +7,16 @@ import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.events.PlayerJoinMatchEvent;
 import xps.Main;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.UUID;
 
 public class Weekly implements Listener {
 
+    /*
     public void WeeklyRanking() {
 
         LocalDate whenRankingWeekStarted = toLocalDate(Main.getInstance().getConfig().getString("WEEKLY.START"));
@@ -52,7 +55,9 @@ public class Weekly implements Listener {
 
     private static LocalDate toLocalDate(String date) {
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-        return LocalDate.parse(date, dtf);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+        return sdf.parse();
     }
+
+     */
 }

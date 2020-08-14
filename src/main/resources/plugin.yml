@@ -1,5 +1,5 @@
 name: Mixed
-version: 1.0
+version: 2.0-SNAPSHOT
 author: XPS
 main: xps.Main
 commands:
@@ -11,11 +11,15 @@ commands:
     description: ping
     usage: /<command>
     default: true
-  ranks:
-    description: ranks
+  rank:
+    description: rank
     usage: /<command>
     default: true
-  rankup:
-    description: rankup
+  point:
+    description: point
+    usage: /<command>
+    default: true
+  points:
+    description: points
     usage: /<command>
     default: true

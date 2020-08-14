@@ -11,7 +11,7 @@ public class MySQLSetterGetter {
         try {
             ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
             ResultSet week_rs = Main.mysql.query("SELECT * FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
-            ResultSet rank_rs = Main.mysql.query("SELECT * FROM RANK WHERE UUID= '" + uuid + "'");
+            ResultSet rank_rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
             return (rs.next() && rs.getString("UUID") != null || week_rs.next() && week_rs.getString("UUID") != null || rank_rs.next() && rank_rs.getString("UUID") != null);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -23,7 +23,7 @@ public class MySQLSetterGetter {
         if (!playerExists(uuid)) {
             Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
             Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO RANK(UUID, NAME, POINTS, RANK) VALUES ('" + uuid + "', 'Null', '0', 'Null');");
+            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK) VALUES ('" + uuid + "', 'Null', '0', 'WOOD_III');");
         }
     }
 
@@ -48,6 +48,8 @@ public class MySQLSetterGetter {
     public static void setName(String uuid, String name) {
         if (playerExists(uuid)) {
             Main.mysql.update("UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setName(uuid, name);
@@ -166,7 +168,7 @@ public class MySQLSetterGetter {
         int i = 0;
         if (playerExists(uuid)) {
             try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM RANK WHERE UUID= '" + uuid + "'");
+                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
                 if(rs.next())
                     rs.getInt("POINTS");
                 i = rs.getInt("POINTS");
@@ -184,10 +186,10 @@ public class MySQLSetterGetter {
         String i = "";
         if (playerExists(uuid)) {
             try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM RANK WHERE UUID= '" + uuid + "'");
+                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
                 if(rs.next())
-                    rs.getString("RANK");
-                i = rs.getString("RANK");
+                    rs.getString("GAMERANK");
+                i = rs.getString("GAMERANK");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -322,7 +324,7 @@ public class MySQLSetterGetter {
 
     public static void setPoints(String uuid, Integer points) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANK SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE RANKS SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setPoints(uuid, points);
@@ -342,19 +344,10 @@ public class MySQLSetterGetter {
 
     public static void setRank(String uuid, String rank) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANK SET RANK= '" + rank + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE RANKS SET GAMERANK= '" + rank + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setRank(uuid, rank);
-        }
-    }
-
-    public static void addRank(String uuid, String rank) {
-        if(playerExists(uuid)) {
-            setRank(uuid, rank);
-        } else {
-            createPlayer(uuid);
-            addRank(uuid, rank);
         }
     }
 }
