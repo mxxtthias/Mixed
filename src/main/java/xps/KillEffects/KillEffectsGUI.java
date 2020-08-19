@@ -22,25 +22,32 @@ public class KillEffectsGUI implements Listener {
     private final getPlayerData playerData = new getPlayerData();
 
     public KillEffectsGUI() {
-        EffectsGUI = Bukkit.createInventory(null, 9, "Kill Effect Selector");
+        EffectsGUI = Bukkit.createInventory(null, 27, "Kill Effect Selector");
         addIconItems();
     }
 
     private void addIconItems() {
 
         ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-        ItemMeta meta = reset.getItemMeta();
+        ItemMeta reset_meta = reset.getItemMeta();
 
-        meta.setDisplayName(ChatColor.RED + "Reset Kill Effect");
-        reset.setItemMeta(meta);
+        reset_meta.setDisplayName(ChatColor.RED + "Reset Kill Effect");
+        reset.setItemMeta(reset_meta);
 
-        EffectsGUI.setItem(0, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "BLOOD", ChatColor.YELLOW + "Click to Select!"));
-        EffectsGUI.setItem(1, createGuiItem(Material.GOLDEN_APPLE, ChatColor.AQUA + "HEART", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(2, createGuiItem(Material.FIREWORK_CHARGE, ChatColor.AQUA + "SMOKE", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(3, createGuiItem(Material.LAVA_BUCKET, ChatColor.AQUA + "FLAME", ChatColor.YELLOW + "Click to select!"));
-        EffectsGUI.setItem(4, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW", ChatColor.YELLOW + "Click to select!"));
-        EffectsGUI.setItem(7, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(8, reset);
+        ItemStack back = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+        ItemMeta back_meta = reset.getItemMeta();
+
+        back_meta.setDisplayName(ChatColor.RED + "Go to previous page ⇒");
+        reset.setItemMeta(back_meta);
+
+        EffectsGUI.setItem(1, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "BLOOD", ChatColor.YELLOW + "Click to Select!"));
+        EffectsGUI.setItem(19, createGuiItem(Material.GOLDEN_APPLE, ChatColor.AQUA + "HEART", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(20, createGuiItem(Material.FIREWORK_CHARGE, ChatColor.AQUA + "SMOKE", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(2, createGuiItem(Material.LAVA_BUCKET, ChatColor.AQUA + "FLAME", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(3, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(21, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(27, reset);
+        EffectsGUI.setItem(8, back);
     }
 
     @EventHandler
@@ -57,6 +64,9 @@ public class KillEffectsGUI implements Listener {
 
                 if (clickedItem.hasItemMeta()) {
                     if (clickedItem.getItemMeta().hasDisplayName()) {
+                        if(getItemName.equals(ChatColor.RED + "Go to previous page ⇒")) {
+                            player.openInventory(DefaultGUI.gui);
+                        }
                         if (getItemName.equals(ChatColor.RED + "Reset Kill Effect")) {
                             MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
                             player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Effect");

@@ -21,7 +21,7 @@ public class KillSoundsGUI implements Listener {
     private final getPlayerData playerData = new getPlayerData();
 
     public KillSoundsGUI() {
-        SoundsGUI = Bukkit.createInventory(null, 9, "Kill Sound Selector");
+        SoundsGUI = Bukkit.createInventory(null, 27, "Kill Sound Selector");
         addIconItems();
     }
 
@@ -33,11 +33,18 @@ public class KillSoundsGUI implements Listener {
         meta.setDisplayName(ChatColor.RED + "Reset Kill Sound");
         reset.setItemMeta(meta);
 
-        SoundsGUI.setItem(0, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(1, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(2, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(3, createGuiItem(Material.IRON_INGOT, ChatColor.AQUA + "GOLEM", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(8, reset);
+        ItemStack back = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+        ItemMeta back_meta = reset.getItemMeta();
+
+        back_meta.setDisplayName(ChatColor.RED + "Go to previous page ⇒");
+        reset.setItemMeta(back_meta);
+
+        SoundsGUI.setItem(10, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(16, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
+        SoundsGUI.setItem(14, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
+        SoundsGUI.setItem(12, createGuiItem(Material.IRON_INGOT, ChatColor.AQUA + "GOLEM", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(26, reset);
+        SoundsGUI.setItem(8, back);
     }
 
     @EventHandler
@@ -54,6 +61,9 @@ public class KillSoundsGUI implements Listener {
 
                 if (clickedItem.hasItemMeta()) {
                     if (clickedItem.getItemMeta().hasDisplayName()) {
+                        if(getItemName.equals(ChatColor.RED + "Go to previous page ⇒")) {
+                            player.openInventory(DefaultGUI.gui);
+                        }
                         if (getItemName.equals(ChatColor.RED + "Reset Kill Sound")) {
                             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
                             player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Sound");

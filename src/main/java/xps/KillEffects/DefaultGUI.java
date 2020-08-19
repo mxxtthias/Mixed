@@ -19,7 +19,7 @@ import java.util.Arrays;
 
 public class DefaultGUI implements Listener, CommandExecutor {
 
-    private final Inventory gui;
+    public static Inventory gui;
 
     public DefaultGUI() {
         gui = Bukkit.createInventory(null, 27, "Kill Effect/Sound Selector");
