@@ -23,7 +23,7 @@ public class MySQLSetterGetter {
         if (!playerExists(uuid)) {
             Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
             Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND) VALUES ('" + uuid + "', 'Null', '0', 'wood_iii', 'NONE', 'NONE');");
+            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND) VALUES ('" + uuid + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT');");
         }
     }
 
