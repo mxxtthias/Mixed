@@ -37,7 +37,7 @@ public class KillEffectsGUI implements Listener {
         ItemStack back = new ItemStack(Material.ARROW, 1);
         ItemMeta back_meta = back.getItemMeta();
 
-        back_meta.setDisplayName(ChatColor.RED + "Go to previous page ⇒");
+        back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
         back.setItemMeta(back_meta);
 
         EffectsGUI.setItem(0, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "BLOOD", ChatColor.YELLOW + "Click to Select!"));
@@ -64,65 +64,55 @@ public class KillEffectsGUI implements Listener {
 
                 if (clickedItem.hasItemMeta()) {
                     if (clickedItem.getItemMeta().hasDisplayName()) {
-                        if(getItemName.equals(ChatColor.RED + "Go to previous page ⇒")) {
+                        if(getItemName.equals(ChatColor.RED + "Go to previous page ➡")) {
                             player.openInventory(DefaultGUI.gui);
                         }
                         if (getItemName.equals(ChatColor.RED + "Reset Kill Effect")) {
                             MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
                             player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Effect");
-                            player.closeInventory();
                         } else if (getItemName.equals(ChatColor.AQUA + "BLOOD")) {
                             if (playerData.hasRequirePoint(player.getUniqueId().toString(), KillEffectsConfig.getCustomConfig().getInt("BLOOD.points"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "BLOOD");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BLOOD Kill Effect");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have enough points");
+                                player.sendMessage(ChatColor.RED + "You don't have enough points");
                             }
-                            player.updateInventory();
                         } else if (getItemName.equals(ChatColor.AQUA + "HEART")) {
                             if (playerData.hasDonorRank(player)) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "HEART");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "HEART kill effect.");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have the donor rank");
+                                player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
-                            player.updateInventory();
 
                         } else if (getItemName.equals(ChatColor.AQUA + "SMOKE")) {
                             if (playerData.hasDonorRank(player)) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "SMOKE");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "SMOKE kill effect.");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have the donor rank");
+                                player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
-                            player.updateInventory();
-
                         } else if (getItemName.equals(ChatColor.AQUA + "FLAME")) {
                             if (playerData.hasRequirePoint(player.getUniqueId().toString(), KillEffectsConfig.getCustomConfig().getInt("FLAME.points"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "FLAME");
                                 player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " FLAME kill effect.");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have enought points");
+                                player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }
-                            player.updateInventory();
-
                         } else if (getItemName.equals(ChatColor.DARK_PURPLE + "RAINBOW")) {
                             if (playerData.hasRequirePoint(player.getUniqueId().toString(), KillEffectsConfig.getCustomConfig().getInt("RAINBOW.points"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "RAINBOW");
                                 player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " RAINBOW kill effect.");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have enought points");
+                                player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }
-                            player.updateInventory();
-
                         } else if (getItemName.equals(ChatColor.GOLD + "DONOR")) {
                             if (player.hasPermission("pgm.group.donor")) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
                                 player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " DONOR kill effect.");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have the donor rank");
+                                player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
-                            player.updateInventory();
                         }
                     }
                 }
