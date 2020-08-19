@@ -1,7 +1,8 @@
-package xps.Database;
+package xps.Statics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -18,14 +19,18 @@ import tc.oc.pgm.destroyable.DestroyableDestroyedEvent;
 import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.flag.event.FlagCaptureEvent;
 import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
+import xps.Database.MySQLSetterGetter;
+import xps.RankSystem.ChatPrefix;
 import xps.RankSystem.Ranks;
 
 @ListenerScope(MatchScope.RUNNING)
 public class PlayerStats implements Listener, MatchModule {
 
-    private final String blank = "                    ";
-    private final String line_1 = ChatColor.YELLOW + "" + ChatColor.BOLD + "〓〓〓〓〓〓〓" + ChatColor.RED + "" + ChatColor.BOLD + " Rank UP! " + ChatColor.YELLOW + "" + ChatColor.BOLD + "〓〓〓〓〓〓〓";
-    private final String line_2 = ChatColor.YELLOW + "" + ChatColor.BOLD + "〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓";
+    private final ChatPrefix chatPrefix = new ChatPrefix();
+
+    private final String blank = "            ";
+    private final String line_1 = ChatColor.YELLOW + "" + ChatColor.BOLD + "〓〓〓〓〓〓" + ChatColor.RED + "" + ChatColor.BOLD + " Rank UP! " + ChatColor.YELLOW + "" + ChatColor.BOLD + "〓〓〓〓〓〓";
+    private final String line_2 = ChatColor.YELLOW + "" + ChatColor.BOLD + "〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓";
 
     @EventHandler
     public void onKill(MatchPlayerDeathEvent e) {
@@ -41,11 +46,15 @@ public class PlayerStats implements Listener, MatchModule {
             MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
 
             if (Ranks.canRankUp(murder.getId().toString())) {
+
+                Bukkit.broadcastMessage(murder.getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(murder.getId().toString()));
+                chatPrefix.setPrefixPermission(murder.getId());
+
+                murder.getBukkit().playSound(murder.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
                 murder.sendMessage(line_1);
-                murder.sendMessage(blank + Ranks.getRankCurrent(murder.getId().toString()) + ChatColor.GRAY + " ⇒ " + Ranks.getRankNext(murder.getId().toString()));
+                murder.sendMessage(blank + Ranks.getRankCurrent(murder.getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + " ⇒ " + Ranks.getRankNext(murder.getId().toString()));
                 murder.sendMessage(line_2);
 
-                Bukkit.broadcastMessage(murder.getPrefixedName() + ChatColor.RED + " has been Rank up! " + ChatColor.YELLOW + Ranks.getRankNext(murder.getId().toString()));
 
                 MySQLSetterGetter.setRank(murder.getId().toString(), Ranks.getNextRank(murder.getId().toString()));
             }
@@ -62,11 +71,14 @@ public class PlayerStats implements Listener, MatchModule {
         if (player.getId() != null) {
             MySQLSetterGetter.addWools(player.getId().toString(), 1);
             if (Ranks.canRankUp(player.getId().toString())) {
-                player.sendMessage(line_1);
-                player.sendMessage(blank + Ranks.getRankCurrent(player.getId().toString()) + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(player.getId().toString()));
-                player.sendMessage(line_2);
 
-                Bukkit.broadcastMessage(player.getPlayer().get().getPrefixedName() + ChatColor.RED + " has been Rank up! " + ChatColor.YELLOW + Ranks.getRankNext(player.getId().toString()));
+                Bukkit.broadcastMessage(player.getPlayer().get().getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(player.getId().toString()));
+                chatPrefix.setPrefixPermission(player.getId());
+
+                player.getParty().getPlayer(player.getId()).getBukkit().playSound(player.getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
+                player.sendMessage(line_1);
+                player.sendMessage(blank + Ranks.getRankCurrent(player.getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(player.getId().toString()));
+                player.sendMessage(line_2);
 
                 MySQLSetterGetter.setRank(player.getId().toString(), Ranks.getNextRank(player.getId().toString()));
             }
@@ -80,11 +92,14 @@ public class PlayerStats implements Listener, MatchModule {
             MySQLSetterGetter.addPoints(ps.getId().toString(), 25);
 
             if (Ranks.canRankUp(ps.getId().toString())) {
-                ps.sendMessage(line_1);
-                ps.sendMessage(blank + Ranks.getRankCurrent(ps.getId().toString()) + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(ps.getId().toString()));
-                ps.sendMessage(line_2);
 
-                Bukkit.broadcastMessage(ps.getPlayer().get().getPrefixedName() + ChatColor.RED + " has been Rank up! " + ChatColor.YELLOW + Ranks.getNextRank(ps.getId().toString()));
+                Bukkit.broadcastMessage(ps.getPlayer().get().getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(ps.getId().toString()));
+                chatPrefix.setPrefixPermission(ps.getId());
+
+                ps.getParty().getPlayer(ps.getId()).getBukkit().playSound(ps.getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
+                ps.sendMessage(line_1);
+                ps.sendMessage(blank + Ranks.getRankCurrent(ps.getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(ps.getId().toString()));
+                ps.sendMessage(line_2);
 
                 MySQLSetterGetter.setRank(ps.getId().toString(), Ranks.getNextRank(ps.getId().toString()));
             }
@@ -99,11 +114,14 @@ public class PlayerStats implements Listener, MatchModule {
             MySQLSetterGetter.addPoints(player.getId().toString(), 15);
 
             if (Ranks.canRankUp(player.getId().toString())) {
-                player.sendMessage(line_1);
-                player.sendMessage(blank + Ranks.getRankCurrent(player.getId().toString()) + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(player.getId().toString()));
-                player.sendMessage(line_2);
 
-                Bukkit.broadcastMessage(player.getPrefixedName() + ChatColor.RED + " has been Rank up! " + ChatColor.YELLOW + Ranks.getRankNext(player.getId().toString()));
+                Bukkit.broadcastMessage(player.getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(player.getId().toString()));
+                chatPrefix.setPrefixPermission(player.getId());
+
+                player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
+                player.sendMessage(line_1);
+                player.sendMessage(blank + Ranks.getRankCurrent(player.getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(player.getId().toString()));
+                player.sendMessage(line_2);
 
                 MySQLSetterGetter.setRank(player.getId().toString(), Ranks.getNextRank(player.getId().toString()));
             }
@@ -117,11 +135,14 @@ public class PlayerStats implements Listener, MatchModule {
             MySQLSetterGetter.addPoints(dc.getPlayerState().getId().toString(), 25);
 
             if (Ranks.canRankUp(dc.getPlayerState().getId().toString())) {
-                dc.getPlayerState().sendMessage(line_1);
-                dc.getPlayerState().sendMessage(blank + Ranks.getRankCurrent(dc.getPlayerState().getId().toString()) + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(dc.getPlayerState().getId().toString()));
-                dc.getPlayerState().sendMessage(line_2);
 
-                Bukkit.broadcastMessage(dc.getPlayerState().getPlayer().get().getPrefixedName() + ChatColor.RED + " has been Rank up! " + ChatColor.YELLOW + Ranks.getRankNext(dc.getPlayerState().getId().toString()));
+                Bukkit.broadcastMessage(dc.getPlayerState().getPlayer().get().getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(dc.getPlayerState().getId().toString()));
+                chatPrefix.setPrefixPermission(dc.getPlayerState().getId());
+
+                dc.getPlayerState().getParty().getPlayer(dc.getPlayerState().getId()).getBukkit().playSound(dc.getPlayerState().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
+                dc.getPlayerState().sendMessage(line_1);
+                dc.getPlayerState().sendMessage(blank + Ranks.getRankCurrent(dc.getPlayerState().getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(dc.getPlayerState().getId().toString()));
+                dc.getPlayerState().sendMessage(line_2);
 
                 MySQLSetterGetter.setRank(dc.getPlayerState().getId().toString(), Ranks.getNextRank(dc.getPlayerState().getId().toString()));
             }
@@ -134,11 +155,13 @@ public class PlayerStats implements Listener, MatchModule {
             MySQLSetterGetter.addPoints(player.getId().toString(), 10);
             if (Ranks.canRankUp(player.getId().toString())) {
 
-                player.sendMessage(line_1);
-                player.sendMessage(blank + Ranks.getRankCurrent(player.getId().toString()) + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(player.getId().toString()));
-                player.sendMessage(line_2);
+                Bukkit.broadcastMessage(player.getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(player.getId().toString()));
+                chatPrefix.setPrefixPermission(player.getId());
 
-                Bukkit.broadcastMessage(player.getPrefixedName() + ChatColor.RED + " has been Rank up! " + ChatColor.YELLOW + Ranks.getRankNext(player.getId().toString()));
+                player.getBukkit().playSound(player.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
+                player.sendMessage(line_1);
+                player.sendMessage(blank + Ranks.getRankCurrent(player.getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + "" + ChatColor.BOLD + " ⇒ " + Ranks.getRankNext(player.getId().toString()));
+                player.sendMessage(line_2);
 
                 MySQLSetterGetter.setRank(player.getId().toString(), Ranks.getNextRank(player.getId().toString()));
             }

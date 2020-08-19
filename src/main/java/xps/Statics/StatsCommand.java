@@ -1,4 +1,4 @@
-package xps.Command;
+package xps.Statics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -64,7 +64,7 @@ public class StatsCommand implements CommandExecutor {
         try {
             p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd(kills, deaths).doubleValue());
         } catch (NullPointerException ignored) {
-            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + 0 + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + 0);
+            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths);
         }
         p.sendMessage(ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores);
         p.sendMessage(ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm);

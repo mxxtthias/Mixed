@@ -23,7 +23,7 @@ public class MySQLSetterGetter {
         if (!playerExists(uuid)) {
             Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
             Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK) VALUES ('" + uuid + "', 'Null', '0', 'WOOD_III');");
+            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND) VALUES ('" + uuid + "', 'Null', '0', 'wood_iii', 'NONE', 'NONE');");
         }
     }
 
@@ -31,7 +31,7 @@ public class MySQLSetterGetter {
         String i = "";
         if (playerExists(uuid)) {
             try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
+                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
                 if (rs.next())
                     rs.getString("NAME");
                 i = rs.getString("NAME");
@@ -200,11 +200,48 @@ public class MySQLSetterGetter {
         return i;
     }
 
+    public static String getKillEffect(String uuid) {
+        String i = "";
+        if (playerExists(uuid)) {
+            try {
+                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+                if(rs.next())
+                    rs.getString("EFFECT");
+                i = rs.getString("EFFECT");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            createPlayer(uuid);
+            getKillEffect(uuid);
+        }
+        return i;
+    }
+
+    public static String getKillSound(String uuid) {
+        String i = "";
+        if (playerExists(uuid)) {
+            try {
+                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+                if(rs.next())
+                    rs.getString("SOUND");
+                i = rs.getString("SOUND");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            createPlayer(uuid);
+            getKillSound(uuid);
+        }
+        return i;
+    }
+
     /* Monuments */
 
     public static void setMonuments(String uuid, int monuments) {
         if(playerExists(uuid)) {
             Main.mysql.update("UPDATE WEEK_STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setMonuments(uuid, monuments);
@@ -225,6 +262,7 @@ public class MySQLSetterGetter {
     public static void setKills(String uuid, Integer kills) {
         if (playerExists(uuid)) {
             Main.mysql.update("UPDATE WEEK_STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setKills(uuid, kills);
@@ -245,6 +283,7 @@ public class MySQLSetterGetter {
     public static void setDeaths(String uuid, Integer deaths) {
         if (playerExists(uuid)) {
             Main.mysql.update("UPDATE WEEK_STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setDeaths(uuid, deaths);
@@ -265,6 +304,7 @@ public class MySQLSetterGetter {
     public static void setWools(String uuid, Integer wools) {
         if (playerExists(uuid)) {
             Main.mysql.update("UPDATE WEEK_STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setWools(uuid, wools);
@@ -285,6 +325,7 @@ public class MySQLSetterGetter {
     public static void setCores(String uuid, Integer cores) {
         if(playerExists(uuid)) {
             Main.mysql.update("UPDATE WEEK_STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setCores(uuid, cores);
@@ -305,6 +346,7 @@ public class MySQLSetterGetter {
     public static void setFlags(String uuid, Integer flags) {
         if(playerExists(uuid)) {
             Main.mysql.update("UPDATE WEEK_STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
             setFlags(uuid, flags);
@@ -348,6 +390,27 @@ public class MySQLSetterGetter {
         } else {
             createPlayer(uuid);
             setRank(uuid, rank);
+        }
+    }
+
+    /* KillEffect */
+
+    public static void setKillEffect(String uuid, String effect) {
+        if(playerExists(uuid)) {
+            Main.mysql.update("UPDATE RANKS SET EFFECT= '" + effect + "' WHERE UUID= '" + uuid + "';");
+        } else {
+            createPlayer(uuid);
+            setKillEffect(uuid, effect);
+        }
+    }
+
+    /* KillSound */
+    public static void setKillSound(String uuid, String effect) {
+        if(playerExists(uuid)) {
+            Main.mysql.update("UPDATE RANKS SET SOUND= '" + effect + "' WHERE UUID= '" + uuid + "';");
+        } else {
+            createPlayer(uuid);
+            setKillSound(uuid, effect);
         }
     }
 }

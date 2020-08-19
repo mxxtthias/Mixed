@@ -11,15 +11,15 @@ commands:
     description: ping
     usage: /<command>
     default: true
+  effect:
+    description: effects
+    usage: /<command>
+    default: true
   rank:
     description: rank
     usage: /<command>
     default: true
-  point:
-    description: point
-    usage: /<command>
-    default: true
-  points:
-    description: points
+  sound:
+    description: sound
     usage: /<command>
     default: true

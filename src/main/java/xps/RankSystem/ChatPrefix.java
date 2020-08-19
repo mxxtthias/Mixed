@@ -1,29 +1,33 @@
 package xps.RankSystem;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.entity.Player;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
-import tc.oc.pgm.api.PGM;
-import tc.oc.pgm.events.PlayerJoinMatchEvent;
-import tc.oc.pgm.events.PlayerPartyChangeEvent;
+import java.util.UUID;
 
 public class ChatPrefix implements Listener {
 
-    @EventHandler
-    public void matchJoinPrefix(PlayerJoinMatchEvent e) {
-        Player player = e.getPlayer().getBukkit();
-        player.setDisplayName(PGM.get().getNameDecorationRegistry().getDecoratedName(player, e.getNewParty()) + Ranks.getPrefix(player.getUniqueId().toString()));
+    public void setPrefixPermission(UUID uuid) {
+        LuckPerms api = LuckPermsProvider.get();
+        User user = api.getUserManager().getUser(uuid);
+
+        removeGroup(user, Ranks.getCurrentRank(uuid.toString()));
+
+        addGroup(user, Ranks.getNextRank(uuid.toString()));
+
+        api.getUserManager().saveUser(user);
     }
 
-    @EventHandler
-    public void partyChange(PlayerPartyChangeEvent e) {
-        Player player = e.getPlayer().getBukkit();
-
-        player.setDisplayName(PGM.get().getNameDecorationRegistry().getDecoratedName(player, e.getNewParty()) + Ranks.getPrefix(player.getUniqueId().toString()));
+    private static void addGroup(User user, String groupName) {
+        PermissionNode node = PermissionNode.builder("pgm.group." + groupName).build();
+        user.data().add(node);
     }
 
-    public ChatPrefix(Plugin plugin) {
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    private static void removeGroup(User user, String groupName) {
+        PermissionNode node = PermissionNode.builder("pgm.group." + groupName).build();
+        user.data().remove(node);
     }
 }
+

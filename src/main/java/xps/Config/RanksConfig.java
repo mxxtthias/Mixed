@@ -1,4 +1,4 @@
-package xps;
+package xps.Config;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -11,19 +11,19 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 
-public class CustomConfig {
+public class RanksConfig {
 
     private static FileConfiguration config = null;
     private static File configFile;
     private static String file;
     private static Plugin plugin;
 
-    public CustomConfig(Plugin plugin) {
+    public RanksConfig(Plugin plugin) {
         this(plugin, null);
     }
 
-    public CustomConfig(Plugin plugin, String fileName) {
-        CustomConfig.plugin = plugin;
+    public RanksConfig(Plugin plugin, String fileName) {
+        RanksConfig.plugin = plugin;
         file = fileName;
         configFile = new File(plugin.getDataFolder(), file);
     }
@@ -39,12 +39,6 @@ public class CustomConfig {
         config.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, StandardCharsets.UTF_8)));
     }
 
-    public void saveDefaultConfig() {
-        if (!configFile.exists()) {
-            plugin.saveResource(file, false);
-        }
-    }
-
     public static FileConfiguration getCustomConfig() {
         if (config == null) {
             reloadConfig();
@@ -57,7 +51,7 @@ public class CustomConfig {
             return;
         }
         try {
-            CustomConfig.getCustomConfig().save(configFile);
+            RanksConfig.getCustomConfig().save(configFile);
         } catch (IOException ex) {
             plugin.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
         }

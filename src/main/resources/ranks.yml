@@ -1,58 +1,39 @@
 Ranks:
-  WOOD_III:
-    prefix: "&7III"
+  wood_iii:
     Points: 0
-  WOOD_II:
-    prefix: "&7II"
+  wood_ii:
     Points: 250
-  WOOD_I:
-    prefix: "&7I"
+  wood_i:
     Points: 500
-  STONE_III:
-    prefix: "&7III"
+  stone_iii:
     Points: 1000
-  STONE_II:
-    prefix: "&7II"
+  stone_ii:
     Points: 1500
-  STONE_I:
-    prefix: "&7I"
+  stone_i:
     Points: 2000
-  IRON_III:
-    prefix: "&fIII"
+  iron_iii:
     Points: 3000
-  IRON_II:
-    prefix: "&fII"
+  iron_ii:
     Points: 4000
-  IRON_I:
-    prefix: "&fI"
+  iron_i:
     Points: 5000
-  GOLD_III:
-    prefix: "&eIII"
+  gold_iii:
     Points: 6000
-  GOLD_II:
-    prefix: "&eII"
+  gold_ii:
     Points: 8000
-  GOLD_I:
-    prefix: "&eI"
+  gold_i:
     Points: 10000
-  EMERALD_III:
-    prefix: "&aIII"
+  emerald_iii:
     Points: 12000
-  EMERALD_II:
-    prefix: "&aII"
+  emerald_ii:
     Points: 15000
-  EMERALD_I:
-    prefix: "&aI"
+  emerald_i:
     Points: 20000
-  DIAMOND_III:
-    prefix: "&bIII"
+  diamond_iii:
     Points: 30000
-  DIAMOND_II:
-    prefix: "&bII"
+  diamond_ii:
     Points: 40000
-  DIAMOND_I:
-    prefix: "&bI"
+  diamond_i:
     Points: 50000
-  OBSIDIAN:
-    prefix: "&5O"
+  obsidian:
     Points: 100000

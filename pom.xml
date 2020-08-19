@@ -14,6 +14,14 @@
             <id>ashcon.app</id>
             <url>https://repo.ashcon.app/content/repositories/snapshots</url>
         </repository>
+        <repository>
+            <id>central-luckperms</id>
+            <url>https://repo1.maven.org/maven2/net/luckperms/api/</url>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://repository.sonatype.org/content/groups/public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -27,6 +35,12 @@
             <groupId>tc.oc.pgm</groupId>
             <artifactId>util</artifactId>
             <version>0.9-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
