@@ -34,7 +34,7 @@ public class KillSoundsGUI implements Listener {
         reset.setItemMeta(reset_meta);
 
         ItemStack back = new ItemStack(Material.ARROW, 1);
-        ItemMeta back_meta = reset.getItemMeta();
+        ItemMeta back_meta = back.getItemMeta();
 
         back_meta.setDisplayName(ChatColor.RED + "Go to previous page ⇒");
         back.setItemMeta(back_meta);
