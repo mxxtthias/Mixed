@@ -28,15 +28,15 @@ public class DefaultGUI implements Listener, CommandExecutor {
 
     private void addIconItems() {
 
-        ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-        ItemMeta meta = reset.getItemMeta();
+        ItemStack close = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+        ItemMeta meta = close.getItemMeta();
 
         meta.setDisplayName(ChatColor.RED + "Close the GUI");
-        reset.setItemMeta(meta);
+        close.setItemMeta(meta);
 
         gui.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.GREEN + "Kill Effects"));
         gui.setItem(13, createGuiItem(Material.RECORD_3, ChatColor.GREEN + "Kill Sounds"));
-        gui.setItem(16, reset);
+        gui.setItem(16, close);
     }
 
     @EventHandler

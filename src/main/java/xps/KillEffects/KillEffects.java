@@ -33,9 +33,9 @@ public class KillEffects implements Listener {
                     createCustomEffect(
                             EnumParticle.BLOCK_CRACK,
                             location,
-                            0.5F,
+                            0.75F,
                             1.5F,
-                            0.5F,
+                            0.75F,
                             0.01F,
                             50,
                             getData(Material.REDSTONE_BLOCK, (short) 0),
@@ -44,9 +44,9 @@ public class KillEffects implements Listener {
                     createCustomEffect(
                             EnumParticle.BLOCK_CRACK,
                             location,
-                            0.5F,
+                            0.75F,
                             1F,
-                            0.5F,
+                            0.75F,
                             0.01F,
                             50,
                             getData(Material.REDSTONE_BLOCK, (short) 0),
@@ -71,9 +71,9 @@ public class KillEffects implements Listener {
                     createCustomEffect(
                             EnumParticle.HEART,
                             location,
-                            0.5F,
-                            0.7F,
-                            0.5F,
+                            0.75F,
+                            0.75F,
+                            0.75F,
                             0.01F,
                             80,
                             null,
@@ -98,9 +98,9 @@ public class KillEffects implements Listener {
                     createCustomEffect(
                             EnumParticle.SMOKE_LARGE,
                             location,
-                            0.5F,
+                            0.75F,
                             1.2F,
-                            0.5F,
+                            0.75F,
                             0.1F,
                             70,
                             null,
@@ -127,9 +127,9 @@ public class KillEffects implements Listener {
                     createCustomEffect(
                             EnumParticle.FLAME,
                             location,
-                            0.5F,
+                            0.75F,
                             1.2F,
-                            0.5F,
+                            0.75F,
                             0.01F,
                             100,
                             null,
@@ -154,7 +154,7 @@ public class KillEffects implements Listener {
                     double radius = 2;
                     double maxheight = 7;
 
-                    for (double y = 0; y < maxheight; y+= 0.05) {
+                    for (double y = 0; y < maxheight; y += 0.05) {
 
                         double x = Math.sin(y * radius);
                         double z = Math.cos(y * radius);
@@ -225,6 +225,46 @@ public class KillEffects implements Listener {
         }
     }
 
+    @EventHandler
+    public void WATER_SPHERE(MatchPlayerDeathEvent e) {
+        MatchPlayer murder = null;
+        MatchPlayer victim = e.getVictim();
+
+        if (e.getKiller() != null) {
+            murder = e.getKiller().getParty().getPlayer(e.getKiller().getId());
+            if (playerData.isSelected(murder.getId().toString(), "WATER_SPHERE")) {
+                if (murder.getBukkit().hasPermission("pgm.group.donor")) {
+
+                    for (int i = 0; i < Math.PI; i += Math.PI / 10) {
+                        double radius = Math.sin(i);
+                        double y = Math.cos(i);
+
+                        for (double a = 0; a < Math.PI * 2; a += Math.PI / 10) {
+                            double x = Math.cos(a) * radius;
+                            double z = Math.sin(a) * radius;
+
+                            Location location = victim.getBukkit().getLocation();
+                            location.add(x, y, z);
+
+                            createCustomEffect(
+                                    EnumParticle.DRIP_LAVA,
+                                    location,
+                                    0f,
+                                    0f,
+                                    0f,
+                                    0.1f,
+                                    50,
+                                    null,
+                                    murder.getBukkit().getPlayer());
+
+                            location.subtract(x, y, z);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private void createCustomEffectWithColor(EnumParticle particle, float x, float y, float z, float x_offset, float y_offset, float z_offset, float speed, int amount, Player player) {
 
         int[] rainbow = null;
@@ -234,8 +274,8 @@ public class KillEffects implements Listener {
         int g = random.nextInt(256) + 1;
         int b = random.nextInt(256) + 1;
 
-        if(r > 0 && g > 0 && b > 0) {
-            rainbow = new int[] {r, g, b};
+        if (r > 0 && g > 0 && b > 0) {
+            rainbow = new int[]{r, g, b};
         }
 
         PacketPlayOutWorldParticles packet = new PacketPlayOutWorldParticles(
@@ -274,7 +314,7 @@ public class KillEffects implements Listener {
     }
 
     private int[] getData(Material data, short id) {
-        return new int[] {data.getId(), id};
+        return new int[]{data.getId(), id};
     }
 
     public KillEffects(Plugin plugin) {

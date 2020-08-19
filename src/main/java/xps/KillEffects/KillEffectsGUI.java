@@ -46,6 +46,7 @@ public class KillEffectsGUI implements Listener {
         EffectsGUI.setItem(1, createGuiItem(Material.LAVA_BUCKET, ChatColor.AQUA + "FLAME", ChatColor.YELLOW + "Click to select!"));
         EffectsGUI.setItem(2, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW", ChatColor.YELLOW + "Click to select!"));
         EffectsGUI.setItem(20, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(20, createGuiItem(Material.WATER_BUCKET, ChatColor.GOLD + "WATER SPHERE", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
         EffectsGUI.setItem(26, reset);
         EffectsGUI.setItem(8, back);
     }
@@ -64,7 +65,7 @@ public class KillEffectsGUI implements Listener {
 
                 if (clickedItem.hasItemMeta()) {
                     if (clickedItem.getItemMeta().hasDisplayName()) {
-                        if(getItemName.equals(ChatColor.RED + "Go to previous page ➡")) {
+                        if (getItemName.equals(ChatColor.RED + "Go to previous page ➡")) {
                             player.openInventory(DefaultGUI.gui);
                         }
                         if (getItemName.equals(ChatColor.RED + "Reset Kill Effect")) {
@@ -113,12 +114,18 @@ public class KillEffectsGUI implements Listener {
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
+                        } else if (getItemName.equals(ChatColor.GOLD + "WATER SPHERE")) {
+                            if (player.hasPermission("pgm.group.donor")) {
+                                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "WATER_SPHERE");
+                                player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " WATER SPHERE kill effect.");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You don't have the donor rank");
+                            }
                         }
                     }
                 }
             }
         } catch (NullPointerException ignored) {
-
         }
     }
 }

@@ -36,7 +36,7 @@ public class KillSoundsGUI implements Listener {
         ItemStack back = new ItemStack(Material.ARROW, 1);
         ItemMeta back_meta = back.getItemMeta();
 
-        back_meta.setDisplayName(ChatColor.RED + "Go to previous page ⇒");
+        back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
         back.setItemMeta(back_meta);
 
         SoundsGUI.setItem(9, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
@@ -61,7 +61,7 @@ public class KillSoundsGUI implements Listener {
 
                 if (clickedItem.hasItemMeta()) {
                     if (clickedItem.getItemMeta().hasDisplayName()) {
-                        if(getItemName.equals(ChatColor.RED + "Go to previous page ⇒")) {
+                        if (getItemName.equals(ChatColor.RED + "Go to previous page ➡")) {
                             player.openInventory(DefaultGUI.gui);
                         }
                         if (getItemName.equals(ChatColor.RED + "Reset Kill Sound")) {
@@ -72,14 +72,14 @@ public class KillSoundsGUI implements Listener {
                                 MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "HOWL");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "HOWL Kill Sound");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have enought points");
+                                player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }
                         } else if (getItemName.equals(ChatColor.AQUA + "VILLAGER")) {
                             if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("VILLAGER"))) {
                                 MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "VILLAGER");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "VILLAGER Kill Sound");
                             } else {
-                                player.sendMessage(ChatColor.RED + "You dont have eought points");
+                                player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }
                         } else if (getItemName.equals(ChatColor.AQUA + "DEFAULT")) {
                             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
@@ -88,7 +88,6 @@ public class KillSoundsGUI implements Listener {
                             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "GOLEM");
                             player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "GOLEM Kill Sound");
                         }
-                        player.closeInventory();
                     }
                 }
             }
