@@ -28,21 +28,21 @@ public class KillSoundsGUI implements Listener {
     private void addIconItems() {
 
         ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-        ItemMeta meta = reset.getItemMeta();
+        ItemMeta reset_meta = reset.getItemMeta();
 
-        meta.setDisplayName(ChatColor.RED + "Reset Kill Sound");
-        reset.setItemMeta(meta);
+        reset_meta.setDisplayName(ChatColor.RED + "Reset Kill Sound");
+        reset.setItemMeta(reset_meta);
 
-        ItemStack back = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+        ItemStack back = new ItemStack(Material.ARROW, 1);
         ItemMeta back_meta = reset.getItemMeta();
 
         back_meta.setDisplayName(ChatColor.RED + "Go to previous page ⇒");
-        reset.setItemMeta(back_meta);
+        back.setItemMeta(back_meta);
 
-        SoundsGUI.setItem(10, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(16, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(14, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(12, createGuiItem(Material.IRON_INGOT, ChatColor.AQUA + "GOLEM", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(9, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(15, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
+        SoundsGUI.setItem(13, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
+        SoundsGUI.setItem(11, createGuiItem(Material.IRON_INGOT, ChatColor.AQUA + "GOLEM", ChatColor.YELLOW + "Click to Select!"));
         SoundsGUI.setItem(26, reset);
         SoundsGUI.setItem(8, back);
     }

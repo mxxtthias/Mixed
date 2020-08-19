@@ -34,19 +34,19 @@ public class KillEffectsGUI implements Listener {
         reset_meta.setDisplayName(ChatColor.RED + "Reset Kill Effect");
         reset.setItemMeta(reset_meta);
 
-        ItemStack back = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+        ItemStack back = new ItemStack(Material.ARROW, 1);
         ItemMeta back_meta = reset.getItemMeta();
 
         back_meta.setDisplayName(ChatColor.RED + "Go to previous page ⇒");
-        reset.setItemMeta(back_meta);
+        back.setItemMeta(back_meta);
 
-        EffectsGUI.setItem(1, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "BLOOD", ChatColor.YELLOW + "Click to Select!"));
-        EffectsGUI.setItem(19, createGuiItem(Material.GOLDEN_APPLE, ChatColor.AQUA + "HEART", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(20, createGuiItem(Material.FIREWORK_CHARGE, ChatColor.AQUA + "SMOKE", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(2, createGuiItem(Material.LAVA_BUCKET, ChatColor.AQUA + "FLAME", ChatColor.YELLOW + "Click to select!"));
-        EffectsGUI.setItem(3, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW", ChatColor.YELLOW + "Click to select!"));
-        EffectsGUI.setItem(21, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(27, reset);
+        EffectsGUI.setItem(0, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "BLOOD", ChatColor.YELLOW + "Click to Select!"));
+        EffectsGUI.setItem(18, createGuiItem(Material.GOLDEN_APPLE, ChatColor.AQUA + "HEART", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(19, createGuiItem(Material.FIREWORK_CHARGE, ChatColor.AQUA + "SMOKE", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(1, createGuiItem(Material.LAVA_BUCKET, ChatColor.AQUA + "FLAME", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(2, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(20, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(26, reset);
         EffectsGUI.setItem(8, back);
     }
 
