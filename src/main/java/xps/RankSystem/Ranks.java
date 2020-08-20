@@ -21,7 +21,7 @@ public class Ranks {
                 try {
                     return ranks.get(i + 1);
                 } catch (IndexOutOfBoundsException | NullPointerException e) {
-                    return ChatColor.RED + "" + ChatColor.BOLD + "MAX RANK";
+                    return getCurrentRank(uuid);
                 }
             }
         }
@@ -46,13 +46,13 @@ public class Ranks {
     public static boolean canRankUp(String uuid) {
         Integer next = RanksConfig.getCustomConfig().getInt("Ranks." + getNextRank(uuid) + ".Points");
         Integer now = getCurrentPoint(uuid);
-        int result = next - now;
 
-        if (next == null) {
+        if (getNextRank(uuid).equals(getCurrentRank(uuid))) {
             return false;
+        } else {
+            int result = next - now;
+            return result <= 0;
         }
-
-        return result <= 0;
     }
 
     public static String getRankCurrent(String uuid) {

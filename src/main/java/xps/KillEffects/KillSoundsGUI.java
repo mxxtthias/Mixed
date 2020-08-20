@@ -40,9 +40,10 @@ public class KillSoundsGUI implements Listener {
         back.setItemMeta(back_meta);
 
         SoundsGUI.setItem(9, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(15, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(13, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(11, createGuiItem(Material.IRON_INGOT, ChatColor.AQUA + "GOLEM", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(11, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
+        SoundsGUI.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
+        SoundsGUI.setItem(12, createGuiItem(Material.TNT, ChatColor.AQUA + "BOMB", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(13, createGuiItem(Material.SEEDS, ChatColor.AQUA + "BURP", ChatColor.YELLOW + "Click to Select!"));
         SoundsGUI.setItem(26, reset);
         SoundsGUI.setItem(8, back);
     }
@@ -84,9 +85,12 @@ public class KillSoundsGUI implements Listener {
                         } else if (getItemName.equals(ChatColor.AQUA + "DEFAULT")) {
                             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
                             player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "DEFAULT Kill Sound");
-                        } else if (getItemName.equals(ChatColor.AQUA + "GOLEM")) {
-                            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "GOLEM");
-                            player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "GOLEM Kill Sound");
+                        } else if (getItemName.equals(ChatColor.AQUA + "BOMB")) {
+                            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BOMB");
+                            player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "PUNCH Kill Sound");
+                        } else if (getItemName.equals(ChatColor.AQUA + "BURP")) {
+                            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BURP");
+                            player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BURP Kill Sound");
                         }
                     }
                 }

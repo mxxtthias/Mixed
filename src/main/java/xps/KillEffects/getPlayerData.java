@@ -6,10 +6,6 @@ import xps.Database.MySQLSetterGetter;
 
 public class getPlayerData {
 
-    public boolean isSelected(String uuid, String effect) {
-        return MySQLSetterGetter.getKillEffect(uuid).equals(effect);
-    }
-
     public boolean hasRequirePoint(String uuid, int require) {
         return MySQLSetterGetter.getPoints(uuid) >= require;
     }
