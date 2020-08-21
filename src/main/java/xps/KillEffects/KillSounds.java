@@ -44,7 +44,7 @@ public class KillSounds implements Listener {
                         playSound(killer, new Sound("random.levelup", 1f, 1.5f));
                         playSound(killer, new Sound("mob.irongolem.hit", 1, 4f / 3f, death));
                     } else {
-                        playSound(killer, new Sound("mob.irongolem.hit", death));
+                        playSound(victim, new Sound("mob.irongolem.hit", death));
                     }
                     break;
                 case "HOWL":

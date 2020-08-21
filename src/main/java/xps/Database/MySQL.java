@@ -26,9 +26,8 @@ public class MySQL {
 
     public void connect() {
         try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://" +  getHost() + ":" +
-                            getPort() + "/" + getDatabase() + "?autoReconnect=true",
-                    getUser(), getPassword());
+            this.connection = DriverManager.getConnection("jdbc:mysql://" + getHost() + ":" +
+                            getPort() + "/" + getDatabase() + "?autoReconnect=true", getUser(), getPassword());
         } catch (SQLException e) {
             e.printStackTrace();
         }
