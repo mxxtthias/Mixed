@@ -44,7 +44,6 @@ public class KillSoundsGUI implements Listener {
         SoundsGUI.setItem(11, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
         SoundsGUI.setItem(12, createGuiItem(Material.TNT, ChatColor.AQUA + "BOMB", ChatColor.YELLOW + "Click to Select!"));
         SoundsGUI.setItem(13, createGuiItem(Material.SEEDS, ChatColor.AQUA + "BURP", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(14, createGuiItem(Material.NOTE_BLOCK, ChatColor.AQUA + "NOTE", ChatColor.YELLOW + "Click to Select!"));
         SoundsGUI.setItem(26, reset);
         SoundsGUI.setItem(8, back);
     }
@@ -97,13 +96,6 @@ public class KillSoundsGUI implements Listener {
                             if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("BURP"))) {
                                 MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BURP");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BURP Kill Sound");
-                            } else {
-                                player.sendMessage(ChatColor.RED + "You don't have enought points");
-                            }
-                        } else if(getItemName.equals(ChatColor.AQUA + "NOTE")) {
-                            if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("NOTE"))) {
-                                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NOTE");
-                                player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "NOTE Kill Sound");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }

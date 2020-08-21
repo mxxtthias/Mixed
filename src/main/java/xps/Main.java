@@ -44,6 +44,14 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
         ConnectMySQL();
 
+        registerCommands();
+        registerEvents();
+
+        BroadCastMesseage broadCastMesseage = new BroadCastMesseage();
+        broadCastMesseage.randomMesseage();
+    }
+
+    private void registerEvents() {
         Bukkit.getServer().getPluginManager().registerEvents(this, this);
         Bukkit.getServer().getPluginManager().registerEvents(new KillEffectsGUI(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new KillSoundsGUI(), this);
@@ -51,15 +59,14 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         new PlayerStats(this);
         new KillEffects(this);
         new KillSounds(this);
+    }
 
+    private void registerCommands() {
         getCommand("stats").setExecutor(new StatsCommand());
         getCommand("ping").setExecutor(new PingCommand());
         getCommand("rank").setExecutor(new CheckRankCommand());
         getCommand("effect").setExecutor(new DefaultGUI());
         getCommand("sound").setExecutor(new DefaultGUI());
-
-        BroadCastMesseage broadCastMesseage = new BroadCastMesseage();
-        broadCastMesseage.randomMesseage();
     }
 
     private void ConnectMySQL() {

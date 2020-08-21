@@ -21,7 +21,7 @@ public class PingCommand implements CommandExecutor {
         return true;
     }
 
-    public int getPing(Player p) {
+    private int getPing(Player p) {
         CraftPlayer pingcraft = (CraftPlayer) p;
         EntityPlayer pingentity = pingcraft.getHandle();
         return pingentity.ping;

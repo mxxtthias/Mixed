@@ -12,7 +12,7 @@ public class MySQLSetterGetter {
             ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
             ResultSet week_rs = Main.mysql.query("SELECT * FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
             ResultSet rank_rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
-            return (rs.next() && rs.getString("UUID") != null || week_rs.next() && week_rs.getString("UUID") != null || rank_rs.next() && rank_rs.getString("UUID") != null);
+            return (rs.next() && rs.getString("UUID") != null && week_rs.next() && week_rs.getString("UUID") != null && rank_rs.next() && rank_rs.getString("UUID") != null);
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
