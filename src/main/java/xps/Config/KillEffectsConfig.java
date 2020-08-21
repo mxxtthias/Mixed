@@ -5,11 +5,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
 
 public class KillEffectsConfig {
 
@@ -44,16 +42,5 @@ public class KillEffectsConfig {
             reloadConfig();
         }
         return config;
-    }
-
-    public void saveConfig() {
-        if (config == null) {
-            return;
-        }
-        try {
-            RanksConfig.getCustomConfig().save(configFile);
-        } catch (IOException ex) {
-            plugin.getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
-        }
     }
 }
