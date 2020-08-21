@@ -3,17 +3,11 @@
 ################################
 
 BLOOD:
-  points: 5000
-HEART:
-  points: 2000
-RAINBOW:
-  points: 10000
+  points: 0
 
 ################################
 #        KILL SOUNDS          #
 ###############################
 
-HOWL:
-  points: 20000
-VILLAGER:
-  points: 5000
+BURP:
+  points: 0

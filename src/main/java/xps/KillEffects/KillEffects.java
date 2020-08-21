@@ -131,7 +131,7 @@ public class KillEffects implements Listener {
                             double x = Math.sin(y * radius);
                             double z = cos(y * radius);
 
-                            createCustomEffectWithColor(
+                            createCustomEffectRainbow(
                                     EnumParticle.REDSTONE,
                                     ((float) (location.getX() + x)),
                                     ((float) (location.getY() + y)),
@@ -139,12 +139,13 @@ public class KillEffects implements Listener {
                                     0,
                                     0,
                                     0,
-                                    0.01F,
+                                    0.001F,
                                     20,
                                     murder.getBukkit().getPlayer()
                             );
                         }
                     }
+                    break;
 
                 case "DONOR":
                     if (murder.getBukkit().hasPermission("pgm.group.donor")) {
@@ -163,7 +164,7 @@ public class KillEffects implements Listener {
                                     0.0f,
                                     0.0f,
                                     0.0f,
-                                    0.01f,
+                                    0.001f,
                                     20,
                                     null,
                                     murder.getBukkit().getPlayer()
@@ -176,11 +177,12 @@ public class KillEffects implements Listener {
                                 0.5f,
                                 0.5f,
                                 0.5f,
-                                0.01f,
+                                0.001f,
                                 80,
                                 null,
                                 murder.getBukkit().getPlayer());
                     }
+                    break;
 
                 case "SPHERE":
                     if (murder.getBukkit().hasPermission("pgm.group.donor")) {
@@ -222,15 +224,34 @@ public class KillEffects implements Listener {
                         }.runTaskTimer(Main.getInstance(), 0, 1);
                     }
                     break;
+
+                case "MAGIC":
+                    if (murder.getBukkit().hasPermission("pgm.group.donor")) {
+
+                        Location location = victim.getBukkit().getLocation();
+                        createCustomEffect(
+                                EnumParticle.SPELL_WITCH,
+                                location,
+                                0.5f,
+                                1f,
+                                0.5f,
+                                0.1f,
+                                200,
+                                null,
+                                murder.getBukkit().getPlayer()
+                        );
+                    }
+                    break;
             }
         }
     }
 
-    private void createCustomEffectWithColor(EnumParticle particle, float x, float y, float z, float x_offset, float y_offset, float z_offset, float speed, int amount, Player player) {
+    private void createCustomEffectRainbow(EnumParticle particle, float x, float y, float z, float x_offset, float y_offset, float z_offset, float speed, int amount, Player player) {
 
         int red = Color.RED.asRGB();
         int blue = Color.BLUE.asRGB();
         int green = Color.GREEN.asRGB();
+        int orange = Color.ORANGE.asRGB();
         int aqua = Color.AQUA.asRGB();
         int lime = Color.LIME.asRGB();
         int yellow = Color.YELLOW.asRGB();
@@ -244,6 +265,7 @@ public class KillEffects implements Listener {
         rainbow.add(yellow);
         rainbow.add(green);
         rainbow.add(purple);
+        rainbow.add(orange);
 
         int index = (new Random()).nextInt(rainbow.size());
         int getColor = rainbow.get(index);

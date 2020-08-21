@@ -41,12 +41,13 @@ public class KillEffectsGUI implements Listener {
         back.setItemMeta(back_meta);
 
         EffectsGUI.setItem(0, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "BLOOD", ChatColor.YELLOW + "Click to Select!"));
-        EffectsGUI.setItem(18, createGuiItem(Material.GOLDEN_APPLE, ChatColor.AQUA + "HEART", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(19, createGuiItem(Material.FIREWORK_CHARGE, ChatColor.AQUA + "SMOKE", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
         EffectsGUI.setItem(1, createGuiItem(Material.LAVA_BUCKET, ChatColor.AQUA + "FLAME", ChatColor.YELLOW + "Click to select!"));
-        EffectsGUI.setItem(2, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW", ChatColor.YELLOW + "Click to select!"));
-        EffectsGUI.setItem(20, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
-        EffectsGUI.setItem(21, createGuiItem(Material.ENCHANTED_BOOK, ChatColor.GOLD + "SPHERE", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(2, createGuiItem(Material.GOLDEN_APPLE, ChatColor.AQUA + "HEART", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(3, createGuiItem(Material.FIREWORK_CHARGE, ChatColor.AQUA + "SMOKE", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(4, createGuiItem(Material.ENCHANTED_BOOK, ChatColor.AQUA + "MAGIC", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(5, createGuiItem(Material.ENDER_PEARL, ChatColor.AQUA + "SPHERE", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(6, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW", ChatColor.YELLOW + "Click to select!"));
+        EffectsGUI.setItem(18, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
         EffectsGUI.setItem(26, reset);
         EffectsGUI.setItem(8, back);
     }
@@ -72,36 +73,35 @@ public class KillEffectsGUI implements Listener {
                             MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
                             player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Effect");
                         } else if (getItemName.equals(ChatColor.AQUA + "BLOOD")) {
-                            if (playerData.hasRequirePoint(player.getUniqueId().toString(), KillEffectsConfig.getCustomConfig().getInt("BLOOD.points"))) {
+                            if (playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("BLOOD"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "BLOOD");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BLOOD Kill Effect");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have enough points");
                             }
                         } else if (getItemName.equals(ChatColor.AQUA + "HEART")) {
-                            if (playerData.hasDonorRank(player)) {
+                            if (playerData.hasDonorRank(player) || playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("HEART"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "HEART");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "HEART kill effect.");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
-
                         } else if (getItemName.equals(ChatColor.AQUA + "SMOKE")) {
-                            if (playerData.hasDonorRank(player)) {
+                            if (playerData.hasDonorRank(player) || playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("SMOKE"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "SMOKE");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "SMOKE kill effect.");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
                         } else if (getItemName.equals(ChatColor.AQUA + "FLAME")) {
-                            if (playerData.hasRequirePoint(player.getUniqueId().toString(), KillEffectsConfig.getCustomConfig().getInt("FLAME.points"))) {
+                            if (playerData.hasDonorRank(player) || playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("FLAME"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "FLAME");
                                 player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " FLAME kill effect.");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }
                         } else if (getItemName.equals(ChatColor.DARK_PURPLE + "RAINBOW")) {
-                            if (playerData.hasRequirePoint(player.getUniqueId().toString(), KillEffectsConfig.getCustomConfig().getInt("RAINBOW.points"))) {
+                            if (playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("RAINBOW"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "RAINBOW");
                                 player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " RAINBOW kill effect.");
                             } else {
@@ -114,10 +114,17 @@ public class KillEffectsGUI implements Listener {
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
-                        } else if (getItemName.equals(ChatColor.GOLD + "SPHERE")) {
-                            if (player.hasPermission("pgm.group.donor")) {
+                        } else if (getItemName.equals(ChatColor.AQUA + "SPHERE")) {
+                            if (playerData.hasDonorRank(player) || playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("SPHERE"))) {
                                 MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "SPHERE");
                                 player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " SPHERE kill effect.");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You don't have the donor rank");
+                            }
+                        } else if (getItemName.equals(ChatColor.AQUA + "MAGIC")) {
+                            if (playerData.hasDonorRank(player) || playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("MAGIC"))) {
+                                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "MAGIC");
+                                player.sendMessage(ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " MAGIC kill effect.");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have the donor rank");
                             }
@@ -125,7 +132,7 @@ public class KillEffectsGUI implements Listener {
                     }
                 }
             }
-        } catch (NullPointerException ignored) {
+        } catch(NullPointerException ignored){
         }
     }
 }

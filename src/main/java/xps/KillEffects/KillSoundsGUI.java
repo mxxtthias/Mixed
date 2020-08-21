@@ -40,10 +40,11 @@ public class KillSoundsGUI implements Listener {
         back.setItemMeta(back_meta);
 
         SoundsGUI.setItem(9, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(11, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
         SoundsGUI.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
+        SoundsGUI.setItem(11, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
         SoundsGUI.setItem(12, createGuiItem(Material.TNT, ChatColor.AQUA + "BOMB", ChatColor.YELLOW + "Click to Select!"));
         SoundsGUI.setItem(13, createGuiItem(Material.SEEDS, ChatColor.AQUA + "BURP", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(14, createGuiItem(Material.NOTE_BLOCK, ChatColor.AQUA + "NOTE", ChatColor.YELLOW + "Click to Select!"));
         SoundsGUI.setItem(26, reset);
         SoundsGUI.setItem(8, back);
     }
@@ -86,11 +87,26 @@ public class KillSoundsGUI implements Listener {
                             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
                             player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "DEFAULT Kill Sound");
                         } else if (getItemName.equals(ChatColor.AQUA + "BOMB")) {
-                            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BOMB");
-                            player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "PUNCH Kill Sound");
+                            if (playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("BOMB"))) {
+                                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BOMB");
+                                player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BOMB Kill Sound");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You don't have enought points");
+                            }
                         } else if (getItemName.equals(ChatColor.AQUA + "BURP")) {
-                            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BURP");
-                            player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BURP Kill Sound");
+                            if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("BURP"))) {
+                                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BURP");
+                                player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BURP Kill Sound");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You don't have enought points");
+                            }
+                        } else if(getItemName.equals(ChatColor.AQUA + "NOTE")) {
+                            if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("NOTE"))) {
+                                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NOTE");
+                                player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "NOTE Kill Sound");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You don't have enought points");
+                            }
                         }
                     }
                 }

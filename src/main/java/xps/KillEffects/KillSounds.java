@@ -27,45 +27,65 @@ public class KillSounds implements Listener {
     @EventHandler
     public void onMatchPlayerDeath(MatchPlayerDeathEvent e) {
         MatchPlayer killer = null;
-        MatchPlayer victim = e.getVictim();;
+        MatchPlayer victim = e.getVictim();
+
+        playSound(victim, new Sound("mob.irongolem.death", 1f, 1f));
 
         if (e.getKiller() != null) {
             killer = e.getKiller().getParty().getPlayer(e.getKiller().getId());
-            if (!killer.getParty().equals(victim.getParty())) {
 
-                String getSound = MySQLSetterGetter.getKillSound(killer.getId().toString());
-                Vector death = victim.getBukkit().getLocation().toVector();
+            String getSound = MySQLSetterGetter.getKillSound(killer.getId().toString());
+            Vector death = victim.getBukkit().getLocation().toVector();
 
-                switch (getSound) {
-                    case "DEFAULT":
+            switch (getSound) {
+                case "DEFAULT":
+                    if (!killer.getParty().equals(victim.getParty())) {
                         playSound(killer, new Sound("random.levelup", 1f, 1.5f));
                         playSound(killer, new Sound("mob.irongolem.hit", 1, 4f / 3f, death));
-
-                        if(killer.getParty() == victim.getParty()) {
-                            playSound(killer ,new Sound("mob.irongolem.hit", death));
-                        }
-                        break;
-                    case "HOWL":
-                        if(playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("HOWL"))) {
+                    } else {
+                        playSound(killer, new Sound("mob.irongolem.hit", death));
+                    }
+                    break;
+                case "HOWL":
+                    if (!killer.getParty().equals(victim.getParty())) {
+                        if (playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("HOWL"))) {
                             playSound(killer, new Sound("mob.wolf.howl", 1f, 1f));
                         }
-                        break;
-                    case "VILLAGER":
-                        if(playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("VILLAGER"))) {
-                            playSound(killer, new Sound("mob.villager.death", 1f, 0.8f));
+                    }
+                    break;
+                case "VILLAGER":
+                    if (!killer.getParty().equals(victim.getParty())) {
+                        if (playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("VILLAGER"))) {
+                            playSound(killer, new Sound("mob.villager.death", 2f, 0.8f));
                         }
-                        break;
-                    case "BOMB":
-                        if(playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("BOMB"))) {
+                    }
+                    break;
+                case "BOMB":
+                    if (!killer.getParty().equals(victim.getParty())) {
+                        if (playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("BOMB"))) {
                             playSound(killer, new Sound("random.explode", 1f, 2f));
                         }
-                        break;
-                    case "BURP":
-                        if(playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("BURP"))) {
+                    }
+                    break;
+                case "BURP":
+                    if (!killer.getParty().equals(victim.getParty())) {
+                        if (playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("BURP"))) {
                             playSound(killer, new Sound("random.burp", 1f, 0.1f));
                         }
-                        break;
-                }
+                    }
+                    break;
+                case "NOTE":
+                    if(!killer.getParty().equals(victim.getParty())) {
+                        if(playerData.hasRequirePoint(killer.getId().toString(), playerData.getRequirePoints("NOTE"))) {
+
+                            float end = 2.0F;
+                            float ft = 0.1F;
+
+                            for (float f = 1.5F; f <= end; f = f + ft) {
+                                playSound(killer, new Sound("note.harp", 1f, f));
+                            }
+                        }
+                    }
             }
         }
     }

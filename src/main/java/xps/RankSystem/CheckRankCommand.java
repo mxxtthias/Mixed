@@ -19,7 +19,7 @@ public class CheckRankCommand implements CommandExecutor {
             if (Ranks.getRankNext(uuid).equals(Ranks.getRankCurrent(uuid))) {
                 s.sendMessage(ChatColor.DARK_AQUA + "You need " + ChatColor.AQUA + Ranks.getRequirePoint(uuid) + ChatColor.DARK_AQUA + " more points to be " + Ranks.getRankNext(uuid));
             } else {
-                s.sendMessage(ChatColor.DARK_AQUA + "You can't ranked up because you're " + Ranks.getRankCurrent(uuid));
+                s.sendMessage(ChatColor.DARK_AQUA + "You can't ranked up because you're " + Ranks.getRankCurrent(uuid).toUpperCase());
             }
         }
         return true;
