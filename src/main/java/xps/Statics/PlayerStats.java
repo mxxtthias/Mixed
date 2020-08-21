@@ -40,26 +40,26 @@ public class PlayerStats implements Listener, MatchModule {
 
         if (e.getKiller() != null) {
             murder = e.getKiller().getParty().getPlayer(e.getKiller().getId());
-            MySQLSetterGetter.addKills(murder.getId().toString(), 1);
-            MySQLSetterGetter.addPoints(murder.getId().toString(), 5);
+            if (!murder.getParty().equals(victim.getParty())) {
 
-            MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
+                MySQLSetterGetter.addKills(murder.getId().toString(), 1);
+                MySQLSetterGetter.addPoints(murder.getId().toString(), 5);
+                MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
 
-            if (Ranks.canRankUp(murder.getId().toString())) {
+                if (Ranks.canRankUp(murder.getId().toString())) {
 
-                Bukkit.broadcastMessage(murder.getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(murder.getId().toString()));
-                chatPrefix.setPrefixPermission(murder.getId());
+                    Bukkit.broadcastMessage(murder.getPrefixedName() + ChatColor.RED + " has ranked up to " + ChatColor.YELLOW + Ranks.getRankNext(murder.getId().toString()));
+                    chatPrefix.setPrefixPermission(murder.getId());
 
-                murder.getBukkit().playSound(murder.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
-                murder.sendMessage(line_1);
-                murder.sendMessage(blank + Ranks.getRankCurrent(murder.getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + " ⇒ " + Ranks.getRankNext(murder.getId().toString()));
-                murder.sendMessage(line_2);
+                    murder.getBukkit().playSound(murder.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
+                    murder.sendMessage(line_1);
+                    murder.sendMessage(blank + Ranks.getRankCurrent(murder.getId().toString()).replace("_", " ").toUpperCase() + ChatColor.GRAY + " ⇒ " + Ranks.getRankNext(murder.getId().toString()));
+                    murder.sendMessage(line_2);
 
 
-                MySQLSetterGetter.setRank(murder.getId().toString(), Ranks.getNextRank(murder.getId().toString()));
+                    MySQLSetterGetter.setRank(murder.getId().toString(), Ranks.getNextRank(murder.getId().toString()));
+                }
             }
-        } else {
-            MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
         }
     }
 
