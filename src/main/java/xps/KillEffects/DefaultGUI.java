@@ -21,6 +21,8 @@ public class DefaultGUI implements Listener, CommandExecutor {
 
     public static Inventory gui;
 
+    public Player player;
+
     public DefaultGUI() {
         gui = Bukkit.createInventory(null, 27, "Kill Effect/Sound Selector");
         addIconItems();
@@ -47,7 +49,7 @@ public class DefaultGUI implements Listener, CommandExecutor {
 
                 final ItemStack clickedItem = e.getCurrentItem();
 
-                final Player player = (Player) e.getWhoClicked();
+                player = (Player) e.getWhoClicked();
 
                 String getItemName = clickedItem.getItemMeta().getDisplayName();
 
@@ -76,6 +78,10 @@ public class DefaultGUI implements Listener, CommandExecutor {
         item.setItemMeta(meta);
 
         return item;
+    }
+
+    public Player getPlayer() {
+        return this.player;
     }
 
     @Override

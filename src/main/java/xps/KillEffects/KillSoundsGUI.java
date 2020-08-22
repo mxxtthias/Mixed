@@ -11,6 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import xps.Config.KillEffectsConfig;
 import xps.Database.MySQLSetterGetter;
 
 import static xps.KillEffects.DefaultGUI.createGuiItem;
@@ -18,7 +19,7 @@ import static xps.KillEffects.DefaultGUI.createGuiItem;
 public class KillSoundsGUI implements Listener {
 
     public static Inventory SoundsGUI;
-    private final getPlayerData playerData = new getPlayerData();
+    private final DefaultGUI defaultGUI = new DefaultGUI();
 
     public KillSoundsGUI() {
         SoundsGUI = Bukkit.createInventory(null, 27, "Kill Sound Selector");
@@ -26,6 +27,8 @@ public class KillSoundsGUI implements Listener {
     }
 
     private void addIconItems() {
+
+        String uuid = defaultGUI.getPlayer().getUniqueId().toString();
 
         ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
         ItemMeta reset_meta = reset.getItemMeta();
@@ -39,13 +42,17 @@ public class KillSoundsGUI implements Listener {
         back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
         back.setItemMeta(back_meta);
 
-        SoundsGUI.setItem(9, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(11, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", ChatColor.YELLOW + "Click to select!"));
-        SoundsGUI.setItem(12, createGuiItem(Material.TNT, ChatColor.AQUA + "BOMB", ChatColor.YELLOW + "Click to Select!"));
-        SoundsGUI.setItem(13, createGuiItem(Material.SEEDS, ChatColor.AQUA + "BURP", ChatColor.YELLOW + "Click to Select!"));
+        SoundsGUI.setItem(9, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT","", getPlayerData.canUseEffects(uuid, 0)));
+        SoundsGUI.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER","", getPlayerData.canUseEffects(uuid, getSoundPoint("VILLAGER"))));
+        SoundsGUI.setItem(11, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", "", getPlayerData.canUseEffects(uuid, getSoundPoint("HOWL"))));
+        SoundsGUI.setItem(12, createGuiItem(Material.TNT, ChatColor.AQUA + "BOMB", "", getPlayerData.canUseEffects(uuid, getSoundPoint("BOMB"))));
+        SoundsGUI.setItem(13, createGuiItem(Material.SEEDS, ChatColor.AQUA + "BURP","", getPlayerData.canUseEffects(uuid, getSoundPoint("BURP"))));
         SoundsGUI.setItem(26, reset);
         SoundsGUI.setItem(8, back);
+    }
+
+    private Integer getSoundPoint(String sound) {
+        return KillEffectsConfig.getCustomConfig().getInt(sound);
     }
 
     @EventHandler
@@ -69,14 +76,14 @@ public class KillSoundsGUI implements Listener {
                             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
                             player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Sound");
                         } else if (getItemName.equals(ChatColor.AQUA + "HOWL")) {
-                            if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("HOWL"))) {
+                            if(getPlayerData.hasRequirePoint(player.getUniqueId().toString(), getPlayerData.getRequirePoints("HOWL"))) {
                                 MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "HOWL");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "HOWL Kill Sound");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }
                         } else if (getItemName.equals(ChatColor.AQUA + "VILLAGER")) {
-                            if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("VILLAGER"))) {
+                            if(getPlayerData.hasRequirePoint(player.getUniqueId().toString(), getPlayerData.getRequirePoints("VILLAGER"))) {
                                 MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "VILLAGER");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "VILLAGER Kill Sound");
                             } else {
@@ -86,14 +93,14 @@ public class KillSoundsGUI implements Listener {
                             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
                             player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "DEFAULT Kill Sound");
                         } else if (getItemName.equals(ChatColor.AQUA + "BOMB")) {
-                            if (playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("BOMB"))) {
+                            if (getPlayerData.hasRequirePoint(player.getUniqueId().toString(), getPlayerData.getRequirePoints("BOMB"))) {
                                 MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BOMB");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BOMB Kill Sound");
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have enought points");
                             }
                         } else if (getItemName.equals(ChatColor.AQUA + "BURP")) {
-                            if(playerData.hasRequirePoint(player.getUniqueId().toString(), playerData.getRequirePoints("BURP"))) {
+                            if(getPlayerData.hasRequirePoint(player.getUniqueId().toString(), getPlayerData.getRequirePoints("BURP"))) {
                                 MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BURP");
                                 player.sendMessage(ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BURP Kill Sound");
                             } else {
