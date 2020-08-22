@@ -58,7 +58,7 @@ public class KillSoundsGUI implements Listener {
     }
 
     private Integer getSoundPoint(String sound) {
-        return KillEffectsConfig.getCustomConfig().getInt(sound);
+        return KillEffectsConfig.getCustomConfig().getInt(sound + ".points");
     }
 
     @EventHandler
