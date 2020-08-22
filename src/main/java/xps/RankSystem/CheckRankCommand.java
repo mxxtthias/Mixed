@@ -16,7 +16,7 @@ public class CheckRankCommand implements CommandExecutor {
         if (args.length == 0) {
             s.sendMessage(ChatColor.DARK_AQUA + "Rank: " + Ranks.getRankCurrent(uuid).replace("_", " ").toUpperCase());
             s.sendMessage(ChatColor.DARK_AQUA + "Your current points are " + ChatColor.AQUA + "" + ChatColor.BOLD + Ranks.getCurrentPoint(uuid));
-            if (Ranks.getRankNext(uuid).equals(Ranks.getRankCurrent(uuid))) {
+            if (Ranks.getNextRank(uuid).equals(Ranks.getCurrentRank(uuid))) {
                 s.sendMessage(ChatColor.DARK_AQUA + "You need " + ChatColor.AQUA + Ranks.getRequirePoint(uuid) + ChatColor.DARK_AQUA + " more points to be " + Ranks.getRankNext(uuid));
             } else {
                 s.sendMessage(ChatColor.DARK_AQUA + "You can't ranked up because you're " + Ranks.getRankCurrent(uuid).toUpperCase());
