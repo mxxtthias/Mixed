@@ -22,16 +22,16 @@ public class KillSoundsGUI implements Listener {
     public static Inventory SoundsGUI;
     private String uuid;
 
+    public KillSoundsGUI() {
+        SoundsGUI = Bukkit.createInventory(null, 27, "Kill Sound Selector");
+    }
+
     @EventHandler
     private void getPlayer(InventoryOpenEvent e) {
-        if(SoundsGUI == e.getInventory()) {
+        if(SoundsGUI.getTitle().equals(e.getInventory().getTitle())) {
             uuid = e.getPlayer().toString();
             addIconItems();
         }
-    }
-
-    public KillSoundsGUI() {
-        SoundsGUI = Bukkit.createInventory(null, 27, "Kill Sound Selector");
     }
 
     private void addIconItems() {

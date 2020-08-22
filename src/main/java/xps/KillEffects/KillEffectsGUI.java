@@ -28,7 +28,7 @@ public class KillEffectsGUI implements Listener {
 
     @EventHandler
     private void getPlayer(InventoryOpenEvent e) {
-        if(EffectsGUI == e.getInventory()) {
+        if(EffectsGUI.getTitle().equals(e.getInventory().getTitle())) {
             uuid = e.getPlayer().toString();
             addIconItems();
         }
@@ -55,7 +55,7 @@ public class KillEffectsGUI implements Listener {
         EffectsGUI.setItem(4, createGuiItem(Material.ENCHANTED_BOOK, ChatColor.AQUA + "MAGIC","",getPlayerData.canUseEffects(uuid, effectPoint("MAGIC"))));
         EffectsGUI.setItem(5, createGuiItem(Material.ENDER_PEARL, ChatColor.AQUA + "SPHERE", "", getPlayerData.canUseEffects(uuid, effectPoint("SPHERE"))));
         EffectsGUI.setItem(6, createGuiItem(Material.NETHER_STAR, ChatColor.DARK_PURPLE + "RAINBOW","", getPlayerData.canUseEffects(uuid, effectPoint("RAINBOW"))));
-        EffectsGUI.setItem(18, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR","", ChatColor.YELLOW + "Click to select!", "", ChatColor.RED + "- Donor Only -"));
+        EffectsGUI.setItem(18, createGuiItem(Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR","", ChatColor.RED + "- Donor Only -"));
         EffectsGUI.setItem(26, reset);
         EffectsGUI.setItem(8, back);
     }
