@@ -4,7 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import xps.Config.KillEffectsConfig;
 import xps.Database.MySQLSetterGetter;
-import xps.RankSystem.Ranks;
 
 public class getPlayerData {
 
@@ -21,12 +20,12 @@ public class getPlayerData {
     }
 
     public static String canUseEffects(String uuid, Integer require) {
-        if(Ranks.getCurrentPoint(uuid) >= require) {
+        if(MySQLSetterGetter.getPoints(uuid) >= require) {
             return ChatColor.GREEN + "Unlocked";
         } else {
             int current = MySQLSetterGetter.getPoints(uuid);
-            int result = current - require;
-            return ChatColor.RED + "You need" + ChatColor.YELLOW + result + ChatColor.RED + "more points";
+            int result = require - current;
+            return ChatColor.RED + "You need " + ChatColor.YELLOW + result + ChatColor.RED + " more points";
         }
     }
 }
