@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -19,16 +20,21 @@ import static xps.KillEffects.DefaultGUI.createGuiItem;
 public class KillEffectsGUI implements Listener {
 
     public static Inventory EffectsGUI;
-    private final DefaultGUI defaultGUI = new DefaultGUI();
+    private String uuid;
 
     public KillEffectsGUI() {
         EffectsGUI = Bukkit.createInventory(null, 27, "Kill Effect Selector");
-        addIconItems();
+    }
+
+    @EventHandler
+    private void getPlayer(InventoryOpenEvent e) {
+        if(EffectsGUI == e.getInventory()) {
+            uuid = e.getPlayer().toString();
+            addIconItems();
+        }
     }
 
     private void addIconItems() {
-
-        String uuid = defaultGUI.getPlayer().getUniqueId().toString();
 
         ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
         ItemMeta reset_meta = reset.getItemMeta();
