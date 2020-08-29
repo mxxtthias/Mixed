@@ -1,9 +1,10 @@
-package xps;
+package network.atria;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
+import network.atria.RankSystem.ChatPrefix;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,15 +13,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import xps.Command.PingCommand;
-import xps.Config.KillEffectsConfig;
-import xps.Config.RanksConfig;
-import xps.KillEffects.*;
-import xps.RankSystem.CheckRankCommand;
-import xps.Statics.StatsCommand;
-import xps.Database.*;
-import xps.Statics.PlayerStats;
-import xps.Task.BroadCastMesseage;
+import network.atria.Command.PingCommand;
+import network.atria.Util.KillEffectsConfig;
+import network.atria.Util.RanksConfig;
+import network.atria.KillEffects.*;
+import network.atria.RankSystem.CheckRankCommand;
+import network.atria.Statics.StatsCommand;
+import network.atria.Database.*;
+import network.atria.RankSystem.RankSystemManager;
+import network.atria.Task.BroadCastMesseage;
 
 public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
@@ -56,9 +57,13 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
         Bukkit.getServer().getPluginManager().registerEvents(new KillEffectsGUI(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new KillSoundsGUI(), this);
         Bukkit.getServer().getPluginManager().registerEvents(new DefaultGUI(), this);
-        new PlayerStats(this);
+        Bukkit.getServer().getPluginManager().registerEvents(new ProjectileGUI(), this);
+        Bukkit.getServer().getPluginManager().registerEvents(new ChatPrefix(), this);
+
+        new RankSystemManager(this);
         new KillEffects(this);
         new KillSounds(this);
+        new ProjectileTrails(this);
     }
 
     private void registerCommands() {

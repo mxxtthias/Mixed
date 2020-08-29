@@ -1,8 +1,8 @@
-package xps.RankSystem;
+package network.atria.RankSystem;
 
 import org.bukkit.ChatColor;
-import xps.Config.RanksConfig;
-import xps.Database.MySQLSetterGetter;
+import network.atria.Util.RanksConfig;
+import network.atria.Database.MySQLSetterGetter;
 
 import java.util.ArrayList;
 import java.util.List;

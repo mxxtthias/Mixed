@@ -1,6 +1,6 @@
-package xps.Database;
+package network.atria.Database;
 
-import xps.Main;
+import network.atria.Main;
 
 import java.sql.*;
 

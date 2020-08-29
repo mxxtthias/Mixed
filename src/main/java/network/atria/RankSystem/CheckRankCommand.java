@@ -1,4 +1,4 @@
-package xps.RankSystem;
+package network.atria.RankSystem;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

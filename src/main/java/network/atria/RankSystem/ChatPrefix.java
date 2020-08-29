@@ -1,10 +1,17 @@
-package xps.RankSystem;
+package network.atria.RankSystem;
 
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
+import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.event.NameDecorationChangeEvent;
+import tc.oc.pgm.api.player.MatchPlayer;
+
 import java.util.UUID;
 
 public class ChatPrefix implements Listener {
@@ -28,6 +35,14 @@ public class ChatPrefix implements Listener {
     private static void removeGroup(User user, String groupName) {
         PermissionNode node = PermissionNode.builder("pgm.group." + groupName).build();
         user.data().remove(node);
+    }
+
+    @EventHandler
+    public void onNameDecorationChange(NameDecorationChangeEvent e) {
+        Player player = Bukkit.getPlayer(e.getUUID());
+        MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
+
+        matchPlayer.getBukkit().setDisplayName(PGM.get().getNameDecorationRegistry().getDecoratedName(player, matchPlayer.getParty()));
     }
 }
 

@@ -1,7 +1,8 @@
-package xps.KillEffects;
+package network.atria.KillEffects;
 
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
+import network.atria.Util.getPlayerData;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,20 +14,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
-import xps.Database.MySQLSetterGetter;
-import xps.Main;
+import network.atria.Database.MySQLSetterGetter;
+import network.atria.Main;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import static java.lang.Math.*;
 
 public class KillEffects implements Listener {
-
-    private final getPlayerData playerData = new getPlayerData();
 
     @EventHandler
     public void onPlayerDeath(MatchPlayerDeathEvent e) {
@@ -40,7 +37,7 @@ public class KillEffects implements Listener {
 
             switch (getEffect) {
                 case "BLOOD":
-                    if (playerData.hasRequirePoint(murder.getId().toString(), playerData.getRequirePoints("BLOOD")) || playerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+                    if (getPlayerData.hasRequirePoint(murder.getId().toString(), getPlayerData.getRequirePoints("BLOOD")) || getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
                         Location location = victim.getBukkit().getLocation();
 
                         createCustomEffect(
@@ -51,7 +48,7 @@ public class KillEffects implements Listener {
                                 0.75F,
                                 0.01F,
                                 50,
-                                getData(Material.REDSTONE_BLOCK, (short) 0),
+                                getData(),
                                 murder.getBukkit().getPlayer());
 
                         createCustomEffect(
@@ -62,13 +59,13 @@ public class KillEffects implements Listener {
                                 0.75F,
                                 0.01F,
                                 50,
-                                getData(Material.REDSTONE_BLOCK, (short) 0),
+                                getData(),
                                 murder.getBukkit().getPlayer());
                     }
                     break;
 
                 case "HEART":
-                    if (playerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+                    if (getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
                         Location location = victim.getBukkit().getLocation();
 
                         createCustomEffect(
@@ -85,7 +82,7 @@ public class KillEffects implements Listener {
                     break;
 
                 case "SMOKE":
-                    if (playerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+                    if (getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
                         Location location = victim.getBukkit().getLocation();
 
                         createCustomEffect(
@@ -103,7 +100,7 @@ public class KillEffects implements Listener {
                     break;
 
                 case "FLAME":
-                    if (playerData.hasRequirePoint(murder.getId().toString(), playerData.getRequirePoints("FLAME")) || playerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+                    if (getPlayerData.hasRequirePoint(murder.getId().toString(), getPlayerData.getRequirePoints("FLAME")) || getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
                         Location location = victim.getBukkit().getLocation();
 
                         createCustomEffect(
@@ -120,7 +117,7 @@ public class KillEffects implements Listener {
                     break;
 
                 case "RAINBOW":
-                    if (playerData.hasRequirePoint(murder.getId().toString(), playerData.getRequirePoints("RAINBOW")) || playerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+                    if (getPlayerData.hasRequirePoint(murder.getId().toString(), getPlayerData.getRequirePoints("RAINBOW")) || getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
                         Location location = victim.getBukkit().getLocation();
 
                         double radius = 2;
@@ -132,15 +129,14 @@ public class KillEffects implements Listener {
                             double z = cos(y * radius);
 
                             createCustomEffectRainbow(
-                                    EnumParticle.REDSTONE,
-                                    ((float) (location.getX() + x)),
-                                    ((float) (location.getY() + y)),
-                                    ((float) (location.getZ() + z)),
-                                    0,
-                                    0,
-                                    0,
-                                    0.001F,
-                                    20,
+                                    (float) (location.getX() + x),
+                                    (float) (location.getY() + y),
+                                    (float) (location.getZ() + z),
+                                    0F,
+                                    0F,
+                                    0F,
+                                    0.01F,
+                                    50,
                                     murder.getBukkit().getPlayer()
                             );
                         }
@@ -158,15 +154,15 @@ public class KillEffects implements Listener {
                             double circle = 2 * Math.PI * i / point;
                             Location ring = Location.clone().add(radius * Math.sin(circle), 0.0d, radius * cos(circle));
 
-                            createCustomEffect(
-                                    EnumParticle.REDSTONE,
-                                    ring,
-                                    0.0f,
-                                    0.0f,
-                                    0.0f,
-                                    0.001f,
-                                    20,
-                                    null,
+                            createCustomEffectRainbow(
+                                    (float) ring.getX(),
+                                    (float) ring.getY(),
+                                    (float) ring.getZ(),
+                                    0F,
+                                    0F,
+                                    0F,
+                                    0.01F,
+                                    50,
                                     murder.getBukkit().getPlayer()
                             );
                         }
@@ -236,7 +232,7 @@ public class KillEffects implements Listener {
                                 1f,
                                 0.5f,
                                 0.1f,
-                                200,
+                                100,
                                 null,
                                 murder.getBukkit().getPlayer()
                         );
@@ -246,32 +242,10 @@ public class KillEffects implements Listener {
         }
     }
 
-    private void createCustomEffectRainbow(EnumParticle particle, float x, float y, float z, float x_offset, float y_offset, float z_offset, float speed, int amount, Player player) {
-
-        int red = Color.RED.asRGB();
-        int blue = Color.BLUE.asRGB();
-        int green = Color.GREEN.asRGB();
-        int orange = Color.ORANGE.asRGB();
-        int aqua = Color.AQUA.asRGB();
-        int lime = Color.LIME.asRGB();
-        int yellow = Color.YELLOW.asRGB();
-        int purple = Color.PURPLE.asRGB();
-
-        List<Integer> rainbow = new ArrayList<>();
-        rainbow.add(red);
-        rainbow.add(blue);
-        rainbow.add(aqua);
-        rainbow.add(lime);
-        rainbow.add(yellow);
-        rainbow.add(green);
-        rainbow.add(purple);
-        rainbow.add(orange);
-
-        int index = (new Random()).nextInt(rainbow.size());
-        int getColor = rainbow.get(index);
+    private void createCustomEffectRainbow(float x, float y, float z, float x_offset, float y_offset, float z_offset, float speed, int amount, Player player) {
 
         PacketPlayOutWorldParticles packet = new PacketPlayOutWorldParticles(
-                particle,
+                EnumParticle.REDSTONE,
                 true,
                 x,
                 y,
@@ -281,10 +255,26 @@ public class KillEffects implements Listener {
                 z_offset,
                 speed,
                 amount,
-                getColor
+                setRainbow()
         );
 
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+    }
+
+    public static int setRainbow() {
+        List<Integer> rainbow = new ArrayList<>();
+
+        rainbow.add(Color.AQUA.asRGB());
+        rainbow.add(Color.BLUE.asRGB());
+        rainbow.add(Color.LIME.asRGB());
+        rainbow.add(Color.PURPLE.asRGB());
+        rainbow.add(Color.RED.asRGB());
+        rainbow.add(Color.WHITE.asRGB());
+        rainbow.add(Color.YELLOW.asRGB());
+
+        int index = (new Random()).nextInt(rainbow.size());
+
+        return rainbow.get(index);
     }
 
     private void createCustomEffect(EnumParticle particle, Location location, float x_offset, float y_offset, float z_offset, float speed, int amount, int[] data, Player player) {
@@ -301,12 +291,11 @@ public class KillEffects implements Listener {
                 amount,
                 data
         );
-
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
     }
 
-    private int[] getData(Material data, short id) {
-        return new int[]{data.getId(), id};
+    private int[] getData() {
+        return new int[]{Material.REDSTONE_BLOCK.getId(), (short) 0};
     }
 
     public KillEffects(Plugin plugin) {

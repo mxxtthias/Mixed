@@ -1,4 +1,4 @@
-package xps.Statics;
+package network.atria.RankSystem;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,12 +19,12 @@ import tc.oc.pgm.destroyable.DestroyableDestroyedEvent;
 import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.flag.event.FlagCaptureEvent;
 import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
-import xps.Database.MySQLSetterGetter;
-import xps.RankSystem.ChatPrefix;
-import xps.RankSystem.Ranks;
+import network.atria.Database.MySQLSetterGetter;
+import network.atria.RankSystem.ChatPrefix;
+import network.atria.RankSystem.Ranks;
 
 @ListenerScope(MatchScope.RUNNING)
-public class PlayerStats implements Listener, MatchModule {
+public class RankSystemManager implements Listener, MatchModule {
 
     private final ChatPrefix chatPrefix = new ChatPrefix();
 
@@ -168,7 +168,7 @@ public class PlayerStats implements Listener, MatchModule {
         }
     }
 
-    public PlayerStats(Plugin plugin) {
+    public RankSystemManager(Plugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 }

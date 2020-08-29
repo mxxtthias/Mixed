@@ -1,4 +1,4 @@
-package xps.Command;
+package network.atria.Command;
 
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import org.bukkit.ChatColor;

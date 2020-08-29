@@ -1,9 +1,9 @@
-package xps.Task;
+package network.atria.Task;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
-import xps.Main;
+import network.atria.Main;
 
 import java.util.*;
 

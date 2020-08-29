@@ -1,6 +1,6 @@
-package xps.Database;
+package network.atria.Database;
 
-import xps.Main;
+import network.atria.Main;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ public class MySQLSetterGetter {
         if (!playerExists(uuid)) {
             Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
             Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND) VALUES ('" + uuid + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT');");
+            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('" + uuid + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');");
         }
     }
 
@@ -236,6 +236,24 @@ public class MySQLSetterGetter {
         return i;
     }
 
+    public static String getProjectileTrails(String uuid) {
+        String i = "";
+        if (playerExists(uuid)) {
+            try {
+                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+                if(rs.next())
+                    rs.getString("PROJECTILE");
+                i = rs.getString("PROJECTILE");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            createPlayer(uuid);
+            getKillSound(uuid);
+        }
+        return i;
+    }
+
     /* Monuments */
 
     public static void setMonuments(String uuid, int monuments) {
@@ -382,7 +400,7 @@ public class MySQLSetterGetter {
         }
     }
 
-    /* Rank */
+    /* RankSystemManager */
 
     public static void setRank(String uuid, String rank) {
         if(playerExists(uuid)) {
@@ -405,12 +423,22 @@ public class MySQLSetterGetter {
     }
 
     /* KillSound */
-    public static void setKillSound(String uuid, String effect) {
+    public static void setKillSound(String uuid, String sound) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANKS SET SOUND= '" + effect + "' WHERE UUID= '" + uuid + "';");
+            Main.mysql.update("UPDATE RANKS SET SOUND= '" + sound + "' WHERE UUID= '" + uuid + "';");
         } else {
             createPlayer(uuid);
-            setKillSound(uuid, effect);
+            setKillSound(uuid, sound);
+        }
+    }
+
+    /* Projectile Trails */
+    public static void setProjectileTrails(String uuid, String projectile) {
+        if(playerExists(uuid)) {
+            Main.mysql.update("UPDATE RANKS SET PROJECTILE= '" + projectile + "' WHERE UUID= '" + uuid + "';");
+        } else {
+            createPlayer(uuid);
+            setProjectileTrails(uuid, projectile);
         }
     }
 }

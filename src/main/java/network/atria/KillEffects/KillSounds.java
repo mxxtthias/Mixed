@@ -1,10 +1,9 @@
-package xps.KillEffects;
+package network.atria.KillEffects;
 
-import org.bukkit.Bukkit;
+import network.atria.Util.getPlayerData;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.player.MatchPlayer;
@@ -13,8 +12,7 @@ import tc.oc.pgm.api.setting.SettingKey;
 import tc.oc.pgm.api.setting.SettingValue;
 import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.util.chat.Sound;
-import xps.Database.MySQLSetterGetter;
-import xps.Main;
+import network.atria.Database.MySQLSetterGetter;
 
 @ListenerScope(MatchScope.RUNNING)
 public class KillSounds implements Listener {
