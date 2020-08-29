@@ -1,7 +1,7 @@
 name: Mixed
 version: 2.0-SNAPSHOT
 author: XPS
-main: xps.Main
+main: network.atria.Main
 commands:
   stats:
     description: stats
