@@ -1,4 +1,4 @@
-package xps.KillEffects;
+package network.atria.KillEffects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,7 +22,7 @@ public class DefaultGUI implements Listener, CommandExecutor {
     public static Inventory gui;
 
     public DefaultGUI() {
-        gui = Bukkit.createInventory(null, 27, "Kill Effect/Sound Selector");
+        gui = Bukkit.createInventory(null, 27, "Main GUI");
         addIconItems();
     }
 
@@ -35,14 +35,15 @@ public class DefaultGUI implements Listener, CommandExecutor {
         close.setItemMeta(meta);
 
         gui.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.GREEN + "Kill Effects"));
-        gui.setItem(13, createGuiItem(Material.RECORD_3, ChatColor.GREEN + "Kill Sounds"));
-        gui.setItem(16, close);
+        gui.setItem(12, createGuiItem(Material.RECORD_3, ChatColor.GREEN + "Kill Sounds"));
+        gui.setItem(14, createGuiItem(Material.BOW, ChatColor.GREEN + "Projectile Trails"));
+        gui.setItem(17, close);
     }
 
     @EventHandler
     public void onGuiClick(final InventoryClickEvent e) {
         try {
-            if (e.getView().getTitle().equals("Kill Effect/Sound Selector")) {
+            if (e.getView().getTitle().equals("Main GUI")) {
                 e.setCancelled(true);
 
                 final ItemStack clickedItem = e.getCurrentItem();
@@ -59,6 +60,8 @@ public class DefaultGUI implements Listener, CommandExecutor {
                             player.openInventory(KillEffectsGUI.EffectsGUI);
                         } else if (getItemName.equals(ChatColor.GREEN + "Kill Sounds")) {
                             player.openInventory(KillSoundsGUI.SoundsGUI);
+                        } else if (getItemName.equals(ChatColor.GREEN + "Projectile Trails")) {
+                            player.openInventory(ProjectileGUI.ProjectileGUI);
                         }
                     }
                 }
