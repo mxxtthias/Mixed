@@ -1,9 +1,8 @@
-package xps.KillEffects;
+package network.atria.Util;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import xps.Config.KillEffectsConfig;
-import xps.Database.MySQLSetterGetter;
+import network.atria.Database.MySQLSetterGetter;
 
 public class getPlayerData {
 
@@ -21,11 +20,11 @@ public class getPlayerData {
 
     public static String canUseEffects(String uuid, Integer require) {
         if(MySQLSetterGetter.getPoints(uuid) >= require) {
-            return ChatColor.GREEN + "Unlocked";
+            return ChatColor.GREEN + "" + ChatColor.BOLD + "✔ Unlocked";
         } else {
             int current = MySQLSetterGetter.getPoints(uuid);
             int result = require - current;
-            return ChatColor.RED + "You need " + ChatColor.YELLOW + result + ChatColor.RED + " more points";
+            return ChatColor.RED + "" +ChatColor.BOLD + "✖ You need " + ChatColor.YELLOW + result + ChatColor.RED + " more points";
         }
     }
 }

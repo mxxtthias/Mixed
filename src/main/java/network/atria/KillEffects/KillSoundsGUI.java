@@ -1,5 +1,6 @@
-package xps.KillEffects;
+package network.atria.KillEffects;
 
+import network.atria.Util.getPlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -12,29 +13,28 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import xps.Config.KillEffectsConfig;
-import xps.Database.MySQLSetterGetter;
+import network.atria.Util.KillEffectsConfig;
+import network.atria.Database.MySQLSetterGetter;
 
-import static xps.KillEffects.DefaultGUI.createGuiItem;
+import static network.atria.KillEffects.DefaultGUI.createGuiItem;
 
 public class KillSoundsGUI implements Listener {
 
     public static Inventory SoundsGUI;
-    private String uuid;
 
     public KillSoundsGUI() {
         SoundsGUI = Bukkit.createInventory(null, 27, "Kill Sound Selector");
     }
 
     @EventHandler
-    private void getPlayer(InventoryOpenEvent e) {
-        if(SoundsGUI.getTitle().equals(e.getInventory().getTitle())) {
-            uuid = e.getPlayer().toString();
-            addIconItems();
+    public void getPlayer(InventoryOpenEvent e) {
+        if(e.getView().getTitle().equals("Kill Sound Selector")) {
+            String uuid = e.getPlayer().getUniqueId().toString();
+            addIconItems(uuid);
         }
     }
 
-    private void addIconItems() {
+    private void addIconItems(String uuid) {
 
         ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
         ItemMeta reset_meta = reset.getItemMeta();
@@ -48,11 +48,11 @@ public class KillSoundsGUI implements Listener {
         back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
         back.setItemMeta(back_meta);
 
-        SoundsGUI.setItem(9, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT","", getPlayerData.canUseEffects(uuid, 0)));
-        SoundsGUI.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER","", getPlayerData.canUseEffects(uuid, getSoundPoint("VILLAGER"))));
-        SoundsGUI.setItem(11, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", "", getPlayerData.canUseEffects(uuid, getSoundPoint("HOWL"))));
-        SoundsGUI.setItem(12, createGuiItem(Material.TNT, ChatColor.AQUA + "BOMB", "", getPlayerData.canUseEffects(uuid, getSoundPoint("BOMB"))));
-        SoundsGUI.setItem(13, createGuiItem(Material.SEEDS, ChatColor.AQUA + "BURP","", getPlayerData.canUseEffects(uuid, getSoundPoint("BURP"))));
+        SoundsGUI.setItem(10, createGuiItem(Material.GHAST_TEAR, ChatColor.AQUA + "DEFAULT","", getPlayerData.canUseEffects(uuid, 0)));
+        SoundsGUI.setItem(11, createGuiItem(Material.REDSTONE, ChatColor.AQUA + "VILLAGER","", getPlayerData.canUseEffects(uuid, getSoundPoint("VILLAGER"))));
+        SoundsGUI.setItem(12, createGuiItem(Material.BONE, ChatColor.AQUA + "HOWL", "", getPlayerData.canUseEffects(uuid, getSoundPoint("HOWL"))));
+        SoundsGUI.setItem(13, createGuiItem(Material.TNT, ChatColor.AQUA + "BOMB", "", getPlayerData.canUseEffects(uuid, getSoundPoint("BOMB"))));
+        SoundsGUI.setItem(14, createGuiItem(Material.SEEDS, ChatColor.AQUA + "BURP","", getPlayerData.canUseEffects(uuid, getSoundPoint("BURP"))));
         SoundsGUI.setItem(26, reset);
         SoundsGUI.setItem(8, back);
     }

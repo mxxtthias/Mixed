@@ -1,5 +1,6 @@
-package xps.KillEffects;
+package network.atria.KillEffects;
 
+import network.atria.Util.getPlayerData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
@@ -12,29 +13,28 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import xps.Config.KillEffectsConfig;
-import xps.Database.MySQLSetterGetter;
+import network.atria.Util.KillEffectsConfig;
+import network.atria.Database.MySQLSetterGetter;
 
-import static xps.KillEffects.DefaultGUI.createGuiItem;
+import static network.atria.KillEffects.DefaultGUI.createGuiItem;
 
 public class KillEffectsGUI implements Listener {
 
     public static Inventory EffectsGUI;
-    private String uuid;
 
     public KillEffectsGUI() {
         EffectsGUI = Bukkit.createInventory(null, 27, "Kill Effect Selector");
     }
 
     @EventHandler
-    private void getPlayer(InventoryOpenEvent e) {
-        if(EffectsGUI.getTitle().equals(e.getInventory().getTitle())) {
-            uuid = e.getPlayer().toString();
-            addIconItems();
+    public void getPlayer(InventoryOpenEvent e) {
+        if(e.getView().getTitle().equals("Kill Effect Selector")) {
+            String uuid = e.getPlayer().getUniqueId().toString();
+            addIconItems(uuid);
         }
     }
 
-    private void addIconItems() {
+    private void addIconItems(String uuid) {
 
         ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
         ItemMeta reset_meta = reset.getItemMeta();
