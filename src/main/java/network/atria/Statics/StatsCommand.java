@@ -1,5 +1,6 @@
-package xps.Statics;
+package network.atria.Statics;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -7,7 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import xps.Database.MySQLSetterGetter;
+import network.atria.Database.MySQLSetterGetter;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -60,14 +61,14 @@ public class StatsCommand implements CommandExecutor {
     }
 
     private void stats(Player p, String name, int kills, int deaths, int flags, int cores, int wools, int dtm) {
-        p.sendMessage(ChatColor.RED + "──── " + ChatColor.DARK_AQUA + name + ChatColor.RED + " ────");
+        p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 18) + ChatColor.AQUA + " " + name + " " + ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 18));
         try {
-            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths + " " + ChatColor.DARK_PURPLE + "K/D: " + ChatColor.GOLD + kd(kills, deaths).doubleValue());
+            p.sendMessage(ChatColor.DARK_AQUA + "Kills: " + ChatColor.AQUA + kills + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Deaths: " + ChatColor.AQUA + deaths + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "K/D: " + ChatColor.AQUA + kd(kills, deaths).doubleValue());
         } catch (NullPointerException ignored) {
-            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + " " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths);
+            p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths);
         }
-        p.sendMessage(ChatColor.DARK_PURPLE + "Wools: " + ChatColor.GOLD + wools + " " + ChatColor.DARK_PURPLE + "Cores: " + ChatColor.GOLD + cores);
-        p.sendMessage(ChatColor.DARK_PURPLE + "Flags: " + ChatColor.GOLD + flags + " " + ChatColor.DARK_PURPLE + "Monuments: " + ChatColor.GOLD + dtm);
+        p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 20) + ChatColor.AQUA + " " + "Objectives" + " " + ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 20));
+        p.sendMessage(ChatColor.DARK_AQUA + "Wools: " + ChatColor.AQUA + wools + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Cores: " + ChatColor.AQUA + cores + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Flags: " + ChatColor.AQUA + flags + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Monuments: " + ChatColor.AQUA + dtm);
     }
 
     private Integer getKillStats(String uuid) {
