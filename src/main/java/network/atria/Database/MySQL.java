@@ -1,88 +1,59 @@
 package network.atria.Database;
 
+import com.zaxxer.hikari.HikariDataSource;
 import network.atria.Main;
 
 import java.sql.*;
 
 public class MySQL {
 
-    public final String host;
-    public final String database;
-    public final String user;
-    public final String password;
-    public final Integer port;
+    public static HikariDataSource hikari;
 
-    private Connection connection;
+    public static void connect() {
+        hikari = new HikariDataSource();
 
-    public MySQL(String host, String database, String user, String password, int port) {
-        this.host = host;
-        this.database = database;
-        this.user = user;
-        this.password = password;
-        this.port = port;
+        hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+        hikari.addDataSourceProperty("serverName", getHost());
+        hikari.addDataSourceProperty("port", getPort());
+        hikari.addDataSourceProperty("databaseName", getDatabase());
+        hikari.addDataSourceProperty("user", getUser());
+        hikari.addDataSourceProperty("password", getPassword());
 
-        connect();
+        hikari.setMaximumPoolSize(500);
+        hikari.setConnectionTimeout(20000);
+        hikari.setMinimumIdle(50);
     }
 
-    public void connect() {
-        try {
-            this.connection = DriverManager.getConnection("jdbc:mysql://" + getHost() + ":" +
-                            getPort() + "/" + getDatabase() + "?autoReconnect=true", getUser(), getPassword());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void close() {
-        try {
-            if (this.connection != null) {
-                this.connection.close();
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void update(String qry) {
-        try {
-            Statement st = this.connection.createStatement();
-            st.executeUpdate(qry);
-            st.close();
-        } catch (SQLException e) {
-            connect();
-            e.printStackTrace();
-        }
-    }
-
-    public ResultSet query(String qry) {
-        ResultSet rs = null;
-        try {
-            Statement st = this.connection.createStatement();
-            rs = st.executeQuery(qry);
-        } catch (SQLException e) {
-            connect();
-            e.printStackTrace();
-        }
-        return rs;
-    }
-
-    public static String getHost() {
+    private static String getHost() {
         return Main.getInstance().getConfig().getString("MySQL.Host");
     }
 
-    public static String getDatabase() {
+    private static String getDatabase() {
         return Main.getInstance().getConfig().getString("MySQL.Database");
     }
 
-    public static String getUser() {
+    private static String getUser() {
         return Main.getInstance().getConfig().getString("MySQL.User");
     }
 
-    public static String getPassword() {
+    private static String getPassword() {
         return Main.getInstance().getConfig().getString("MySQL.Password");
     }
 
-    public static Integer getPort() {
+    private static Integer getPort() {
         return Main.getInstance().getConfig().getInt("MySQL.Port");
+    }
+
+    public static HikariDataSource getHikari() {
+        return hikari;
+    }
+
+    public static Connection getConnection() {
+        try {
+            return hikari.getConnection();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

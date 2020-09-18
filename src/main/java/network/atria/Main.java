@@ -23,6 +23,10 @@ import network.atria.Database.*;
 import network.atria.RankSystem.RankSystemManager;
 import network.atria.Task.BroadCastMesseage;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
     public static MySQL mysql;
@@ -50,6 +54,16 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
         BroadCastMesseage broadCastMesseage = new BroadCastMesseage();
         broadCastMesseage.randomMesseage();
+
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        if(MySQL.getHikari() != null) {
+            MySQL.getHikari().close();
+        }
+        super.onDisable();
     }
 
     private void registerEvents() {
@@ -75,9 +89,16 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
     }
 
     private void ConnectMySQL() {
-        (mysql = new MySQL(MySQL.getHost(), MySQL.getDatabase(), MySQL.getUser(), MySQL.getPassword(), MySQL.getPort())).update("CREATE TABLE IF NOT EXISTS STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64));");
-        mysql.update("CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64));");
-        mysql.update("CREATE TABLE IF NOT EXISTS RANKS(UUID varchar(64), NAME varchar(64), POINTS int, GAMERANK varchar(64), EFFECT varchar(64), SOUND varchar(64));");
+        try {
+            Connection connection = MySQL.getConnection();
+            Statement statement = connection.createStatement();
+
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64));");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(64), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(64));");
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS RANKS(UUID varchar(64), NAME varchar(64), POINTS int, GAMERANK varchar(64), EFFECT varchar(64), SOUND varchar(64));");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public static Main getInstance() {

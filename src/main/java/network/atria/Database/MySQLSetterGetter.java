@@ -2,6 +2,7 @@ package network.atria.Database;
 
 import network.atria.Main;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -9,47 +10,90 @@ public class MySQLSetterGetter {
 
     public static boolean playerExists(String uuid) {
         try {
-            ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-            ResultSet week_rs = Main.mysql.query("SELECT * FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
-            ResultSet rank_rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+            PreparedStatement statement2 = MySQL.getConnection().prepareStatement("SELECT * FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
+            PreparedStatement statement3 = MySQL.getConnection().prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+
+            ResultSet rs = statement.executeQuery();
+            ResultSet week_rs = statement2.executeQuery();
+            ResultSet rank_rs = statement3.executeQuery();
+
             return (rs.next() && rs.getString("UUID") != null && week_rs.next() && week_rs.getString("UUID") != null && rank_rs.next() && rank_rs.getString("UUID") != null);
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            if (MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     public static void createPlayer(String uuid) {
         if (!playerExists(uuid)) {
-            Main.mysql.update("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
-            Main.mysql.update("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('" + uuid + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
+                PreparedStatement statement2 = MySQL.getConnection().prepareStatement("INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('" + uuid + "', '0', '0', '0', '0', '0', '0', 'Null');");
+                PreparedStatement statement3 = MySQL.getConnection().prepareStatement("INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('" + uuid + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');");
+
+                statement.execute(); statement2.execute(); statement3.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
     public static String getName(String uuid) {
         String i = "";
-        if (playerExists(uuid)) {
             try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-                if (rs.next())
-                    rs.getString("NAME");
-                i = rs.getString("NAME");
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+                ResultSet rs = statement.executeQuery();
+                if (rs.next()) i = rs.getString("UUID");
             } catch (SQLException e) {
                 e.printStackTrace();
+            } finally {
+                if (MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getName(uuid);
-        }
         return i;
     }
 
     public static void setName(String uuid, String name) {
         if (playerExists(uuid)) {
-            Main.mysql.update("UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement(("UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
+                PreparedStatement statemen2 = MySQL.getConnection().prepareStatement(("UPDATE STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
+                PreparedStatement statemen3 = MySQL.getConnection().prepareStatement(("UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
+                statement.execute(); statemen2.execute(); statemen3.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setName(uuid, name);
@@ -58,198 +102,220 @@ public class MySQLSetterGetter {
 
     public static Integer getMonuments(String uuid) {
         int i = 0;
-        if(playerExists(uuid)) {
             try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getInt("MONUMENTS");
-                i = rs.getInt("MONUMENTS");
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+                ResultSet rs = statement.executeQuery();
+                if (rs.next()) i = rs.getInt("MONUMENTS");
             } catch (SQLException e) {
                 e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getMonuments(uuid);
-        }
         return i;
     }
 
     public static Integer getFlags(String uuid) {
         int i = 0;
-        if(playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getInt("FLAGS");
-                i = rs.getInt("FLAGS");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getInt("FLAGS");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getFlags(uuid);
         }
         return i;
     }
 
     public static Integer getCores(String uuid) {
         int i = 0;
-        if (playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-                if (rs.next())
-                    rs.getInt("CORES");
-                i = rs.getInt("CORES");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getInt("CORES");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getCores(uuid);
         }
         return i;
     }
 
     public static Integer getWools(String uuid) {
         int i = 0;
-        if(playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getInt("WOOLS");
-                i = rs.getInt("WOOLS");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getInt("WOOLS");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getWools(uuid);
         }
         return i;
     }
 
     public static Integer getKills(String uuid) {
         int i = 0;
-        if(playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getInt("KILLS");
-                i = rs.getInt("KILLS");
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getInt("KILLS");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
                 } catch (SQLException e) {
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getKills(uuid);
         }
         return i;
     }
 
     public static Integer getDeaths(String uuid) {
         int i = 0;
-        if (playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
-                if (rs.next())
-                    rs.getInt("DEATHS");
-                i = rs.getInt("DEATHS");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getInt("DEATHS");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getDeaths(uuid);
         }
         return i;
     }
 
     public static Integer getPoints(String uuid) {
         int i = 0;
-        if (playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getInt("POINTS");
-                i = rs.getInt("POINTS");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getInt("POINTS");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getPoints(uuid);
         }
         return i;
     }
 
     public static String getRank(String uuid) {
         String i = "";
-        if (playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getString("GAMERANK");
-                i = rs.getString("GAMERANK");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getString("GAMERANK");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getRank(uuid);
         }
         return i;
     }
 
     public static String getKillEffect(String uuid) {
         String i = "";
-        if (playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getString("EFFECT");
-                i = rs.getString("EFFECT");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getString("EFFECT");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getKillEffect(uuid);
         }
         return i;
     }
 
     public static String getKillSound(String uuid) {
         String i = "";
-        if (playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getString("SOUND");
-                i = rs.getString("SOUND");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getString("SOUND");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getKillSound(uuid);
         }
         return i;
     }
 
     public static String getProjectileTrails(String uuid) {
         String i = "";
-        if (playerExists(uuid)) {
-            try {
-                ResultSet rs = Main.mysql.query("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
-                if(rs.next())
-                    rs.getString("PROJECTILE");
-                i = rs.getString("PROJECTILE");
-            } catch (SQLException e) {
-                e.printStackTrace();
+        try {
+            PreparedStatement statement = MySQL.getConnection().prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) i = rs.getString("PROJECTILE");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if(MySQL.getConnection() != null) {
+                try {
+                    MySQL.getConnection().close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
-        } else {
-            createPlayer(uuid);
-            getKillSound(uuid);
         }
         return i;
     }
@@ -258,8 +324,22 @@ public class MySQLSetterGetter {
 
     public static void setMonuments(String uuid, int monuments) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE WEEK_STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
+                try {
+                    PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE WEEK_STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
+                    PreparedStatement statement2 = MySQL.getConnection().prepareStatement("UPDATE STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
+
+                    statement.execute(); statement2.execute();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } finally {
+                    if(MySQL.getConnection() != null) {
+                        try {
+                            MySQL.getConnection().close();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
         } else {
             createPlayer(uuid);
             setMonuments(uuid, monuments);
@@ -278,9 +358,23 @@ public class MySQLSetterGetter {
     /* Kills */
 
     public static void setKills(String uuid, Integer kills) {
-        if (playerExists(uuid)) {
-            Main.mysql.update("UPDATE WEEK_STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
+        if(playerExists(uuid)) {
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE WEEK_STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
+                PreparedStatement statement2 = MySQL.getConnection().prepareStatement("UPDATE STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute(); statement2.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setKills(uuid, kills);
@@ -299,9 +393,23 @@ public class MySQLSetterGetter {
     /* Deaths */
 
     public static void setDeaths(String uuid, Integer deaths) {
-        if (playerExists(uuid)) {
-            Main.mysql.update("UPDATE WEEK_STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
+        if(playerExists(uuid)) {
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE WEEK_STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
+                PreparedStatement statement2 = MySQL.getConnection().prepareStatement("UPDATE STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute(); statement2.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setDeaths(uuid, deaths);
@@ -320,9 +428,23 @@ public class MySQLSetterGetter {
     /* Wools */
 
     public static void setWools(String uuid, Integer wools) {
-        if (playerExists(uuid)) {
-            Main.mysql.update("UPDATE WEEK_STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
+        if(playerExists(uuid)) {
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE WEEK_STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
+                PreparedStatement statement2 = MySQL.getConnection().prepareStatement("UPDATE STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute(); statement2.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setWools(uuid, wools);
@@ -342,8 +464,22 @@ public class MySQLSetterGetter {
 
     public static void setCores(String uuid, Integer cores) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE WEEK_STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE WEEK_STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
+                PreparedStatement statement2 = MySQL.getConnection().prepareStatement("UPDATE STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute(); statement2.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setCores(uuid, cores);
@@ -363,8 +499,22 @@ public class MySQLSetterGetter {
 
     public static void setFlags(String uuid, Integer flags) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE WEEK_STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
-            Main.mysql.update("UPDATE STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE WEEK_STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
+                PreparedStatement statement2 = MySQL.getConnection().prepareStatement("UPDATE STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute(); statement2.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setFlags(uuid, flags);
@@ -384,7 +534,21 @@ public class MySQLSetterGetter {
 
     public static void setPoints(String uuid, Integer points) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANKS SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE RANKS SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setPoints(uuid, points);
@@ -404,7 +568,21 @@ public class MySQLSetterGetter {
 
     public static void setRank(String uuid, String rank) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANKS SET GAMERANK= '" + rank + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE RANKS SET GAMERANK= '" + rank + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setRank(uuid, rank);
@@ -415,7 +593,21 @@ public class MySQLSetterGetter {
 
     public static void setKillEffect(String uuid, String effect) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANKS SET EFFECT= '" + effect + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE RANKS SET EFFECT= '" + effect + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setKillEffect(uuid, effect);
@@ -425,7 +617,21 @@ public class MySQLSetterGetter {
     /* KillSound */
     public static void setKillSound(String uuid, String sound) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANKS SET SOUND= '" + sound + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE RANKS SET SOUND= '" + sound + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setKillSound(uuid, sound);
@@ -435,7 +641,21 @@ public class MySQLSetterGetter {
     /* Projectile Trails */
     public static void setProjectileTrails(String uuid, String projectile) {
         if(playerExists(uuid)) {
-            Main.mysql.update("UPDATE RANKS SET PROJECTILE= '" + projectile + "' WHERE UUID= '" + uuid + "';");
+            try {
+                PreparedStatement statement = MySQL.getConnection().prepareStatement("UPDATE RANKS SET PROJECTILE= '" + projectile + "' WHERE UUID= '" + uuid + "';");
+
+                statement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                if(MySQL.getConnection() != null) {
+                    try {
+                        MySQL.getConnection().close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             createPlayer(uuid);
             setProjectileTrails(uuid, projectile);
