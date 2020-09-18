@@ -42,7 +42,7 @@ public class ProjectileTrails implements Listener {
                                 player
                         );
                         break;
-                    case "RAINBOW":
+                    case "RAINBOW_TRAIL":
                         playProjectileTrails(
                                 EnumParticle.SPELL_MOB,
                                 projectile,
@@ -88,11 +88,11 @@ public class ProjectileTrails implements Listener {
                         (float) x,
                         (float) y,
                         (float) z,
-                        (float) 0.0,
-                        (float) 0.0,
-                        (float) 0.0,
-                        (float) 1.0,
-                        10,
+                        0F, // x offset
+                        0F, // y offset
+                        0F, // z offset
+                        1F, // speed
+                        15, // amount
                         null
                 );
 

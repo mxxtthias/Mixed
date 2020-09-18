@@ -46,7 +46,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
         config.options().copyDefaults();
         saveDefaultConfig();
-
+        MySQL.connect();
         ConnectMySQL();
 
         registerCommands();
