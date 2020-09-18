@@ -11,6 +11,8 @@ import org.bukkit.event.Listener;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.event.NameDecorationChangeEvent;
 import tc.oc.pgm.api.player.MatchPlayer;
+import tc.oc.pgm.tablist.MatchTabManager;
+import tc.oc.pgm.util.tablist.PlayerTabEntry;
 
 import java.util.UUID;
 
@@ -43,6 +45,15 @@ public class ChatPrefix implements Listener {
         MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
 
         matchPlayer.getBukkit().setDisplayName(PGM.get().getNameDecorationRegistry().getDecoratedName(player, matchPlayer.getParty()));
+
+        MatchTabManager tab = PGM.get().getMatchTabManager();
+
+        if(tab != null) {
+            PlayerTabEntry tabEntry = (PlayerTabEntry) tab.getPlayerEntryOrNull(player);
+            if(tabEntry != null) {
+                tabEntry.invalidate();
+            }
+        }
     }
 }
 

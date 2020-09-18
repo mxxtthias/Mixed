@@ -20,8 +20,6 @@ import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.flag.event.FlagCaptureEvent;
 import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
 import network.atria.Database.MySQLSetterGetter;
-import network.atria.RankSystem.ChatPrefix;
-import network.atria.RankSystem.Ranks;
 
 @ListenerScope(MatchScope.RUNNING)
 public class RankSystemManager implements Listener, MatchModule {

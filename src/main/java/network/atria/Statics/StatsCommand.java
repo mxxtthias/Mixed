@@ -61,13 +61,13 @@ public class StatsCommand implements CommandExecutor {
     }
 
     private void stats(Player p, String name, int kills, int deaths, int flags, int cores, int wools, int dtm) {
-        p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 18) + ChatColor.AQUA + " " + name + " " + ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 18));
+        p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 15) + ChatColor.AQUA + " " + name + " " + ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 20));
         try {
             p.sendMessage(ChatColor.DARK_AQUA + "Kills: " + ChatColor.AQUA + kills + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Deaths: " + ChatColor.AQUA + deaths + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "K/D: " + ChatColor.AQUA + kd(kills, deaths).doubleValue());
         } catch (NullPointerException ignored) {
             p.sendMessage(ChatColor.DARK_PURPLE + "Kills: " + ChatColor.GOLD + kills + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_PURPLE + "Deaths: " + ChatColor.GOLD + deaths);
         }
-        p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 20) + ChatColor.AQUA + " " + "Objectives" + " " + ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 20));
+        p.sendMessage(ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 15) + ChatColor.AQUA + " " + "Objectives" + " " + ChatColor.WHITE + "" + ChatColor.BOLD + "" + ChatColor.STRIKETHROUGH + StringUtils.repeat(" ", 20));
         p.sendMessage(ChatColor.DARK_AQUA + "Wools: " + ChatColor.AQUA + wools + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Cores: " + ChatColor.AQUA + cores + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Flags: " + ChatColor.AQUA + flags + ChatColor.DARK_GRAY + " | " + ChatColor.DARK_AQUA + "Monuments: " + ChatColor.AQUA + dtm);
     }
 
