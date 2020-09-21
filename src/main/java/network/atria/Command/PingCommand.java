@@ -10,20 +10,20 @@ import org.bukkit.entity.Player;
 
 public class PingCommand implements CommandExecutor {
 
-    @Override
-    public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
+  @Override
+  public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
 
-        Player p = (Player) s;
+    Player p = (Player) s;
 
-        if(args.length == 0) {
-            s.sendMessage(ChatColor.AQUA  + "Your ping is " + getPing(p) + " ms");
-        }
-        return true;
+    if (args.length == 0) {
+      s.sendMessage(ChatColor.AQUA + "Your ping is " + getPing(p) + " ms");
     }
+    return true;
+  }
 
-    private int getPing(Player p) {
-        CraftPlayer pingcraft = (CraftPlayer) p;
-        EntityPlayer pingentity = pingcraft.getHandle();
-        return pingentity.ping;
-    }
+  private int getPing(Player p) {
+    CraftPlayer pingcraft = (CraftPlayer) p;
+    EntityPlayer pingentity = pingcraft.getHandle();
+    return pingentity.ping;
+  }
 }

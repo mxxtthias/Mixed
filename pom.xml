@@ -22,9 +22,20 @@
             <id>sonatype</id>
             <url>https://repository.sonatype.org/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>jcenter</id>
+            <name>jcenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>4.2.0_204</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>tc.oc.pgm</groupId>
             <artifactId>core</artifactId>
@@ -47,6 +58,7 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
             <version>3.4.5</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -60,6 +72,21 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.coveo</groupId>
+                <artifactId>fmt-maven-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <style>google</style>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -91,6 +118,8 @@
                                 </includes>
                                 <excludes>
                                     <exclude>app.ashcon:sportpaper</exclude>
+                                    <exclude>tc.oc.pgm:core</exclude>
+                                    <exclude>tc.oc.pgm:util</exclude>
                                 </excludes>
                             </artifactSet>
                         </configuration>
