@@ -1,59 +1,62 @@
 package network.atria.Database;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import network.atria.Main;
-
 import java.sql.*;
+import network.atria.Main;
 
 public class MySQL {
 
-    public static HikariDataSource hikari;
+  private static HikariDataSource ds;
 
-    public static void connect() {
-        hikari = new HikariDataSource();
+  public static void connect() {
+    HikariConfig hikari = new HikariConfig();
 
-        hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-        hikari.addDataSourceProperty("serverName", getHost());
-        hikari.addDataSourceProperty("port", getPort());
-        hikari.addDataSourceProperty("databaseName", getDatabase());
-        hikari.addDataSourceProperty("user", getUser());
-        hikari.addDataSourceProperty("password", getPassword());
+    hikari.setJdbcUrl("jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDatabase());
+    /*
+    hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+    hikari.addDataSourceProperty("serverName", getHost());
+    hikari.addDataSourceProperty("port", getPort());
+    hikari.addDataSourceProperty("databaseName", getDatabase());
 
-        hikari.setMaximumPoolSize(500);
-        hikari.setConnectionTimeout(20000);
-        hikari.setMinimumIdle(50);
-    }
+     */
+    hikari.addDataSourceProperty("user", getUser());
+    hikari.addDataSourceProperty("password", getPassword());
+    hikari.addDataSourceProperty("autoReconnect", true);
+    hikari.addDataSourceProperty("cachePrepStmts", true);
+    hikari.addDataSourceProperty("prepStmtCacheSize", 250);
+    hikari.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+    hikari.addDataSourceProperty("useServerPrepStmts", true);
+    hikari.addDataSourceProperty("cacheResultSetMetadata", true);
 
-    private static String getHost() {
-        return Main.getInstance().getConfig().getString("MySQL.Host");
-    }
+    hikari.setConnectionTimeout(250);
+    hikari.setMinimumIdle(10);
+    hikari.setMaximumPoolSize(15);
 
-    private static String getDatabase() {
-        return Main.getInstance().getConfig().getString("MySQL.Database");
-    }
+    ds = new HikariDataSource(hikari);
+  }
 
-    private static String getUser() {
-        return Main.getInstance().getConfig().getString("MySQL.User");
-    }
+  private static String getHost() {
+    return Main.getInstance().getConfig().getString("MySQL.Host");
+  }
 
-    private static String getPassword() {
-        return Main.getInstance().getConfig().getString("MySQL.Password");
-    }
+  private static String getDatabase() {
+    return Main.getInstance().getConfig().getString("MySQL.Database");
+  }
 
-    private static Integer getPort() {
-        return Main.getInstance().getConfig().getInt("MySQL.Port");
-    }
+  private static String getUser() {
+    return Main.getInstance().getConfig().getString("MySQL.User");
+  }
 
-    public static HikariDataSource getHikari() {
-        return hikari;
-    }
+  private static String getPassword() {
+    return Main.getInstance().getConfig().getString("MySQL.Password");
+  }
 
-    public static Connection getConnection() {
-        try {
-            return hikari.getConnection();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+  private static Integer getPort() {
+    return Main.getInstance().getConfig().getInt("MySQL.Port");
+  }
+
+  public static HikariDataSource getHikari() {
+    return ds;
+  }
 }
