@@ -81,6 +81,8 @@ public class RankSystemManager implements Listener, MatchModule {
               murder.getId().toString(), Ranks.getNextRank(murder.getId().toString()));
         }
       }
+    } else {
+      MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
     }
   }
 
