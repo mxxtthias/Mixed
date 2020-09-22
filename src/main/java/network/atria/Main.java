@@ -169,14 +169,10 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
     LuckPerms api = LuckPermsProvider.get();
     User user = api.getUserManager().getUser(p.getUniqueId());
+    MySQLSetterGetter.setName(p.getUniqueId().toString(), p.getName());
 
-    if (!MySQLSetterGetter.playerExists(p.getUniqueId().toString())) {
-      MySQLSetterGetter.createPlayer(p.getUniqueId().toString());
-      MySQLSetterGetter.setName(p.getUniqueId().toString(), p.getName());
-
-      PermissionNode addGroup = PermissionNode.builder("pgm.group.wood_iii").build();
-      user.data().add(addGroup);
-      api.getUserManager().saveUser(user);
-    }
+    PermissionNode addGroup = PermissionNode.builder("pgm.group.wood_iii").build();
+    user.data().add(addGroup);
+    api.getUserManager().saveUser(user);
   }
 }

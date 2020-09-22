@@ -123,9 +123,9 @@ public class MySQLSetterGetter {
         statement3 =
             connection.prepareStatement(
                 ("UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
-        statement.executeQuery();
-        statement2.executeQuery();
-        statement3.executeQuery();
+        statement.executeUpdate();
+        statement2.executeUpdate();
+        statement3.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -341,8 +341,8 @@ public class MySQLSetterGetter {
         statement2 =
             connection.prepareStatement(
                 "UPDATE STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
-        statement2.executeQuery();
+        statement.executeUpdate();
+        statement2.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -377,8 +377,8 @@ public class MySQLSetterGetter {
         statement2 =
             connection.prepareStatement(
                 "UPDATE STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
-        statement2.executeQuery();
+        statement.executeUpdate();
+        statement2.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -413,8 +413,8 @@ public class MySQLSetterGetter {
         statement2 =
             connection.prepareStatement(
                 "UPDATE STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
-        statement2.executeQuery();
+        statement.executeUpdate();
+        statement2.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -449,8 +449,8 @@ public class MySQLSetterGetter {
         statement2 =
             connection.prepareStatement(
                 "UPDATE STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
-        statement2.executeQuery();
+        statement.executeUpdate();
+        statement2.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -485,8 +485,8 @@ public class MySQLSetterGetter {
         statement2 =
             connection.prepareStatement(
                 "UPDATE STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
-        statement2.executeQuery();
+        statement.executeUpdate();
+        statement2.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -522,8 +522,8 @@ public class MySQLSetterGetter {
             connection.prepareStatement(
                 "UPDATE STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
 
-        statement.executeQuery();
-        statement2.executeQuery();
+        statement.executeUpdate();
+        statement2.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -554,7 +554,7 @@ public class MySQLSetterGetter {
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
+        statement.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -584,7 +584,7 @@ public class MySQLSetterGetter {
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET GAMERANK= '" + rank + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
+        statement.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -605,7 +605,7 @@ public class MySQLSetterGetter {
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET EFFECT= '" + effect + "' WHERE UUID= '" + uuid + "';");
-        statement.executeQuery();
+        statement.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -627,7 +627,7 @@ public class MySQLSetterGetter {
             connection.prepareStatement(
                 "UPDATE RANKS SET SOUND= '" + sound + "' WHERE UUID= '" + uuid + "';");
 
-        statement.executeQuery();
+        statement.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
@@ -649,7 +649,7 @@ public class MySQLSetterGetter {
             connection.prepareStatement(
                 "UPDATE RANKS SET PROJECTILE= '" + projectile + "' WHERE UUID= '" + uuid + "';");
 
-        statement.executeQuery();
+        statement.executeUpdate();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
