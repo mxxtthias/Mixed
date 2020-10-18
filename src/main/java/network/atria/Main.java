@@ -107,7 +107,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
     try {
       jda =
           new JDABuilder(AccountType.BOT)
-              .setToken("NzQxNjI2ODAzNDkxMTc2NTM4.Xy6TyA.8bF83VEkmak9p2KxME5YEhS0GsI")
+              .setToken("regenerated")
               .build();
     } catch (LoginException e) {
       e.printStackTrace();
