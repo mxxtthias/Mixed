@@ -1,4 +1,4 @@
-package network.atria.Task;
+package network.atria.Discord;
 
 import java.awt.*;
 import net.dv8tion.jda.api.EmbedBuilder;

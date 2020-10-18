@@ -15,6 +15,7 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
 import network.atria.Command.PingCommand;
 import network.atria.Database.*;
+import network.atria.Discord.Punish;
 import network.atria.KillEffects.*;
 import network.atria.RankSystem.ChatPrefix;
 import network.atria.RankSystem.CheckRankCommand;
@@ -22,7 +23,7 @@ import network.atria.RankSystem.RankSystemManager;
 import network.atria.Statics.StatsCommand;
 import network.atria.Statics.StatsDiscord;
 import network.atria.Task.BroadCastMesseage;
-import network.atria.Task.Discord;
+import network.atria.Discord.Discord;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.RanksConfig;
 import org.bukkit.Bukkit;
@@ -89,6 +90,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
     new KillEffects(this);
     new KillSounds(this);
     new ProjectileTrails(this);
+    new Punish(this);
 
     jda.addEventListener(new StatsDiscord());
   }
@@ -103,7 +105,10 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
 
   private void startBot() {
     try {
-      jda = new JDABuilder(AccountType.BOT).setToken("token").build();
+      jda =
+          new JDABuilder(AccountType.BOT)
+              .setToken("NzQxNjI2ODAzNDkxMTc2NTM4.Xy6TyA.8bF83VEkmak9p2KxME5YEhS0GsI")
+              .build();
     } catch (LoginException e) {
       e.printStackTrace();
     }
@@ -145,7 +150,7 @@ public class Main extends JavaPlugin implements Listener, CommandExecutor {
   }
 
   public Guild getGuild() {
-    return jda.getGuildById("serverid");
+    return jda.getGuildById("733709259178639401");
   }
 
   private void setActivity() {
