@@ -7,16 +7,6 @@ import java.sql.SQLException;
 
 public class MySQLSetterGetter {
 
-  public static Connection connection;
-
-  static {
-    try {
-      connection = MySQL.getHikari().getConnection();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-  }
-
   public static boolean playerExists(String uuid) {
 
     ResultSet rs = null;
@@ -25,8 +15,10 @@ public class MySQLSetterGetter {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
     PreparedStatement statement3 = null;
+    Connection connection = null;
 
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       statement2 =
           connection.prepareStatement("SELECT * FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
@@ -52,6 +44,7 @@ public class MySQLSetterGetter {
       closeResultSet(rs);
       closeResultSet(week_rs);
       closeResultSet(rank_rs);
+      close(connection);
     }
   }
 
@@ -59,8 +52,10 @@ public class MySQLSetterGetter {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
     PreparedStatement statement3 = null;
+    Connection connection = null;
     if (!playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
@@ -76,10 +71,9 @@ public class MySQLSetterGetter {
                 "INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('"
                     + uuid
                     + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');");
-
-        statement.executeQuery();
-        statement2.executeQuery();
-        statement3.executeQuery();
+        statement.execute();
+        statement2.execute();
+        statement3.execute();
 
       } catch (SQLException e) {
         e.printStackTrace();
@@ -87,6 +81,7 @@ public class MySQLSetterGetter {
         closeStatement(statement);
         closeStatement(statement2);
         closeStatement(statement3);
+        close(connection);
       }
     }
   }
@@ -95,7 +90,9 @@ public class MySQLSetterGetter {
     String i = "";
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("UUID");
@@ -104,6 +101,7 @@ public class MySQLSetterGetter {
     } finally {
       closeStatement(statement);
       closeResultSet(rs);
+      close(connection);
     }
     return i;
   }
@@ -112,8 +110,10 @@ public class MySQLSetterGetter {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
     PreparedStatement statement3 = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 ("UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
@@ -132,6 +132,7 @@ public class MySQLSetterGetter {
         closeStatement(statement);
         closeStatement(statement2);
         closeStatement(statement3);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -143,7 +144,9 @@ public class MySQLSetterGetter {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("MONUMENTS");
@@ -152,6 +155,7 @@ public class MySQLSetterGetter {
     } finally {
       closeResultSet(rs);
       closeStatement(statement);
+      close(connection);
     }
     return i;
   }
@@ -160,7 +164,9 @@ public class MySQLSetterGetter {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("FLAGS");
@@ -169,6 +175,7 @@ public class MySQLSetterGetter {
     } finally {
       closeStatement(statement);
       closeResultSet(rs);
+      close(connection);
     }
     return i;
   }
@@ -177,7 +184,9 @@ public class MySQLSetterGetter {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("CORES");
@@ -186,6 +195,7 @@ public class MySQLSetterGetter {
     } finally {
       closeResultSet(rs);
       closeStatement(statement);
+      close(connection);
     }
     return i;
   }
@@ -194,7 +204,9 @@ public class MySQLSetterGetter {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("WOOLS");
@@ -205,6 +217,7 @@ public class MySQLSetterGetter {
     } finally {
       closeStatement(statement);
       closeResultSet(rs);
+      close(connection);
     }
     return i;
   }
@@ -213,7 +226,9 @@ public class MySQLSetterGetter {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("KILLS");
@@ -222,6 +237,7 @@ public class MySQLSetterGetter {
     } finally {
       closeResultSet(rs);
       closeStatement(statement);
+      close(connection);
     }
     return i;
   }
@@ -230,7 +246,9 @@ public class MySQLSetterGetter {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("DEATHS");
@@ -239,6 +257,7 @@ public class MySQLSetterGetter {
     } finally {
       closeStatement(statement);
       closeResultSet(rs);
+      close(connection);
     }
     return i;
   }
@@ -247,7 +266,9 @@ public class MySQLSetterGetter {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("POINTS");
@@ -256,6 +277,7 @@ public class MySQLSetterGetter {
     } finally {
       closeResultSet(rs);
       closeStatement(statement);
+      close(connection);
     }
     return i;
   }
@@ -264,7 +286,9 @@ public class MySQLSetterGetter {
     String i = "";
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("GAMERANK");
@@ -273,6 +297,7 @@ public class MySQLSetterGetter {
     } finally {
       closeStatement(statement);
       closeResultSet(rs);
+      close(connection);
     }
     return i;
   }
@@ -281,7 +306,9 @@ public class MySQLSetterGetter {
     String i = "";
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("EFFECT");
@@ -290,6 +317,7 @@ public class MySQLSetterGetter {
     } finally {
       closeResultSet(rs);
       closeStatement(statement);
+      close(connection);
     }
     return i;
   }
@@ -298,7 +326,9 @@ public class MySQLSetterGetter {
     String i = "";
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("SOUND");
@@ -307,6 +337,7 @@ public class MySQLSetterGetter {
     } finally {
       closeStatement(statement);
       closeResultSet(rs);
+      close(connection);
     }
     return i;
   }
@@ -315,7 +346,9 @@ public class MySQLSetterGetter {
     String i = "";
     PreparedStatement statement = null;
     ResultSet rs = null;
+    Connection connection = null;
     try {
+      connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("PROJECTILE");
@@ -324,6 +357,7 @@ public class MySQLSetterGetter {
     } finally {
       closeStatement(statement);
       closeResultSet(rs);
+      close(connection);
     }
     return i;
   }
@@ -333,8 +367,10 @@ public class MySQLSetterGetter {
   public static void setMonuments(String uuid, int monuments) {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE WEEK_STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
@@ -348,6 +384,7 @@ public class MySQLSetterGetter {
       } finally {
         closeStatement(statement);
         closeStatement(statement2);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -369,8 +406,10 @@ public class MySQLSetterGetter {
   public static void setKills(String uuid, Integer kills) {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE WEEK_STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
@@ -384,6 +423,7 @@ public class MySQLSetterGetter {
       } finally {
         closeStatement(statement);
         closeStatement(statement2);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -405,8 +445,10 @@ public class MySQLSetterGetter {
   public static void setDeaths(String uuid, Integer deaths) {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE WEEK_STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
@@ -420,6 +462,7 @@ public class MySQLSetterGetter {
       } finally {
         closeStatement(statement);
         closeStatement(statement2);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -441,8 +484,10 @@ public class MySQLSetterGetter {
   public static void setWools(String uuid, Integer wools) {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE WEEK_STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
@@ -456,6 +501,7 @@ public class MySQLSetterGetter {
       } finally {
         closeStatement(statement);
         closeStatement(statement2);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -477,8 +523,10 @@ public class MySQLSetterGetter {
   public static void setCores(String uuid, Integer cores) {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE WEEK_STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
@@ -492,6 +540,7 @@ public class MySQLSetterGetter {
       } finally {
         closeStatement(statement);
         closeStatement(statement2);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -513,8 +562,10 @@ public class MySQLSetterGetter {
   public static void setFlags(String uuid, Integer flags) {
     PreparedStatement statement = null;
     PreparedStatement statement2 = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE WEEK_STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
@@ -529,6 +580,7 @@ public class MySQLSetterGetter {
       } finally {
         closeStatement(statement);
         closeStatement(statement2);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -549,8 +601,10 @@ public class MySQLSetterGetter {
 
   public static void setPoints(String uuid, Integer points) {
     PreparedStatement statement = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
@@ -559,6 +613,7 @@ public class MySQLSetterGetter {
         e.printStackTrace();
       } finally {
         closeStatement(statement);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -579,8 +634,10 @@ public class MySQLSetterGetter {
 
   public static void setRank(String uuid, String rank) {
     PreparedStatement statement = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET GAMERANK= '" + rank + "' WHERE UUID= '" + uuid + "';");
@@ -589,6 +646,7 @@ public class MySQLSetterGetter {
         e.printStackTrace();
       } finally {
         closeStatement(statement);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -600,8 +658,10 @@ public class MySQLSetterGetter {
 
   public static void setKillEffect(String uuid, String effect) {
     PreparedStatement statement = null;
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET EFFECT= '" + effect + "' WHERE UUID= '" + uuid + "';");
@@ -610,6 +670,7 @@ public class MySQLSetterGetter {
         e.printStackTrace();
       } finally {
         closeStatement(statement);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -620,9 +681,10 @@ public class MySQLSetterGetter {
   /* KillSound */
   public static void setKillSound(String uuid, String sound) {
     PreparedStatement statement = null;
-
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET SOUND= '" + sound + "' WHERE UUID= '" + uuid + "';");
@@ -632,6 +694,7 @@ public class MySQLSetterGetter {
         e.printStackTrace();
       } finally {
         closeStatement(statement);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -642,9 +705,10 @@ public class MySQLSetterGetter {
   /* Projectile Trails */
   public static void setProjectileTrails(String uuid, String projectile) {
     PreparedStatement statement = null;
-
+    Connection connection = null;
     if (playerExists(uuid)) {
       try {
+        connection = MySQL.getHikari().getConnection();
         statement =
             connection.prepareStatement(
                 "UPDATE RANKS SET PROJECTILE= '" + projectile + "' WHERE UUID= '" + uuid + "';");
@@ -654,6 +718,7 @@ public class MySQLSetterGetter {
         e.printStackTrace();
       } finally {
         closeStatement(statement);
+        close(connection);
       }
     } else {
       createPlayer(uuid);
@@ -661,8 +726,7 @@ public class MySQLSetterGetter {
     }
   }
 
-  /*
-  public static void close() {
+  private static void close(Connection connection) {
       if (connection != null) {
           try {
               connection.close();
@@ -671,8 +735,8 @@ public class MySQLSetterGetter {
           }
       }
   }
-   */
-  public static void closeStatement(PreparedStatement statement) {
+
+  private static void closeStatement(PreparedStatement statement) {
     if (statement != null) {
       try {
         statement.close();
@@ -682,7 +746,7 @@ public class MySQLSetterGetter {
     }
   }
 
-  public static void closeResultSet(ResultSet rs) {
+  private static void closeResultSet(ResultSet rs) {
     if (rs != null) {
       try {
         rs.close();
