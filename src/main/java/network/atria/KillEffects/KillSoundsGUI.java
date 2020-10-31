@@ -2,6 +2,7 @@ package network.atria.KillEffects;
 
 import static network.atria.KillEffects.DefaultGUI.createGuiItem;
 
+import java.util.UUID;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.getPlayerData;
@@ -29,21 +30,21 @@ public class KillSoundsGUI implements Listener {
   @EventHandler
   public void getPlayer(InventoryOpenEvent e) {
     if (e.getView().getTitle().equals("Kill Sound Selector")) {
-      String uuid = e.getPlayer().getUniqueId().toString();
+      final UUID uuid = e.getPlayer().getUniqueId();
       addIconItems(uuid);
     }
   }
 
-  private void addIconItems(String uuid) {
+  private void addIconItems(UUID uuid) {
 
-    ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-    ItemMeta reset_meta = reset.getItemMeta();
+    final ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+    final ItemMeta reset_meta = reset.getItemMeta();
 
     reset_meta.setDisplayName(ChatColor.RED + "Reset Kill Sound");
     reset.setItemMeta(reset_meta);
 
-    ItemStack back = new ItemStack(Material.ARROW, 1);
-    ItemMeta back_meta = back.getItemMeta();
+    final ItemStack back = new ItemStack(Material.ARROW, 1);
+    final ItemMeta back_meta = back.getItemMeta();
 
     back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
     back.setItemMeta(back_meta);
@@ -93,69 +94,56 @@ public class KillSoundsGUI implements Listener {
 
   @EventHandler
   public void onGuiClick(final InventoryClickEvent e) {
-    try {
-      if (e.getView().getTitle().equals("Kill Sound Selector")) {
-        e.setCancelled(true);
+    if (e.getView().getTitle().equals("Kill Sound Selector")) {
+      e.setCancelled(true);
 
-        final ItemStack clickedItem = e.getCurrentItem();
+      final ItemStack clickedItem = e.getCurrentItem();
+      final Player player = (Player) e.getWhoClicked();
+      final String getItemName = clickedItem.getItemMeta().getDisplayName().substring(2);
 
-        final Player player = (Player) e.getWhoClicked();
-
-        String getItemName = clickedItem.getItemMeta().getDisplayName();
-
-        if (clickedItem.hasItemMeta()) {
-          if (clickedItem.getItemMeta().hasDisplayName()) {
-            if (getItemName.equals(ChatColor.RED + "Go to previous page ➡")) {
-              player.openInventory(DefaultGUI.gui);
-            }
-            if (getItemName.equals(ChatColor.RED + "Reset Kill Sound")) {
-              MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
-              player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Sound");
-            } else if (getItemName.equals(ChatColor.AQUA + "HOWL")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("HOWL"))) {
-                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "HOWL");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "HOWL Kill Sound");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "VILLAGER")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("VILLAGER"))) {
-                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "VILLAGER");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "VILLAGER Kill Sound");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "DEFAULT")) {
-              MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
-              player.sendMessage(
-                  ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "DEFAULT Kill Sound");
-            } else if (getItemName.equals(ChatColor.AQUA + "BOMB")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("BOMB"))) {
-                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BOMB");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BOMB Kill Sound");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "BURP")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("BURP"))) {
-                MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "BURP");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BURP Kill Sound");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            }
-          }
-        }
+      switch (getItemName) {
+        case "Go to previous page ➡":
+          player.openInventory(DefaultGUI.gui);
+          break;
+        case "Reset Kill Sound":
+          MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
+          player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Sound");
+          break;
+        case "DEFAULT":
+          MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
+          player.sendMessage(
+              ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "DEFAULT Kill Sound");
+          break;
+        case "HOWL":
+          selectSound(player, "HOWL");
+          break;
+        case "VILLAGER":
+          selectSound(player, "VILLAGER");
+          break;
+        case "BOMB":
+          selectSound(player, "BOMB");
+          break;
+        case "BURP":
+          selectSound(player, "BURP");
+          break;
       }
-    } catch (NullPointerException ignored) {
+    }
+  }
+
+  private void selectSound(Player player, String sound) {
+    final UUID uuid = player.getUniqueId();
+    final int require = getPlayerData.getRequirePoints(sound);
+
+    if (getPlayerData.hasRequirePoint(uuid, require)) {
+      MySQLSetterGetter.setKillSound(uuid.toString(), sound);
+      player.sendMessage(
+          ChatColor.GREEN
+              + "You selected "
+              + ChatColor.YELLOW
+              + sound.toUpperCase()
+              + " Kill Sound");
+    } else {
+      player.sendMessage(ChatColor.RED + "You don't have enough points");
     }
   }
 }

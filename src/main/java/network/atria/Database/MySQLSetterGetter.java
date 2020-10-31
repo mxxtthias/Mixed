@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class MySQLSetterGetter {
 
@@ -136,7 +137,6 @@ public class MySQLSetterGetter {
       }
     } else {
       createPlayer(uuid);
-      setName(uuid, name);
     }
   }
 
@@ -262,7 +262,7 @@ public class MySQLSetterGetter {
     return i;
   }
 
-  public static Integer getPoints(String uuid) {
+  public static Integer getPoints(UUID uuid) {
     int i = 0;
     PreparedStatement statement = null;
     ResultSet rs = null;
@@ -282,7 +282,7 @@ public class MySQLSetterGetter {
     return i;
   }
 
-  public static String getRank(String uuid) {
+  public static String getRank(UUID uuid) {
     String i = "";
     PreparedStatement statement = null;
     ResultSet rs = null;
@@ -623,7 +623,7 @@ public class MySQLSetterGetter {
 
   public static void addPoints(String uuid, Integer points) {
     if (playerExists(uuid)) {
-      setPoints(uuid, getPoints(uuid) + points);
+      setPoints(uuid, getPoints(UUID.fromString(uuid)) + points);
     } else {
       createPlayer(uuid);
       addPoints(uuid, points);
@@ -727,13 +727,13 @@ public class MySQLSetterGetter {
   }
 
   private static void close(Connection connection) {
-      if (connection != null) {
-          try {
-              connection.close();
-          } catch (SQLException e) {
-              e.printStackTrace();
-          }
+    if (connection != null) {
+      try {
+        connection.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
       }
+    }
   }
 
   private static void closeStatement(PreparedStatement statement) {

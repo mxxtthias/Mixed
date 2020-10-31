@@ -6,5 +6,5 @@ MySQL:
   Port: 3306 #default
 
 Messeages:
-  - "" # Messeages
+  - "" #Broadcast Messages
 

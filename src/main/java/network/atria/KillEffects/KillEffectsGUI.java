@@ -2,6 +2,7 @@ package network.atria.KillEffects;
 
 import static network.atria.KillEffects.DefaultGUI.createGuiItem;
 
+import java.util.UUID;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.getPlayerData;
@@ -29,21 +30,21 @@ public class KillEffectsGUI implements Listener {
   @EventHandler
   public void getPlayer(InventoryOpenEvent e) {
     if (e.getView().getTitle().equals("Kill Effect Selector")) {
-      String uuid = e.getPlayer().getUniqueId().toString();
+      final UUID uuid = e.getPlayer().getUniqueId();
       addIconItems(uuid);
     }
   }
 
-  private void addIconItems(String uuid) {
+  private void addIconItems(UUID uuid) {
 
-    ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-    ItemMeta reset_meta = reset.getItemMeta();
+    final ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+    final ItemMeta reset_meta = reset.getItemMeta();
 
     reset_meta.setDisplayName(ChatColor.RED + "Reset Kill Effect");
     reset.setItemMeta(reset_meta);
 
-    ItemStack back = new ItemStack(Material.ARROW, 1);
-    ItemMeta back_meta = back.getItemMeta();
+    final ItemStack back = new ItemStack(Material.ARROW, 1);
+    final ItemMeta back_meta = back.getItemMeta();
 
     back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
     back.setItemMeta(back_meta);
@@ -111,106 +112,84 @@ public class KillEffectsGUI implements Listener {
 
   @EventHandler
   public void onGuiClick(final InventoryClickEvent e) {
-    try {
-      if (e.getView().getTitle().equals("Kill Effect Selector")) {
-        e.setCancelled(true);
+    if (e.getView().getTitle().equals("Kill Effect Selector")) {
+      e.setCancelled(true);
 
-        final ItemStack clickedItem = e.getCurrentItem();
+      final ItemStack clickedItem = e.getCurrentItem();
+      final Player player = (Player) e.getWhoClicked();
+      final String getItemName = clickedItem.getItemMeta().getDisplayName().substring(2);
 
-        final Player player = (Player) e.getWhoClicked();
-
-        String getItemName = clickedItem.getItemMeta().getDisplayName();
-
-        if (clickedItem.hasItemMeta()) {
-          if (clickedItem.getItemMeta().hasDisplayName()) {
-            if (getItemName.equals(ChatColor.RED + "Go to previous page ➡")) {
-              player.openInventory(DefaultGUI.gui);
-            }
-            if (getItemName.equals(ChatColor.RED + "Reset Kill Effect")) {
-              MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
-              player.sendMessage(
-                  ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Effect");
-            } else if (getItemName.equals(ChatColor.AQUA + "BLOOD")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("BLOOD"))) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "BLOOD");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "BLOOD Kill Effect");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enough points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "HEART")) {
-              if (getPlayerData.hasDonorRank(player)
-                  || getPlayerData.hasRequirePoint(
-                      player.getUniqueId().toString(), getPlayerData.getRequirePoints("HEART"))) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "HEART");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "HEART kill effect.");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "SMOKE")) {
-              if (getPlayerData.hasDonorRank(player)
-                  || getPlayerData.hasRequirePoint(
-                      player.getUniqueId().toString(), getPlayerData.getRequirePoints("SMOKE"))) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "SMOKE");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected " + ChatColor.YELLOW + "SMOKE kill effect.");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "FLAME")) {
-              if (getPlayerData.hasDonorRank(player)
-                  || getPlayerData.hasRequirePoint(
-                      player.getUniqueId().toString(), getPlayerData.getRequirePoints("FLAME"))) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "FLAME");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " FLAME kill effect.");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.DARK_PURPLE + "RAINBOW")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("RAINBOW"))) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "RAINBOW");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " RAINBOW kill effect.");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.GOLD + "DONOR")) {
-              if (player.hasPermission("pgm.group.donor")) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " DONOR kill effect.");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have the donor rank");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "SPHERE")) {
-              if (getPlayerData.hasDonorRank(player)
-                  || getPlayerData.hasRequirePoint(
-                      player.getUniqueId().toString(), getPlayerData.getRequirePoints("SPHERE"))) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "SPHERE");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " SPHERE kill effect.");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "MAGIC")) {
-              if (getPlayerData.hasDonorRank(player)
-                  || getPlayerData.hasRequirePoint(
-                      player.getUniqueId().toString(), getPlayerData.getRequirePoints("MAGIC"))) {
-                MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "MAGIC");
-                player.sendMessage(
-                    ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " MAGIC kill effect.");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            }
+      switch (getItemName) {
+        case "Go to previous page ➡":
+          player.openInventory(DefaultGUI.gui);
+          break;
+        case "NONE":
+          MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
+          player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + " Kill Effect");
+          break;
+        case "BLOOD":
+          selectEffect(player, "BLOOD", false);
+          break;
+        case "RAINBOW":
+          selectEffect(player, "RAINBOW", false);
+          break;
+        case "HEART":
+          selectEffect(player, "HEART", true);
+          break;
+        case "SMOKE":
+          selectEffect(player, "SMOKE", true);
+          break;
+        case "FLAME":
+          selectEffect(player, "FLAME", true);
+          break;
+        case "SPHERE":
+          selectEffect(player, "SPHERE", true);
+          break;
+        case "MAGIC":
+          selectEffect(player, "MAGIC", true);
+        case "DONOR":
+          if (player.hasPermission("pgm.group.donor")) {
+            MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
+            player.sendMessage(
+                ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " DONOR kill effect.");
+          } else {
+            player.sendMessage(ChatColor.RED + "You don't have the donor rank");
           }
+          break;
+      }
+    }
+  }
+
+  private void selectEffect(Player player, String effect, Boolean donor) {
+    final UUID uuid = player.getUniqueId();
+    final int require = getPlayerData.getRequirePoints(effect);
+
+    if (donor) {
+      if (getPlayerData.hasDonorRank(player)) {
+        if (getPlayerData.hasRequirePoint(uuid, require)) {
+          MySQLSetterGetter.setKillEffect(uuid.toString(), effect);
+          player.sendMessage(
+              ChatColor.GREEN
+                  + "You selected "
+                  + ChatColor.YELLOW
+                  + effect.toUpperCase()
+                  + " kill effect.");
+        } else {
+          player.sendMessage(ChatColor.RED + "You don't have enough points");
         }
       }
-    } catch (NullPointerException ignored) {
+    } else {
+      if (getPlayerData.hasRequirePoint(uuid, require)) {
+        MySQLSetterGetter.setKillEffect(uuid.toString(), effect);
+        player.sendMessage(
+            ChatColor.GREEN
+                + "You selected "
+                + ChatColor.YELLOW
+                + effect.toUpperCase()
+                + " kill effect.");
+      } else {
+        player.sendMessage(ChatColor.RED + "You don't have enough points");
+      }
     }
   }
 }

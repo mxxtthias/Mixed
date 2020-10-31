@@ -26,13 +26,13 @@ public class KillSounds implements Listener {
   @EventHandler
   public void onMatchPlayerDeath(MatchPlayerDeathEvent e) {
     MatchPlayer killer = null;
-    MatchPlayer victim = e.getVictim();
+    final MatchPlayer victim = e.getVictim();
 
     if (e.getKiller() != null) {
       killer = e.getKiller().getParty().getPlayer(e.getKiller().getId());
 
-      String getSound = MySQLSetterGetter.getKillSound(killer.getId().toString());
-      Vector death = victim.getBukkit().getLocation().toVector();
+      final String getSound = MySQLSetterGetter.getKillSound(killer.getId().toString());
+      final Vector death = victim.getBukkit().getLocation().toVector();
 
       switch (getSound) {
         case "DEFAULT":
@@ -46,7 +46,7 @@ public class KillSounds implements Listener {
         case "HOWL":
           if (!killer.getParty().equals(victim.getParty())) {
             if (getPlayerData.hasRequirePoint(
-                killer.getId().toString(), getPlayerData.getRequirePoints("HOWL"))) {
+                killer.getId(), getPlayerData.getRequirePoints("HOWL"))) {
               playSound(killer, new Sound("mob.wolf.howl", 1f, 1f));
             } else {
               playSound(victim, new Sound("mob.irongolem.death", death));
@@ -56,7 +56,7 @@ public class KillSounds implements Listener {
         case "VILLAGER":
           if (!killer.getParty().equals(victim.getParty())) {
             if (getPlayerData.hasRequirePoint(
-                killer.getId().toString(), getPlayerData.getRequirePoints("VILLAGER"))) {
+                killer.getId(), getPlayerData.getRequirePoints("VILLAGER"))) {
               playSound(killer, new Sound("mob.villager.death", 2f, 0.8f));
             } else {
               playSound(victim, new Sound("mob.irongolem.death", death));
@@ -66,7 +66,7 @@ public class KillSounds implements Listener {
         case "BOMB":
           if (!killer.getParty().equals(victim.getParty())) {
             if (getPlayerData.hasRequirePoint(
-                killer.getId().toString(), getPlayerData.getRequirePoints("BOMB"))) {
+                killer.getId(), getPlayerData.getRequirePoints("BOMB"))) {
               playSound(killer, new Sound("random.explode", 1f, 2f));
             } else {
               playSound(victim, new Sound("mob.irongolem.death", death));
@@ -76,7 +76,7 @@ public class KillSounds implements Listener {
         case "BURP":
           if (!killer.getParty().equals(victim.getParty())) {
             if (getPlayerData.hasRequirePoint(
-                killer.getId().toString(), getPlayerData.getRequirePoints("BURP"))) {
+                killer.getId(), getPlayerData.getRequirePoints("BURP"))) {
               playSound(killer, new Sound("random.burp", 1f, 0.1f));
             } else {
               playSound(victim, new Sound("mob.irongolem.death", death));

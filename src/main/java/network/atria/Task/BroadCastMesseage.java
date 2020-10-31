@@ -37,9 +37,9 @@ public class BroadCastMesseage {
   }
 
   private String random(String msg) {
-    List<String> messeages = Main.getInstance().getConfig().getStringList("Messeages");
+    final List<String> messeages = Main.getInstance().getConfig().getStringList("Messeages");
 
-    int index = (new Random()).nextInt(messeages.size());
+    final int index = (new Random()).nextInt(messeages.size());
     msg = messeages.get(index);
     return msg;
   }

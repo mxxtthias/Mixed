@@ -16,10 +16,10 @@ public class StatsCommand implements CommandExecutor {
 
   @Override
   public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
-    Player p = (Player) s;
+    final Player p = (Player) s;
 
     if (args.length == 0) {
-      String uuid = p.getUniqueId().toString();
+      final String uuid = p.getUniqueId().toString();
 
       stats(
           p,
@@ -31,42 +31,38 @@ public class StatsCommand implements CommandExecutor {
           getWoolStats(uuid),
           getMonumentStats(uuid));
 
-    } else {
-      if (args.length == 1) {
-        Player target = Bukkit.getPlayer(args[0]);
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[0]);
-        if (target == null) {
-          if (MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
+    } else if (args.length == 1) {
+      final Player target = Bukkit.getPlayer(args[0]);
+      final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(args[0]);
+      if (target == null) {
+        if (MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
 
-            String uuid = offlinePlayer.getUniqueId().toString();
-
-            stats(
-                p,
-                getName(uuid),
-                getKillStats(uuid),
-                getDeathStats(uuid),
-                getFlagStats(uuid),
-                getCoreStats(uuid),
-                getWoolStats(uuid),
-                getMonumentStats(uuid));
-
-          } else {
-            p.sendMessage("The player not found");
-          }
-        } else {
-
-          String uuid = target.getUniqueId().toString();
+          final String uuid = offlinePlayer.getUniqueId().toString();
 
           stats(
               p,
-              target.getName(),
+              getName(uuid),
               getKillStats(uuid),
               getDeathStats(uuid),
               getFlagStats(uuid),
               getCoreStats(uuid),
               getWoolStats(uuid),
               getMonumentStats(uuid));
+
+        } else {
+          p.sendMessage("The player not found");
         }
+      } else {
+        final String uuid = target.getUniqueId().toString();
+        stats(
+            p,
+            target.getName(),
+            getKillStats(uuid),
+            getDeathStats(uuid),
+            getFlagStats(uuid),
+            getCoreStats(uuid),
+            getWoolStats(uuid),
+            getMonumentStats(uuid));
       }
     }
     return true;
@@ -91,7 +87,7 @@ public class StatsCommand implements CommandExecutor {
             + ChatColor.BOLD
             + ""
             + ChatColor.STRIKETHROUGH
-            + StringUtils.repeat(" ", 15)
+            + StringUtils.repeat(" ", 20)
             + ChatColor.AQUA
             + " "
             + name
@@ -122,15 +118,15 @@ public class StatsCommand implements CommandExecutor {
               + kd(kills, deaths).doubleValue());
     } catch (NullPointerException ignored) {
       p.sendMessage(
-          ChatColor.DARK_PURPLE
+          ChatColor.DARK_AQUA
               + "Kills: "
-              + ChatColor.GOLD
+              + ChatColor.AQUA
               + kills
               + ChatColor.DARK_GRAY
               + " | "
-              + ChatColor.DARK_PURPLE
+              + ChatColor.DARK_AQUA
               + "Deaths: "
-              + ChatColor.GOLD
+              + ChatColor.AQUA
               + deaths);
     }
     p.sendMessage(
@@ -139,7 +135,7 @@ public class StatsCommand implements CommandExecutor {
             + ChatColor.BOLD
             + ""
             + ChatColor.STRIKETHROUGH
-            + StringUtils.repeat(" ", 15)
+            + StringUtils.repeat(" ", 20)
             + ChatColor.AQUA
             + " "
             + "Objectives"

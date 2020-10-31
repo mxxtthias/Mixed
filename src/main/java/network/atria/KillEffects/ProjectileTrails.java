@@ -17,15 +17,14 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class ProjectileTrails implements Listener {
 
-  private BukkitTask runnable;
-
   @EventHandler
   public void onProjectileEffect(ProjectileLaunchEvent e) {
-    Projectile projectile = e.getEntity();
+    final Projectile projectile = e.getEntity();
     if (projectile.getShooter() instanceof Player) {
       if (projectile instanceof Arrow) {
-        Player player = (Player) projectile.getShooter();
-        String trails = MySQLSetterGetter.getProjectileTrails(player.getUniqueId().toString());
+        final Player player = (Player) projectile.getShooter();
+        final String trails =
+            MySQLSetterGetter.getProjectileTrails(player.getUniqueId().toString());
 
         switch (trails) {
           case "HEART":
@@ -49,8 +48,7 @@ public class ProjectileTrails implements Listener {
   }
 
   private void playProjectileTrails(EnumParticle particle, Projectile projectile, Player player) {
-
-    this.runnable =
+    BukkitTask task =
         new BukkitRunnable() {
           public void run() {
 
@@ -58,18 +56,18 @@ public class ProjectileTrails implements Listener {
               cancel();
             }
 
-            double x = projectile.getLocation().getX();
-            double y = projectile.getLocation().getY();
-            double z = projectile.getLocation().getZ();
+            final double x = projectile.getLocation().getX();
+            final double y = projectile.getLocation().getY();
+            final double z = projectile.getLocation().getZ();
 
-            PacketPlayOutWorldParticles packet =
+            final PacketPlayOutWorldParticles packet =
                 new PacketPlayOutWorldParticles(
                     particle, true, (float) x, (float) y, (float) z, 0F, // x offset
                     0F, // y offset
                     0F, // z offset
                     1F, // speed
                     15, // amount
-                    null);
+                    0);
 
             ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
           }

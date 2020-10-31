@@ -13,13 +13,6 @@ public class MySQL {
     HikariConfig hikari = new HikariConfig();
 
     hikari.setJdbcUrl("jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDatabase());
-    /*
-    hikari.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-    hikari.addDataSourceProperty("serverName", getHost());
-    hikari.addDataSourceProperty("port", getPort());
-    hikari.addDataSourceProperty("databaseName", getDatabase());
-
-     */
     hikari.addDataSourceProperty("user", getUser());
     hikari.addDataSourceProperty("password", getPassword());
     hikari.addDataSourceProperty("autoReconnect", true);
@@ -28,10 +21,6 @@ public class MySQL {
     hikari.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
     hikari.addDataSourceProperty("useServerPrepStmts", true);
     hikari.addDataSourceProperty("cacheResultSetMetadata", true);
-
-    hikari.setConnectionTimeout(250);
-    hikari.setMinimumIdle(10);
-    hikari.setMaximumPoolSize(15);
 
     ds = new HikariDataSource(hikari);
   }

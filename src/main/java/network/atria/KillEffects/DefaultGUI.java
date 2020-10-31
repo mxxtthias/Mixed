@@ -27,8 +27,8 @@ public class DefaultGUI implements Listener, CommandExecutor {
 
   private void addIconItems() {
 
-    ItemStack close = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-    ItemMeta meta = close.getItemMeta();
+    final ItemStack close = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+    final ItemMeta meta = close.getItemMeta();
 
     meta.setDisplayName(ChatColor.RED + "Close the GUI");
     close.setItemMeta(meta);
@@ -46,10 +46,8 @@ public class DefaultGUI implements Listener, CommandExecutor {
         e.setCancelled(true);
 
         final ItemStack clickedItem = e.getCurrentItem();
-
         final Player player = (Player) e.getWhoClicked();
-
-        String getItemName = clickedItem.getItemMeta().getDisplayName();
+        final String getItemName = clickedItem.getItemMeta().getDisplayName();
 
         if (clickedItem.hasItemMeta()) {
           if (clickedItem.getItemMeta().hasDisplayName()) {
@@ -83,9 +81,7 @@ public class DefaultGUI implements Listener, CommandExecutor {
 
   @Override
   public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
-
     Player player = (Player) s;
-
     if (args.length == 0) {
       player.openInventory(gui);
     }

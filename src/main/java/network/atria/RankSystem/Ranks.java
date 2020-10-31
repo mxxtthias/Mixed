@@ -3,17 +3,17 @@ package network.atria.RankSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Util.RanksConfig;
 import org.bukkit.ChatColor;
 
 public class Ranks {
 
-  public static String getNextRank(String uuid) {
+  public static String getNextRank(UUID uuid) {
+    final String now = MySQLSetterGetter.getRank(uuid);
 
-    String now = MySQLSetterGetter.getRank(uuid);
-
-    List<String> ranks =
+    final List<String> ranks =
         new ArrayList<>(
             RanksConfig.getCustomConfig().getConfigurationSection("Ranks").getKeys(false));
 
@@ -29,26 +29,28 @@ public class Ranks {
     return null;
   }
 
-  public static String getCurrentRank(String uuid) {
+  public static String getCurrentRank(UUID uuid) {
     return MySQLSetterGetter.getRank(uuid);
   }
 
-  public static Integer getCurrentPoint(String uuid) {
+  public static Integer getCurrentPoint(UUID uuid) {
     return MySQLSetterGetter.getPoints(uuid);
   }
 
-  public static Integer getRequirePoint(String uuid) {
-    Integer next = RanksConfig.getCustomConfig().getInt("Ranks." + getNextRank(uuid) + ".Points");
-    Integer now = getCurrentPoint(uuid);
+  public static Integer getRequirePoint(UUID uuid) {
+    final Integer next =
+        RanksConfig.getCustomConfig().getInt("Ranks." + getNextRank(uuid) + ".Points");
+    final Integer now = getCurrentPoint(uuid);
 
     return next - now;
   }
 
-  public static boolean canRankUp(String uuid) {
-    Integer next = RanksConfig.getCustomConfig().getInt("Ranks." + getNextRank(uuid) + ".Points");
-    Integer now = getCurrentPoint(uuid);
+  public static boolean canRankUp(UUID uuid) {
+    final String rank = getNextRank(uuid);
+    final Integer next = RanksConfig.getCustomConfig().getInt("Ranks." + rank + ".Points");
+    final Integer now = getCurrentPoint(uuid);
 
-    if (getNextRank(uuid).equals(getCurrentRank(uuid))) {
+    if (rank.equalsIgnoreCase(getCurrentRank(uuid))) {
       return false;
     } else {
       int result = next - now;
@@ -56,139 +58,93 @@ public class Ranks {
     }
   }
 
-  public static String getRankCurrent(String uuid) {
+  public static String getRankCurrent(UUID uuid) {
+    final String current = getCurrentRank(uuid);
     String rank = null;
 
-    if (getCurrentRank(uuid).equals("wood_iii")
-        || getCurrentRank(uuid).equals("wood_ii")
-        || getCurrentRank(uuid).equals("wood_i")) {
-      rank = ChatColor.GOLD + "" + ChatColor.BOLD + getCurrentRank(uuid);
+    switch (current) {
+      case "wood_iii":
+      case "wood_ii":
+      case "wood_i":
+        rank = ChatColor.GOLD + "" + ChatColor.BOLD + current;
+        break;
+      case "stone_iii":
+      case "stone_ii":
+      case "stone_i":
+        rank = ChatColor.GRAY + "" + ChatColor.BOLD + current;
+        break;
+      case "iron_iii":
+      case "iron_ii":
+      case "iron_i":
+        rank = ChatColor.WHITE + "" + ChatColor.BOLD + current;
+        break;
+      case "gold_iii":
+      case "gold_ii":
+      case "gold_i":
+        rank = ChatColor.YELLOW + "" + ChatColor.BOLD + current;
+        break;
+      case "emerald_iii":
+      case "emerald_ii":
+      case "emerald_i":
+        rank = ChatColor.GREEN + "" + ChatColor.BOLD + current;
+        break;
+      case "diamond_iii":
+      case "diamond_ii":
+      case "diamond_i":
+        rank = ChatColor.AQUA + "" + ChatColor.BOLD + current;
+        break;
+      case "obsidian":
+        rank = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + current;
     }
 
-    if (getCurrentRank(uuid).equals("stone_iii")
-        || getCurrentRank(uuid).equals("stone_ii")
-        || getCurrentRank(uuid).equals("stone_i")) {
-      rank = ChatColor.GRAY + "" + ChatColor.BOLD + getCurrentRank(uuid);
-    }
-
-    if (getCurrentRank(uuid).equals("iron_iii")
-        || getCurrentRank(uuid).equals("iron_ii")
-        || getCurrentRank(uuid).equals("iron_i")) {
-      rank = ChatColor.WHITE + "" + ChatColor.BOLD + getCurrentRank(uuid);
-    }
-
-    if (getCurrentRank(uuid).equals("gold_iii")
-        || getCurrentRank(uuid).equals("gold_ii")
-        || getCurrentRank(uuid).equals("gold_i")) {
-      rank = ChatColor.YELLOW + "" + ChatColor.BOLD + getCurrentRank(uuid);
-    }
-
-    if (getCurrentRank(uuid).equals("emerald_iii")
-        || getCurrentRank(uuid).equals("emerald_ii")
-        || getCurrentRank(uuid).equals("emerald_i")) {
-      rank = ChatColor.GREEN + "" + ChatColor.BOLD + getCurrentRank(uuid);
-    }
-
-    if (getCurrentRank(uuid).equals("diamond_iii")
-        || getCurrentRank(uuid).equals("diamond_ii")
-        || getCurrentRank(uuid).equals("diamond_i")) {
-      rank = ChatColor.AQUA + "" + ChatColor.BOLD + getCurrentRank(uuid);
-    }
-
-    if (getCurrentRank(uuid).equals("obsidian")) {
-      rank = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + getCurrentRank(uuid);
-    }
     return rank;
   }
 
-  public static String getRankNext(String uuid) {
-    String rank = null;
+  /*
 
-    try {
-      if (getNextRank(uuid).equals("wood_iii")
-          || getNextRank(uuid).equals("wood_ii")
-          || getNextRank(uuid).equals("wood_i")) {
+  Designed Rank
+   */
+
+  public static String getRankNext(UUID uuid) {
+    String rank = null;
+    switch (Objects.requireNonNull(getNextRank(uuid))) {
+      case "wood_iii":
+      case "wood_ii":
+      case "wood_i":
         rank = ChatColor.GOLD + "" + ChatColor.BOLD + format(uuid);
-      }
-
-      if (getNextRank(uuid).equals("stone_iii")
-          || getNextRank(uuid).equals("stone_ii")
-          || getNextRank(uuid).equals("stone_i")) {
+        break;
+      case "stone_iii":
+      case "stone_ii":
+      case "stone_i":
         rank = ChatColor.GRAY + "" + ChatColor.BOLD + format(uuid);
-      }
-
-      if (getNextRank(uuid).equals("iron_iii")
-          || getNextRank(uuid).equals("iron_ii")
-          || getNextRank(uuid).equals("iron_i")) {
+        break;
+      case "iron_iii":
+      case "iron_ii":
+      case "iron_i":
         rank = ChatColor.WHITE + "" + ChatColor.BOLD + format(uuid);
-      }
-
-      if (getNextRank(uuid).equals("gold_iii")
-          || getNextRank(uuid).equals("gold_ii")
-          || getNextRank(uuid).equals("gold_i")) {
+        break;
+      case "gold_iii":
+      case "gold_ii":
+      case "gold_i":
         rank = ChatColor.YELLOW + "" + ChatColor.BOLD + format(uuid);
-      }
-
-      if (getNextRank(uuid).equals("emerald_iii")
-          || getNextRank(uuid).equals("emerald_ii")
-          || getNextRank(uuid).equals("emerald_i")) {
+        break;
+      case "emerald_iii":
+      case "emerald_ii":
+      case "emerald_i":
         rank = ChatColor.GREEN + "" + ChatColor.BOLD + format(uuid);
-      }
-
-      if (getNextRank(uuid).equals("diamond_iii")
-          || getNextRank(uuid).equals("diamond_ii")
-          || getNextRank(uuid).equals("diamond_i")) {
+        break;
+      case "diamond_iii":
+      case "diamond_ii":
+      case "diamond_i":
         rank = ChatColor.AQUA + "" + ChatColor.BOLD + format(uuid);
-      }
-
-      if (getNextRank(uuid).equals("obsidian")) {
+        break;
+      case "obsidian":
         rank = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + format(uuid);
-      }
-    } catch (NullPointerException e) {
-      if (getNextRank(uuid).equals("wood_iii")
-          || getNextRank(uuid).equals("wood_ii")
-          || getNextRank(uuid).equals("wood_i")) {
-        rank = ChatColor.GOLD + "" + ChatColor.BOLD + getNextRank(uuid);
-      }
-
-      if (getNextRank(uuid).equals("stone_iii")
-          || getNextRank(uuid).equals("stone_ii")
-          || getNextRank(uuid).equals("stone_i")) {
-        rank = ChatColor.GRAY + "" + ChatColor.BOLD + getNextRank(uuid);
-      }
-
-      if (getNextRank(uuid).equals("iron_iii")
-          || getNextRank(uuid).equals("iron_ii")
-          || getNextRank(uuid).equals("iron_i")) {
-        rank = ChatColor.WHITE + "" + ChatColor.BOLD + getNextRank(uuid);
-      }
-
-      if (getNextRank(uuid).equals("gold_iii")
-          || getNextRank(uuid).equals("gold_ii")
-          || getNextRank(uuid).equals("gold_i")) {
-        rank = ChatColor.YELLOW + "" + ChatColor.BOLD + getNextRank(uuid);
-      }
-
-      if (getNextRank(uuid).equals("emerald_iii")
-          || getNextRank(uuid).equals("emerald_ii")
-          || getNextRank(uuid).equals("emerald_i")) {
-        rank = ChatColor.GREEN + "" + ChatColor.BOLD + getNextRank(uuid);
-      }
-
-      if (getNextRank(uuid).equals("diamond_iii")
-          || getNextRank(uuid).equals("diamond_ii")
-          || getNextRank(uuid).equals("diamond_i")) {
-        rank = ChatColor.AQUA + "" + ChatColor.BOLD + getNextRank(uuid);
-      }
-
-      if (getNextRank(uuid).equals("obsidian")) {
-        rank = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + getNextRank(uuid);
-      }
     }
     return rank;
   }
 
-  private static String format(String uuid) {
+  private static String format(UUID uuid) {
     return Objects.requireNonNull(getNextRank(uuid)).replace("_", " ").toUpperCase();
   }
 }

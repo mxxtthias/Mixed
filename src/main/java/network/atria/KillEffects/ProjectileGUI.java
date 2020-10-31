@@ -2,6 +2,7 @@ package network.atria.KillEffects;
 
 import static network.atria.KillEffects.DefaultGUI.createGuiItem;
 
+import java.util.UUID;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.getPlayerData;
@@ -29,21 +30,21 @@ public class ProjectileGUI implements Listener {
   @EventHandler
   public void getPlayer(InventoryOpenEvent e) {
     if (e.getView().getTitle().equals("Projectile Trails Selector")) {
-      String uuid = e.getPlayer().getUniqueId().toString();
+      final UUID uuid = e.getPlayer().getUniqueId();
       addIconItems(uuid);
     }
   }
 
-  private void addIconItems(String uuid) {
+  private void addIconItems(UUID uuid) {
 
-    ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-    ItemMeta reset_meta = reset.getItemMeta();
+    final ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+    final ItemMeta reset_meta = reset.getItemMeta();
 
     reset_meta.setDisplayName(ChatColor.RED + "Reset Projectile Trail");
     reset.setItemMeta(reset_meta);
 
-    ItemStack back = new ItemStack(Material.ARROW, 1);
-    ItemMeta back_meta = back.getItemMeta();
+    final ItemStack back = new ItemStack(Material.ARROW, 1);
+    final ItemMeta back_meta = back.getItemMeta();
 
     back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
     back.setItemMeta(back_meta);
@@ -96,93 +97,54 @@ public class ProjectileGUI implements Listener {
 
   @EventHandler
   public void onGuiClick(final InventoryClickEvent e) {
-    try {
-      if (e.getView().getTitle().equals("Projectile Trails Selector")) {
-        e.setCancelled(true);
+    if (e.getView().getTitle().equals("Projectile Trails Selector")) {
+      e.setCancelled(true);
 
-        final ItemStack clickedItem = e.getCurrentItem();
+      final ItemStack clickedItem = e.getCurrentItem();
+      final Player player = (Player) e.getWhoClicked();
+      final String getItemName = clickedItem.getItemMeta().getDisplayName().substring(2);
 
-        final Player player = (Player) e.getWhoClicked();
-
-        String getItemName = clickedItem.getItemMeta().getDisplayName();
-
-        if (clickedItem.hasItemMeta()) {
-          if (clickedItem.getItemMeta().hasDisplayName()) {
-            if (getItemName.equals(ChatColor.RED + "Go to previous page ➡")) {
-              player.openInventory(DefaultGUI.gui);
-            }
-            if (getItemName.equals(ChatColor.RED + "Reset Projectile Trail")) {
-              MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
-              player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + "Kill Sound");
-            } else if (getItemName.equals(ChatColor.AQUA + "HEART")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("HEART_TRAIL"))) {
-                MySQLSetterGetter.setProjectileTrails(player.getUniqueId().toString(), "HEART");
-                player.sendMessage(
-                    ChatColor.GREEN
-                        + "You selected "
-                        + ChatColor.YELLOW
-                        + "HEART Projectile Trail");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "WITCH")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("WITCH"))) {
-                MySQLSetterGetter.setProjectileTrails(player.getUniqueId().toString(), "WITCH");
-                player.sendMessage(
-                    ChatColor.GREEN
-                        + "You selected "
-                        + ChatColor.YELLOW
-                        + "WITCH Projectile Trail");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "RAINBOW")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(),
-                  getPlayerData.getRequirePoints("RAINBOW_TRAIL"))) {
-                MySQLSetterGetter.setProjectileTrails(
-                    player.getUniqueId().toString(), "RAINBOW_TRAIL");
-                player.sendMessage(
-                    ChatColor.GREEN
-                        + "You selected "
-                        + ChatColor.YELLOW
-                        + "RAINBOW Projectile Trail");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else if (getItemName.equals(ChatColor.AQUA + "GREEN")) {
-              if (getPlayerData.hasRequirePoint(
-                  player.getUniqueId().toString(), getPlayerData.getRequirePoints("GREEN"))) {
-                MySQLSetterGetter.setProjectileTrails(player.getUniqueId().toString(), "GREEN");
-                player.sendMessage(
-                    ChatColor.GREEN
-                        + "You selected "
-                        + ChatColor.YELLOW
-                        + "GREEN Projectile Trail");
-              } else {
-                player.sendMessage(ChatColor.RED + "You don't have enought points");
-              }
-            } else {
-              if (getItemName.equals(ChatColor.AQUA + "NOTE")) {
-                if (getPlayerData.hasRequirePoint(
-                    player.getUniqueId().toString(), getPlayerData.getRequirePoints("NOTE"))) {
-                  MySQLSetterGetter.setProjectileTrails(player.getUniqueId().toString(), "NOTE");
-                  player.sendMessage(
-                      ChatColor.GREEN
-                          + "You selected "
-                          + ChatColor.YELLOW
-                          + "NOTE Projectile Trail");
-                } else {
-                  player.sendMessage(ChatColor.RED + "You don't have enought points");
-                }
-              }
-            }
-          }
-        }
+      switch (getItemName) {
+        case "Go to previous page ➡":
+          player.openInventory(DefaultGUI.gui);
+          break;
+        case "Reset Projectile Trail":
+          MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
+          player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + " Kill Sound");
+          break;
+        case "HEART":
+          selectProjectile(player, "HEART");
+          break;
+        case "WITCH":
+          selectProjectile(player, "WITCH");
+          break;
+        case "RAINBOW":
+          selectProjectile(player, "RAINBOW_TRAIL");
+          break;
+        case "GREEN":
+          selectProjectile(player, "GREEN");
+          break;
+        case "NOTE":
+          selectProjectile(player, "NOTE");
+          break;
       }
-    } catch (NullPointerException ignored) {
+    }
+  }
+
+  private void selectProjectile(Player player, String projectile) {
+    final UUID uuid = player.getUniqueId();
+    final int require = getPlayerData.getRequirePoints(projectile);
+
+    if (getPlayerData.hasRequirePoint(uuid, require)) {
+      MySQLSetterGetter.setProjectileTrails(uuid.toString(), projectile);
+      player.sendMessage(
+          ChatColor.GREEN
+              + "You selected "
+              + ChatColor.YELLOW
+              + projectile.toUpperCase()
+              + " Projectile Trail");
+    } else {
+      player.sendMessage(ChatColor.RED + "You don't have enough points");
     }
   }
 }

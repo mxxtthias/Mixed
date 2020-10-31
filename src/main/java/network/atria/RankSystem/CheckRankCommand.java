@@ -1,5 +1,6 @@
 package network.atria.RankSystem;
 
+import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,27 +12,29 @@ public class CheckRankCommand implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
 
-    Player player = (Player) s;
-    String uuid = player.getUniqueId().toString();
+    final Player player = (Player) s;
+    final UUID uuid = player.getUniqueId();
+    final String current = Ranks.getCurrentRank(uuid);
+    final String next = Ranks.getNextRank(uuid);
+
     if (args.length == 0) {
-      s.sendMessage(
+      player.sendMessage(
           ChatColor.DARK_AQUA
               + "Rank: "
-              + Ranks.getRankCurrent(uuid).replace("_", " ").toUpperCase());
-      s.sendMessage(
+              + ChatColor.AQUA
+              + current.replace("_", " ").toUpperCase());
+      player.sendMessage(
           ChatColor.DARK_AQUA
               + "Your current points are "
               + ChatColor.AQUA
               + ""
               + ChatColor.BOLD
               + Ranks.getCurrentPoint(uuid));
-      if (Ranks.getNextRank(uuid).equals(Ranks.getCurrentRank(uuid))) {
-        s.sendMessage(
-            ChatColor.DARK_AQUA
-                + "You can't ranked up because you're "
-                + Ranks.getRankCurrent(uuid).toUpperCase());
+      if (next.equalsIgnoreCase(current)) {
+        player.sendMessage(
+            ChatColor.DARK_AQUA + "You can't ranked up because you're " + current.toUpperCase());
       } else {
-        s.sendMessage(
+        player.sendMessage(
             ChatColor.DARK_AQUA
                 + "You need "
                 + ChatColor.AQUA
