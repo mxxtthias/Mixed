@@ -5,6 +5,6 @@ MySQL:
   Password: ""
   Port: 3306 #default
 
-Messeages:
+Messages:
   - "" #Broadcast Messages
 

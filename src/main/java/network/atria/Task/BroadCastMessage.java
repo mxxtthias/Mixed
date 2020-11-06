@@ -6,7 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class BroadCastMesseage {
+public class BroadCastMessage {
 
   private final String prefix =
       ChatColor.WHITE
@@ -23,24 +23,22 @@ public class BroadCastMesseage {
           + "] "
           + ChatColor.DARK_AQUA;
 
-  public void randomMesseage() {
-
-    final String messeage = random(null);
+  public void randomMessage() {
 
     new BukkitRunnable() {
       @Override
       public void run() {
-        Bukkit.broadcastMessage(
-            prefix + ChatColor.translateAlternateColorCodes('&', random(messeage)));
+        Bukkit.broadcastMessage(prefix + ChatColor.translateAlternateColorCodes('&', random()));
       }
     }.runTaskTimer(Main.getInstance(), 0L, 20 * 60 * 5);
   }
 
-  private String random(String msg) {
-    final List<String> messeages = Main.getInstance().getConfig().getStringList("Messeages");
+  private String random() {
+    final List<String> messages = Main.getInstance().getConfig().getStringList("Messages");
+    final String msg;
 
-    final int index = (new Random()).nextInt(messeages.size());
-    msg = messeages.get(index);
+    final int index = (new Random()).nextInt(messages.size());
+    msg = messages.get(index);
     return msg;
   }
 }
