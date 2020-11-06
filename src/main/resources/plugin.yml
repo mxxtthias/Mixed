@@ -1,25 +1,4 @@
 name: Mixed
-version: 2.0-SNAPSHOT
-author: XPS
-main: network.atria.Main
-commands:
-  stats:
-    description: stats
-    usage: /<command>
-    default: true
-  ping:
-    description: ping
-    usage: /<command>
-    default: true
-  effect:
-    description: effects
-    usage: /<command>
-    default: true
-  rank:
-    description: rank
-    usage: /<command>
-    default: true
-  sound:
-    description: sound
-    usage: /<command>
-    default: true
+version: ${project.version} (git-${git.commit.id.abbrev})
+main: ${project.mainClass}
+
