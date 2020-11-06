@@ -1,13 +1,12 @@
 package network.atria.KillEffects;
 
+import app.ashcon.intake.Command;
+import app.ashcon.intake.bukkit.parametric.annotation.Sender;
 import java.util.Arrays;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +15,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-public class DefaultGUI implements Listener, CommandExecutor {
+public class DefaultGUI implements Listener {
 
   public static Inventory gui;
 
@@ -79,12 +78,11 @@ public class DefaultGUI implements Listener, CommandExecutor {
     return item;
   }
 
-  @Override
-  public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
-    Player player = (Player) s;
-    if (args.length == 0) {
-      player.openInventory(gui);
-    }
+  @Command(
+      aliases = {"effect", "sound", "projectile"},
+      desc = "Open Select GUI")
+  public boolean gui(@Sender Player sender) {
+    sender.openInventory(gui);
     return true;
   }
 }
