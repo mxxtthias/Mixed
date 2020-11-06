@@ -1,18 +1,15 @@
 package network.atria;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
+import network.atria.Commands.graph.CommandExecutor;
+import network.atria.Commands.graph.CommandGraph;
 import network.atria.Database.*;
 import network.atria.KillEffects.*;
 import network.atria.Listener.MatchEvents;
-import network.atria.RankSystem.CheckRankCommand;
-import network.atria.Statics.StatsCommand;
-import network.atria.Task.BroadCastMesseage;
+import network.atria.Task.BroadCastMessage;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.RanksConfig;
 import org.bukkit.Bukkit;
@@ -26,11 +23,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin implements Listener {
 
   public static Main instance;
+  private long uptime;
 
   RanksConfig ranks;
   KillEffectsConfig effects;
 
   FileConfiguration config = getConfig();
+  MySQL database = new MySQL();
 
   @Override
   public void onEnable() {
@@ -41,14 +40,16 @@ public class Main extends JavaPlugin implements Listener {
 
     config.options().copyDefaults();
     saveDefaultConfig();
-    MySQL.connect();
-    ConnectMySQL();
+    database.connect();
+    database.createTables();
 
     registerCommands();
     registerEvents();
 
-    BroadCastMesseage broadCastMesseage = new BroadCastMesseage();
-    broadCastMesseage.randomMesseage();
+    uptime = System.currentTimeMillis();
+
+    BroadCastMessage broadCastMessage = new BroadCastMessage();
+    broadCastMessage.randomMessage();
 
     super.onEnable();
   }
@@ -74,37 +75,8 @@ public class Main extends JavaPlugin implements Listener {
   }
 
   private void registerCommands() {
-    getCommand("stats").setExecutor(new StatsCommand());
-    getCommand("rank").setExecutor(new CheckRankCommand());
-    getCommand("effect").setExecutor(new DefaultGUI());
-    getCommand("sound").setExecutor(new DefaultGUI());
-  }
-
-  private void ConnectMySQL() {
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      Statement statement = connection.createStatement();
-
-      statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS STATS(UUID varchar(36) NOT NULL PRIMARY KEY, KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(20));");
-      statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(36) NOT NULL PRIMARY KEY, KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(20));");
-      statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS RANKS(UUID varchar(36) NOT NULL PRIMARY KEY, NAME varchar(20), POINTS int, GAMERANK varchar(20), EFFECT varchar(20), SOUND varchar(20), PROJECTILE varchar(20));");
-
-      statement.close();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-    }
+    final CommandGraph graph = new CommandGraph();
+    new CommandExecutor(this, graph).register();
   }
 
   @EventHandler
@@ -120,7 +92,14 @@ public class Main extends JavaPlugin implements Listener {
 
       user.data().add(node);
       api.getUserManager().saveUser(user);
+    } else if (!MySQLSetterGetter.getName(player.getUniqueId().toString())
+        .equals(player.getName())) {
+      MySQLSetterGetter.setName(player.getUniqueId().toString(), player.getName());
     }
+  }
+
+  public long getUptime() {
+    return uptime;
   }
 
   public static Main getInstance() {
