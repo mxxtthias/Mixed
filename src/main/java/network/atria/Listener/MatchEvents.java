@@ -30,16 +30,18 @@ public class MatchEvents implements Listener, MatchModule {
   @EventHandler
   public void onKill(MatchPlayerDeathEvent e) {
     final MatchPlayer victim = e.getVictim();
-    MatchPlayer murder = null;
+    MatchPlayer murder;
 
     if (e.getKiller() != null) {
       murder = e.getKiller().getParty().getPlayer(e.getKiller().getId());
-      if (!murder.getParty().equals(victim.getParty())) {
+      if (murder != null) {
+        if (!murder.getParty().equals(victim.getParty())) {
 
-        MySQLSetterGetter.addKills(murder.getId().toString(), 1);
-        MySQLSetterGetter.addPoints(murder.getId().toString(), 5);
-        MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
-        LevelUp(murder);
+          MySQLSetterGetter.addKills(murder.getId().toString(), 1);
+          MySQLSetterGetter.addPoints(murder.getId().toString(), 5);
+          MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
+          LevelUp(murder);
+        }
       }
     } else {
       MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
@@ -49,17 +51,21 @@ public class MatchEvents implements Listener, MatchModule {
   @EventHandler
   public void ctw(PlayerWoolPlaceEvent e) {
     final MatchPlayerState player = e.getPlayer();
-    MySQLSetterGetter.addPoints(player.getId().toString(), 20);
-    MySQLSetterGetter.addWools(player.getId().toString(), 1);
-    LevelUp(player.getPlayer().get());
+    if (player.getPlayer().isPresent()) {
+      MySQLSetterGetter.addPoints(player.getId().toString(), 20);
+      MySQLSetterGetter.addWools(player.getId().toString(), 1);
+      LevelUp(player.getPlayer().get());
+    }
   }
 
   @EventHandler
   public void dtc(CoreLeakEvent e) {
     for (ParticipantState ps : e.getCore().getTouchingPlayers()) {
-      MySQLSetterGetter.addCores(ps.getId().toString(), 1);
-      MySQLSetterGetter.addPoints(ps.getId().toString(), 25);
-      LevelUp(ps.getPlayer().get());
+      if (ps.getPlayer().isPresent()) {
+        MySQLSetterGetter.addCores(ps.getId().toString(), 1);
+        MySQLSetterGetter.addPoints(ps.getId().toString(), 25);
+        LevelUp(ps.getPlayer().get());
+      }
     }
   }
 
@@ -74,9 +80,11 @@ public class MatchEvents implements Listener, MatchModule {
   @EventHandler
   public void dtm(DestroyableDestroyedEvent e) {
     for (DestroyableContribution dc : e.getDestroyable().getContributions()) {
-      MySQLSetterGetter.addMonuments(dc.getPlayerState().getId().toString(), 1);
-      MySQLSetterGetter.addPoints(dc.getPlayerState().getId().toString(), 25);
-      LevelUp(dc.getPlayerState().getPlayer().get());
+      if (dc.getPlayerState().getPlayer().isPresent()) {
+        MySQLSetterGetter.addMonuments(dc.getPlayerState().getId().toString(), 1);
+        MySQLSetterGetter.addPoints(dc.getPlayerState().getId().toString(), 25);
+        LevelUp(dc.getPlayerState().getPlayer().get());
+      }
     }
   }
 
