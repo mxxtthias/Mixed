@@ -9,39 +9,72 @@ public class MySQL {
 
   private static HikariDataSource ds;
 
-  public static void connect() {
-    HikariConfig hikari = new HikariConfig();
-
-    hikari.setJdbcUrl("jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDatabase());
+  public void connect() {
+    final HikariConfig hikari = new HikariConfig();
+    hikari.setJdbcUrl(
+        "jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDatabase() + "?useSSL=false");
     hikari.addDataSourceProperty("user", getUser());
     hikari.addDataSourceProperty("password", getPassword());
-    hikari.addDataSourceProperty("autoReconnect", true);
+    hikari.addDataSourceProperty("useServerPrepStmts", true);
     hikari.addDataSourceProperty("cachePrepStmts", true);
+    hikari.addDataSourceProperty("cacheResultSetMetadata", true);
+    hikari.addDataSourceProperty("useLocalSessionState", true);
+    hikari.addDataSourceProperty("rewriteBatchedStatements", true);
+    hikari.addDataSourceProperty("cacheResultSetMetadata", true);
+    hikari.addDataSourceProperty("cacheServerConfiguration", true);
+    hikari.addDataSourceProperty("elideSetAutoCommits", true);
+    hikari.addDataSourceProperty("maintainTimeStats", false);
     hikari.addDataSourceProperty("prepStmtCacheSize", 250);
     hikari.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
-    hikari.addDataSourceProperty("useServerPrepStmts", true);
-    hikari.addDataSourceProperty("cacheResultSetMetadata", true);
+    hikari.addDataSourceProperty("characterEncoding", "utf8");
 
     ds = new HikariDataSource(hikari);
   }
 
-  private static String getHost() {
+  public void createTables() {
+    Connection connection = null;
+    try {
+      connection = MySQL.getHikari().getConnection();
+      Statement statement = connection.createStatement();
+
+      statement.executeUpdate(
+          "CREATE TABLE IF NOT EXISTS STATS(UUID varchar(36) NOT NULL PRIMARY KEY, KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(20));");
+      statement.executeUpdate(
+          "CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(36) NOT NULL PRIMARY KEY, KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, NAME varchar(20));");
+      statement.executeUpdate(
+          "CREATE TABLE IF NOT EXISTS RANKS(UUID varchar(36) NOT NULL PRIMARY KEY, NAME varchar(20), POINTS int, GAMERANK varchar(20), EFFECT varchar(20), SOUND varchar(20), PROJECTILE varchar(20));");
+
+      statement.close();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    } finally {
+      if (connection != null) {
+        try {
+          connection.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+  }
+
+  private String getHost() {
     return Main.getInstance().getConfig().getString("MySQL.Host");
   }
 
-  private static String getDatabase() {
+  private String getDatabase() {
     return Main.getInstance().getConfig().getString("MySQL.Database");
   }
 
-  private static String getUser() {
+  private String getUser() {
     return Main.getInstance().getConfig().getString("MySQL.User");
   }
 
-  private static String getPassword() {
+  private String getPassword() {
     return Main.getInstance().getConfig().getString("MySQL.Password");
   }
 
-  private static Integer getPort() {
+  private Integer getPort() {
     return Main.getInstance().getConfig().getInt("MySQL.Port");
   }
 

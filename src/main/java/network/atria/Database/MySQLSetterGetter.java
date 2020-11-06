@@ -20,10 +20,10 @@ public class MySQLSetterGetter {
 
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement = connection.prepareStatement("SELECT UUID FROM STATS WHERE UUID= '" + uuid + "'");
       statement2 =
-          connection.prepareStatement("SELECT * FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
-      statement3 = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+          connection.prepareStatement("SELECT UUID FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
+      statement3 = connection.prepareStatement("SELECT UUID FROM RANKS WHERE UUID= '" + uuid + "'");
 
       rs = statement.executeQuery();
       week_rs = statement2.executeQuery();
@@ -94,9 +94,9 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement = connection.prepareStatement("SELECT NAME FROM STATS WHERE UUID= '" + uuid + "';");
       rs = statement.executeQuery();
-      if (rs.next()) i = rs.getString("UUID");
+      if (rs.next()) i = rs.getString("NAME");
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
@@ -147,7 +147,8 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement =
+          connection.prepareStatement("SELECT MONUMENTS FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("MONUMENTS");
     } catch (SQLException e) {
@@ -167,7 +168,7 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement = connection.prepareStatement("SELECT FLAGS FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("FLAGS");
     } catch (SQLException e) {
@@ -187,7 +188,7 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement = connection.prepareStatement("SELECT CORES FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("CORES");
     } catch (SQLException e) {
@@ -207,7 +208,7 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement = connection.prepareStatement("SELECT WOOLS FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("WOOLS");
       closeStatement(statement);
@@ -229,7 +230,7 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement = connection.prepareStatement("SELECT KILLS FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("KILLS");
     } catch (SQLException e) {
@@ -249,7 +250,8 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM STATS WHERE UUID= '" + uuid + "'");
+      statement =
+          connection.prepareStatement("SELECT DEATHS FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("DEATHS");
     } catch (SQLException e) {
@@ -269,7 +271,8 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+      statement =
+          connection.prepareStatement("SELECT POINTS FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("POINTS");
     } catch (SQLException e) {
@@ -289,7 +292,8 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+      statement =
+          connection.prepareStatement("SELECT GAMERANK FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("GAMERANK");
     } catch (SQLException e) {
@@ -309,7 +313,8 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+      statement =
+          connection.prepareStatement("SELECT EFFECT FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("EFFECT");
     } catch (SQLException e) {
@@ -329,7 +334,7 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+      statement = connection.prepareStatement("SELECT SOUND FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("SOUND");
     } catch (SQLException e) {
@@ -349,7 +354,8 @@ public class MySQLSetterGetter {
     Connection connection = null;
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT * FROM RANKS WHERE UUID= '" + uuid + "'");
+      statement =
+          connection.prepareStatement("SELECT PROJECTILE FROM RANKS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getString("PROJECTILE");
     } catch (SQLException e) {
