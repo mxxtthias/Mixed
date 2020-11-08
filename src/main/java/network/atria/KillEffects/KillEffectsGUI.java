@@ -1,15 +1,14 @@
 package network.atria.KillEffects;
 
-import static network.atria.KillEffects.DefaultGUI.createGuiItem;
-
+import java.util.Set;
 import java.util.UUID;
 import network.atria.Database.MySQLSetterGetter;
+import network.atria.Util.EffectUtils;
 import network.atria.Util.KillEffectsConfig;
-import network.atria.Util.getPlayerData;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -18,18 +17,23 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
-public class KillEffectsGUI implements Listener {
+public class KillEffectsGUI extends EffectUtils implements Listener {
 
-  public static Inventory EffectsGUI;
+  public static Inventory effect;
+  protected String title = "Kill Effect Selector";
+  protected int size = 27;
+  private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
 
-  public KillEffectsGUI() {
-    EffectsGUI = Bukkit.createInventory(null, 27, "Kill Effect Selector");
+  public KillEffectsGUI(Plugin plugin) {
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
+    effect = createGUI(size, title);
   }
 
   @EventHandler
-  public void getPlayer(InventoryOpenEvent e) {
-    if (e.getView().getTitle().equals("Kill Effect Selector")) {
+  public void openGUI(InventoryOpenEvent e) {
+    if (e.getView().getTitle().equals(title)) {
       final UUID uuid = e.getPlayer().getUniqueId();
       addIconItems(uuid);
     }
@@ -49,124 +53,76 @@ public class KillEffectsGUI implements Listener {
     back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
     back.setItemMeta(back_meta);
 
-    EffectsGUI.setItem(
-        0,
-        createGuiItem(
-            Material.REDSTONE,
-            ChatColor.AQUA + "BLOOD",
-            "",
-            getPlayerData.canUseEffects(uuid, effectPoint("BLOOD"))));
-    EffectsGUI.setItem(
-        1,
-        createGuiItem(
-            Material.LAVA_BUCKET,
-            ChatColor.AQUA + "FLAME",
-            "",
-            getPlayerData.canUseEffects(uuid, effectPoint("FLAME"))));
-    EffectsGUI.setItem(
-        2,
-        createGuiItem(
-            Material.GOLDEN_APPLE,
-            ChatColor.AQUA + "HEART",
-            "",
-            getPlayerData.canUseEffects(uuid, effectPoint("HEART"))));
-    EffectsGUI.setItem(
-        3,
-        createGuiItem(
-            Material.FIREWORK_CHARGE,
-            ChatColor.AQUA + "SMOKE",
-            "",
-            getPlayerData.canUseEffects(uuid, effectPoint("SMOKE"))));
-    EffectsGUI.setItem(
-        4,
-        createGuiItem(
-            Material.ENCHANTED_BOOK,
-            ChatColor.AQUA + "MAGIC",
-            "",
-            getPlayerData.canUseEffects(uuid, effectPoint("MAGIC"))));
-    EffectsGUI.setItem(
-        5,
-        createGuiItem(
-            Material.ENDER_PEARL,
-            ChatColor.AQUA + "SPHERE",
-            "",
-            getPlayerData.canUseEffects(uuid, effectPoint("SPHERE"))));
-    EffectsGUI.setItem(
-        6,
-        createGuiItem(
-            Material.NETHER_STAR,
-            ChatColor.DARK_PURPLE + "RAINBOW",
-            "",
-            getPlayerData.canUseEffects(uuid, effectPoint("RAINBOW"))));
-    EffectsGUI.setItem(
+    for (String effect : config.getConfigurationSection("KILL_EFFECT").getKeys(false)) {
+      final Material material =
+          Material.valueOf(config.getString("KILL_EFFECT." + effect + ".material").toUpperCase());
+      final int number = config.getInt("KILL_EFFECT." + effect + ".number");
+
+      setItemGUI(
+          KillEffectsGUI.effect,
+          number,
+          material,
+          effect,
+          "",
+          canUseEffects(uuid, effectPoint(effect)));
+    }
+    setItemGUI(
+        effect,
         18,
-        createGuiItem(
-            Material.GOLD_NUGGET, ChatColor.GOLD + "DONOR", "", ChatColor.RED + "- Donor Only -"));
-    EffectsGUI.setItem(26, reset);
-    EffectsGUI.setItem(8, back);
+        Material.GOLD_NUGGET,
+        ChatColor.GOLD + "DONOR",
+        "",
+        ChatColor.RED + "- Donor Only -");
+    effect.setItem(26, reset);
+    effect.setItem(8, back);
   }
 
   private Integer effectPoint(String effectName) {
-    return KillEffectsConfig.getCustomConfig().getInt(effectName + ".points");
+    return config.getInt("KILL_EFFECT." + effectName + ".points");
   }
 
   @EventHandler
   public void onGuiClick(final InventoryClickEvent e) {
-    if (e.getView().getTitle().equals("Kill Effect Selector")) {
+    if (e.getView().getTitle().equals(title)) {
       e.setCancelled(true);
 
       final ItemStack clickedItem = e.getCurrentItem();
       final Player player = (Player) e.getWhoClicked();
-      final String getItemName = clickedItem.getItemMeta().getDisplayName().substring(2);
+      final String getItemName = clickedItem.getItemMeta().getDisplayName();
+      final Set<String> effect = config.getConfigurationSection("KILL_EFFECT").getKeys(false);
 
-      switch (getItemName) {
-        case "Go to previous page ➡":
-          player.openInventory(DefaultGUI.gui);
-          break;
-        case "NONE":
-          MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
-          player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + " Kill Effect");
-          break;
-        case "BLOOD":
-          selectEffect(player, "BLOOD", false);
-          break;
-        case "RAINBOW":
-          selectEffect(player, "RAINBOW", false);
-          break;
-        case "HEART":
-          selectEffect(player, "HEART", true);
-          break;
-        case "SMOKE":
-          selectEffect(player, "SMOKE", true);
-          break;
-        case "FLAME":
-          selectEffect(player, "FLAME", true);
-          break;
-        case "SPHERE":
-          selectEffect(player, "SPHERE", true);
-          break;
-        case "MAGIC":
-          selectEffect(player, "MAGIC", true);
-        case "DONOR":
-          if (player.hasPermission("pgm.group.donor")) {
-            MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
-            player.sendMessage(
-                ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " DONOR kill effect.");
-          } else {
-            player.sendMessage(ChatColor.RED + "You don't have the donor rank");
-          }
-          break;
+      if (effect.contains(getItemName)) {
+        selectEffect(player, getItemName, false);
+      } else {
+        switch (getItemName.substring(2)) {
+          case "Go to previous page ➡":
+            player.openInventory(DefaultGUI.gui);
+            break;
+          case "Reset Kill Effect":
+            MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
+            player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + " Kill Effect");
+            break;
+          case "DONOR":
+            if (player.hasPermission("pgm.group.donor")) {
+              MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
+              player.sendMessage(
+                  ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " DONOR kill effect.");
+            } else {
+              player.sendMessage(ChatColor.RED + "You don't have the donor rank");
+            }
+            break;
+        }
       }
     }
   }
 
   private void selectEffect(Player player, String effect, Boolean donor) {
     final UUID uuid = player.getUniqueId();
-    final int require = getPlayerData.getRequirePoints(effect);
+    final int require = getRequirePoints("KILL_EFFECT", effect);
 
     if (donor) {
-      if (getPlayerData.hasDonorRank(player)) {
-        if (getPlayerData.hasRequirePoint(uuid, require)) {
+      if (hasDonorRank(player)) {
+        if (hasRequirePoint(uuid, require)) {
           MySQLSetterGetter.setKillEffect(uuid.toString(), effect);
           player.sendMessage(
               ChatColor.GREEN
@@ -179,7 +135,7 @@ public class KillEffectsGUI implements Listener {
         }
       }
     } else {
-      if (getPlayerData.hasRequirePoint(uuid, require)) {
+      if (hasRequirePoint(uuid, require)) {
         MySQLSetterGetter.setKillEffect(uuid.toString(), effect);
         player.sendMessage(
             ChatColor.GREEN

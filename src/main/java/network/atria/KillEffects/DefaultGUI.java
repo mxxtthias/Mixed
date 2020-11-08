@@ -14,12 +14,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
 public class DefaultGUI implements Listener {
 
   public static Inventory gui;
 
-  public DefaultGUI() {
+  public DefaultGUI(Plugin plugin) {
+    plugin.getServer().getPluginManager().registerEvents(this, plugin);
     gui = Bukkit.createInventory(null, 27, "Main GUI");
     addIconItems();
   }
@@ -53,11 +55,11 @@ public class DefaultGUI implements Listener {
             if (getItemName.equals(ChatColor.RED + "Close the GUI")) {
               player.closeInventory();
             } else if (getItemName.equals(ChatColor.GREEN + "Kill Effects")) {
-              player.openInventory(KillEffectsGUI.EffectsGUI);
+              player.openInventory(KillEffectsGUI.effect);
             } else if (getItemName.equals(ChatColor.GREEN + "Kill Sounds")) {
-              player.openInventory(KillSoundsGUI.SoundsGUI);
+              player.openInventory(KillSoundsGUI.sound);
             } else if (getItemName.equals(ChatColor.GREEN + "Projectile Trails")) {
-              player.openInventory(ProjectileGUI.ProjectileGUI);
+              player.openInventory(ProjectileGUI.projectile);
             }
           }
         }

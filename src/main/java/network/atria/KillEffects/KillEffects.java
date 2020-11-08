@@ -9,7 +9,7 @@ import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Main;
-import network.atria.Util.getPlayerData;
+import network.atria.Util.EffectUtils;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,7 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 
-public class KillEffects implements Listener {
+public class KillEffects extends EffectUtils implements Listener {
 
   @EventHandler
   public void onPlayerDeath(MatchPlayerDeathEvent e) {
@@ -36,8 +36,8 @@ public class KillEffects implements Listener {
 
       switch (getEffect) {
         case "BLOOD":
-          if (getPlayerData.hasRequirePoint(murder.getId(), getPlayerData.getRequirePoints("BLOOD"))
-              || getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+          if (hasRequirePoint(murder.getId(), getRequirePoints("KILL_EFFECT", "BLOOD"))
+              || hasDonorRank(murder.getBukkit().getPlayer())) {
             final Location location = victim.getBukkit().getLocation();
 
             createCustomEffect(
@@ -65,7 +65,7 @@ public class KillEffects implements Listener {
           break;
 
         case "HEART":
-          if (getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+          if (hasDonorRank(murder.getBukkit().getPlayer())) {
             final Location location = victim.getBukkit().getLocation();
 
             createCustomEffect(
@@ -82,7 +82,7 @@ public class KillEffects implements Listener {
           break;
 
         case "SMOKE":
-          if (getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+          if (hasDonorRank(murder.getBukkit().getPlayer())) {
             final Location location = victim.getBukkit().getLocation();
 
             createCustomEffect(
@@ -99,8 +99,8 @@ public class KillEffects implements Listener {
           break;
 
         case "FLAME":
-          if (getPlayerData.hasRequirePoint(murder.getId(), getPlayerData.getRequirePoints("FLAME"))
-              || getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+          if (hasRequirePoint(murder.getId(), getRequirePoints("KILL_EFFECT", "FLAME"))
+              || hasDonorRank(murder.getBukkit().getPlayer())) {
             final Location location = victim.getBukkit().getLocation();
 
             createCustomEffect(
@@ -117,9 +117,8 @@ public class KillEffects implements Listener {
           break;
 
         case "RAINBOW":
-          if (getPlayerData.hasRequirePoint(
-                  murder.getId(), getPlayerData.getRequirePoints("RAINBOW"))
-              || getPlayerData.hasDonorRank(murder.getBukkit().getPlayer())) {
+          if (hasRequirePoint(murder.getId(), getRequirePoints("KILL_EFFECT", "RAINBOW"))
+              || hasDonorRank(murder.getBukkit().getPlayer())) {
             final Location location = victim.getBukkit().getLocation();
 
             final double radius = 2;
