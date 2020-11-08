@@ -13,7 +13,12 @@ public class ServerInfoCommand {
       desc = "Send Atria Network's Discord Link")
   public void discord(@Sender Player sender) {
     sender.sendMessage(
-        ChatColor.DARK_PURPLE + "Discord: " + ChatColor.DARK_AQUA + "https://discord.gg/X3F6S6m");
+        ChatColor.DARK_AQUA
+            + ""
+            + ChatColor.BOLD
+            + "Discord: "
+            + ChatColor.AQUA
+            + "https://discord.gg/X3F6S6m");
   }
 
   @Command(
@@ -21,7 +26,12 @@ public class ServerInfoCommand {
       desc = "Send Atria Network's Webiste Link")
   public void site(@Sender Player sender) {
     sender.sendMessage(
-        ChatColor.DARK_AQUA + "Website: " + ChatColor.AQUA + "https://atria.network/");
+        ChatColor.DARK_AQUA
+            + ""
+            + ChatColor.BOLD
+            + "Website: "
+            + ChatColor.AQUA
+            + "https://atria.network/");
   }
 
   @Command(

@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin implements Listener {
@@ -25,10 +26,10 @@ public class Main extends JavaPlugin implements Listener {
   public static Main instance;
   private long uptime;
 
-  RanksConfig ranks;
-  KillEffectsConfig effects;
+  private RanksConfig ranks;
+  private KillEffectsConfig effects;
 
-  FileConfiguration config = getConfig();
+  private final FileConfiguration config = getConfig();
   MySQL database = new MySQL();
 
   @Override
@@ -63,11 +64,13 @@ public class Main extends JavaPlugin implements Listener {
   }
 
   private void registerEvents() {
-    Bukkit.getServer().getPluginManager().registerEvents(this, this);
-    Bukkit.getServer().getPluginManager().registerEvents(new KillEffectsGUI(), this);
-    Bukkit.getServer().getPluginManager().registerEvents(new KillSoundsGUI(), this);
-    Bukkit.getServer().getPluginManager().registerEvents(new DefaultGUI(), this);
-    Bukkit.getServer().getPluginManager().registerEvents(new ProjectileGUI(), this);
+    final PluginManager pm = Bukkit.getServer().getPluginManager();
+
+    pm.registerEvents(this, this);
+    new KillEffectsGUI(this);
+    new KillSoundsGUI(this);
+    new DefaultGUI(this);
+    new ProjectileGUI(this);
     new MatchEvents(this);
     new KillEffects(this);
     new KillSounds(this);
@@ -82,6 +85,7 @@ public class Main extends JavaPlugin implements Listener {
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
     final Player player = event.getPlayer();
+    ;
     final LuckPerms api = LuckPermsProvider.get();
     final User user = api.getUserManager().getUser(player.getUniqueId());
     final PermissionNode node = PermissionNode.builder("pgm.group.wood_iii").build();

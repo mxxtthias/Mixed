@@ -5,6 +5,7 @@ import app.ashcon.intake.fluent.DispatcherNode;
 import network.atria.Commands.ServerInfoCommand;
 import network.atria.Commands.StatsCommand;
 import network.atria.KillEffects.DefaultGUI;
+import network.atria.Main;
 import network.atria.RankSystem.CheckRankCommand;
 
 public class CommandGraph extends BasicBukkitCommandGraph {
@@ -16,7 +17,7 @@ public class CommandGraph extends BasicBukkitCommandGraph {
   public void registerAll() {
     register(new ServerInfoCommand());
     register(new StatsCommand());
-    register(new DefaultGUI());
+    register(new DefaultGUI(Main.getInstance()));
     register(new CheckRankCommand());
   }
 

@@ -3,6 +3,7 @@ package network.atria.RankSystem;
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
 import java.util.UUID;
+import network.atria.Database.MySQLSetterGetter;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -14,7 +15,7 @@ public class CheckRankCommand {
   public void rank(@Sender Player sender) {
 
     final UUID uuid = sender.getUniqueId();
-    final String current = Ranks.getCurrentRank(uuid);
+    final String current = MySQLSetterGetter.getRank(uuid);
     final String next = Ranks.getNextRank(uuid);
 
     sender.sendMessage(
