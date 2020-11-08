@@ -2,7 +2,6 @@ package network.atria.Commands;
 
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
-import app.ashcon.intake.parametric.annotation.Text;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
@@ -10,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import javax.annotation.Nullable;
 import network.atria.Database.MySQL;
 import network.atria.Database.MySQLSetterGetter;
 import org.bukkit.Bukkit;
@@ -24,33 +24,16 @@ public class StatsCommand {
       aliases = {"stats"},
       desc = "Show Player Stats",
       usage = "[Target]")
-  public void stats(@Sender Player player, @Text String playerName) {
-    final Map<String, Integer> statsMap = getStats(player.getUniqueId());
+  public void stats(@Sender Player player, @Nullable String playerName) {
     if (playerName == null) {
-      showStats(
-          player,
-          player.getName(),
-          statsMap.get("KILLS"),
-          statsMap.get("DEATHS"),
-          statsMap.get("FLAGS"),
-          statsMap.get("CORES"),
-          statsMap.get("WOOLS"),
-          statsMap.get("MONUMENTS"));
+      showStats(player, player.getName());
+
     } else {
       final Player target = Bukkit.getPlayer(playerName);
       final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
       if (target == null) {
         if (MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
-          final Map<String, Integer> offlineStats = getStats(offlinePlayer.getUniqueId());
-          showStats(
-              player,
-              offlinePlayer.getName(),
-              offlineStats.get("KILLS"),
-              offlineStats.get("DEATHS"),
-              offlineStats.get("FLAGS"),
-              offlineStats.get("CORES"),
-              offlineStats.get("WOOLS"),
-              offlineStats.get("MONUMENTS"));
+          showStats(player, offlinePlayer.getName());
         } else {
           player.sendMessage("The player not found");
         }
@@ -70,25 +53,21 @@ public class StatsCommand {
     return result;
   }
 
-  private void showStats(
-      final Player player,
-      final String name,
-      final int kills,
-      final int deaths,
-      final int flags,
-      final int cores,
-      final int wools,
-      final int dtm) {
+  private void showStats(Player player, String name) {
+
+    final Map<String, Integer> stats = getStats(player.getUniqueId());
     player.sendMessage(
         LegacyFormatUtils.horizontalLineHeading(
             ChatColor.AQUA + name + "'s Stats", net.md_5.bungee.api.ChatColor.WHITE));
-    player.sendMessage(ChatColor.AQUA + "Kills: " + ChatColor.BLUE + kills);
-    player.sendMessage(ChatColor.AQUA + "Deaths: " + ChatColor.BLUE + deaths);
-    player.sendMessage(ChatColor.AQUA + "K/D: " + ChatColor.BLUE + kd(kills, deaths));
-    player.sendMessage(ChatColor.AQUA + "Wool Placed: " + ChatColor.BLUE + wools);
-    player.sendMessage(ChatColor.AQUA + "Cores Leaked: " + ChatColor.BLUE + cores);
-    player.sendMessage(ChatColor.AQUA + "Monuments Destroyed: " + ChatColor.BLUE + dtm);
-    player.sendMessage(ChatColor.AQUA + "Flags Captured: " + ChatColor.BLUE + flags);
+    player.sendMessage(ChatColor.AQUA + "Kills: " + ChatColor.BLUE + stats.get("KILLS"));
+    player.sendMessage(ChatColor.AQUA + "Deaths: " + ChatColor.BLUE + stats.get("DEATHS"));
+    player.sendMessage(
+        ChatColor.AQUA + "K/D: " + ChatColor.BLUE + kd(stats.get("KILLS"), stats.get("DEATHS")));
+    player.sendMessage(ChatColor.AQUA + "Wool Placed: " + ChatColor.BLUE + stats.get("WOOLS"));
+    player.sendMessage(ChatColor.AQUA + "Cores Leaked: " + ChatColor.BLUE + stats.get("CORES"));
+    player.sendMessage(
+        ChatColor.AQUA + "Monuments Destroyed: " + ChatColor.BLUE + stats.get("MONUMENTS"));
+    player.sendMessage(ChatColor.AQUA + "Flags Captured: " + ChatColor.BLUE + stats.get("FLAGS"));
     player.sendMessage(LegacyFormatUtils.horizontalLine(net.md_5.bungee.api.ChatColor.WHITE, 300));
   }
 
