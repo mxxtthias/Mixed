@@ -1,5 +1,6 @@
 package network.atria.Listener;
 
+import java.util.HashMap;
 import java.util.UUID;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.RankSystem.ChatPrefix;
@@ -27,70 +28,113 @@ import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
 @ListenerScope(MatchScope.RUNNING)
 public class MatchEvents implements Listener, MatchModule {
 
-  @EventHandler
-  public void onKill(MatchPlayerDeathEvent e) {
-    final MatchPlayer victim = e.getVictim();
-    MatchPlayer murder;
+  private final HashMap<UUID, Integer> kills = new HashMap<>();
+  private final HashMap<UUID, Integer> deaths = new HashMap<>();
+  private final HashMap<UUID, Integer> points = new HashMap<>();
+  private final HashMap<UUID, Integer> wools = new HashMap<>();
+  private final HashMap<UUID, Integer> cores = new HashMap<>();
+  private final HashMap<UUID, Integer> flags = new HashMap<>();
+  private final HashMap<UUID, Integer> monuments = new HashMap<>();
 
-    if (e.getKiller() != null) {
-      murder = e.getKiller().getParty().getPlayer(e.getKiller().getId());
+  @EventHandler
+  public void onKill(MatchPlayerDeathEvent event) {
+    final MatchPlayer victim = event.getPlayer();
+    MatchPlayer murder = null;
+
+    addStats(deaths, victim.getId(), 1);
+
+    if (event.getKiller() != null) {
+      murder = event.getKiller().getParty().getPlayer(event.getKiller().getId());
       if (murder != null) {
         if (!murder.getParty().equals(victim.getParty())) {
-
-          MySQLSetterGetter.addKills(murder.getId().toString(), 1);
-          MySQLSetterGetter.addPoints(murder.getId().toString(), 5);
-          MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
-          LevelUp(murder);
+          addStats(kills, murder.getId(), 1);
+          addStats(points, murder.getId(), 5);
         }
       }
-    } else {
-      MySQLSetterGetter.addDeaths(victim.getId().toString(), 1);
     }
   }
 
   @EventHandler
-  public void ctw(PlayerWoolPlaceEvent e) {
-    final MatchPlayerState player = e.getPlayer();
+  public void ctw(PlayerWoolPlaceEvent event) {
+    MatchPlayerState player = event.getPlayer();
     if (player.getPlayer().isPresent()) {
-      MySQLSetterGetter.addPoints(player.getId().toString(), 20);
-      MySQLSetterGetter.addWools(player.getId().toString(), 1);
-      LevelUp(player.getPlayer().get());
+      addStats(points, player.getId(), 20);
+      addStats(wools, player.getId(), 1);
     }
   }
 
   @EventHandler
-  public void dtc(CoreLeakEvent e) {
-    for (ParticipantState ps : e.getCore().getTouchingPlayers()) {
+  public void dtc(CoreLeakEvent event) {
+    for (ParticipantState ps : event.getCore().getTouchingPlayers()) {
       if (ps.getPlayer().isPresent()) {
-        MySQLSetterGetter.addCores(ps.getId().toString(), 1);
-        MySQLSetterGetter.addPoints(ps.getId().toString(), 25);
-        LevelUp(ps.getPlayer().get());
+        addStats(points, ps.getId(), 25);
+        addStats(cores, ps.getId(), 1);
       }
     }
   }
 
   @EventHandler
-  public void ctf(FlagCaptureEvent e) {
-    final MatchPlayer player = e.getCarrier();
-    MySQLSetterGetter.addFlags(player.getId().toString(), 1);
-    MySQLSetterGetter.addPoints(player.getId().toString(), 15);
-    LevelUp(player);
+  public void ctf(FlagCaptureEvent event) {
+    final MatchPlayer player = event.getCarrier();
+    addStats(points, player.getId(), 15);
+    addStats(flags, player.getId(), 1);
   }
 
   @EventHandler
-  public void dtm(DestroyableDestroyedEvent e) {
-    for (DestroyableContribution dc : e.getDestroyable().getContributions()) {
+  public void dtm(DestroyableDestroyedEvent event) {
+    for (DestroyableContribution dc : event.getDestroyable().getContributions()) {
       if (dc.getPlayerState().getPlayer().isPresent()) {
-        MySQLSetterGetter.addMonuments(dc.getPlayerState().getId().toString(), 1);
-        MySQLSetterGetter.addPoints(dc.getPlayerState().getId().toString(), 25);
-        LevelUp(dc.getPlayerState().getPlayer().get());
+        addStats(monuments, dc.getPlayerState().getId(), 1);
+        addStats(points, dc.getPlayerState().getId(), 25);
       }
     }
   }
 
   @EventHandler
-  public void endMatch(MatchFinishEvent e) {
-    for (MatchPlayer player : e.getMatch().getPlayers()) {
+  public void endMatch(MatchFinishEvent event) {
+    if (!kills.isEmpty()) {
+      for (UUID uuid : kills.keySet()) {
+        MySQLSetterGetter.addKills(uuid.toString(), kills.get(uuid));
+        removeCached(uuid, kills);
+      }
+    }
+    if (!deaths.isEmpty()) {
+      for (UUID uuid : deaths.keySet()) {
+        MySQLSetterGetter.addDeaths(uuid.toString(), deaths.get(uuid));
+        removeCached(uuid, deaths);
+      }
+    }
+    if (!points.isEmpty()) {
+      for (UUID uuid : points.keySet()) {
+        MySQLSetterGetter.addPoints(uuid.toString(), points.get(uuid));
+        removeCached(uuid, points);
+      }
+    }
+    if (!wools.isEmpty()) {
+      for (UUID uuid : wools.keySet()) {
+        MySQLSetterGetter.addWools(uuid.toString(), wools.get(uuid));
+        removeCached(uuid, wools);
+      }
+    }
+    if (!cores.isEmpty()) {
+      for (UUID uuid : cores.keySet()) {
+        MySQLSetterGetter.addCores(uuid.toString(), cores.get(uuid));
+        removeCached(uuid, cores);
+      }
+    }
+    if (!flags.isEmpty()) {
+      for (UUID uuid : flags.keySet()) {
+        MySQLSetterGetter.addFlags(uuid.toString(), flags.get(uuid));
+        removeCached(uuid, flags);
+      }
+    }
+    if (!monuments.isEmpty()) {
+      for (UUID uuid : monuments.keySet()) {
+        MySQLSetterGetter.addMonuments(uuid.toString(), monuments.get(uuid));
+        removeCached(uuid, monuments);
+      }
+    }
+    for (MatchPlayer player : event.getMatch().getPlayers()) {
       MySQLSetterGetter.addPoints(player.getId().toString(), 10);
       LevelUp(player);
     }
@@ -138,12 +182,24 @@ public class MatchEvents implements Listener, MatchModule {
                   + Ranks.getRankNext(uuid));
       player.getBukkit().sendMessage(line_2);
 
-      /*
-      Rankの処理
-       */
       MySQLSetterGetter.setRank(player.getId().toString(), Ranks.getNextRank(uuid));
       chatPrefix.setPrefixPermission(uuid);
     }
+  }
+
+  private void addStats(HashMap<UUID, Integer> map, UUID uuid, Integer score) {
+    if (map.containsKey(uuid)) {
+      final int stats = map.get(uuid) != 0 ? map.get(uuid) : 0;
+      map.replace(uuid, stats + score);
+    } else {
+      map.put(uuid, 0);
+      map.replace(uuid, score);
+    }
+  }
+
+  private void removeCached(UUID uuid, HashMap<UUID, Integer> cache) {
+    if (!cache.containsKey(uuid)) return;
+    cache.remove(uuid);
   }
 
   public MatchEvents(Plugin plugin) {
