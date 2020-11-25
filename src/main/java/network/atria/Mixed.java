@@ -21,16 +21,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class Main extends JavaPlugin implements Listener {
+public class Mixed extends JavaPlugin implements Listener {
 
-  public static Main instance;
+  public static Mixed instance;
   private long uptime;
 
   private RanksConfig ranks;
   private KillEffectsConfig effects;
 
   private final FileConfiguration config = getConfig();
-  MySQL database = new MySQL();
 
   @Override
   public void onEnable() {
@@ -41,6 +40,8 @@ public class Main extends JavaPlugin implements Listener {
 
     config.options().copyDefaults();
     saveDefaultConfig();
+
+    MySQL database = new MySQL();
     database.connect();
     database.createTables();
 
@@ -49,7 +50,7 @@ public class Main extends JavaPlugin implements Listener {
 
     uptime = System.currentTimeMillis();
 
-    BroadCastMessage broadCastMessage = new BroadCastMessage();
+    final BroadCastMessage broadCastMessage = new BroadCastMessage();
     broadCastMessage.randomMessage();
 
     super.onEnable();
@@ -85,7 +86,6 @@ public class Main extends JavaPlugin implements Listener {
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
     final Player player = event.getPlayer();
-    ;
     final LuckPerms api = LuckPermsProvider.get();
     final User user = api.getUserManager().getUser(player.getUniqueId());
     final PermissionNode node = PermissionNode.builder("pgm.group.wood_iii").build();
@@ -106,7 +106,7 @@ public class Main extends JavaPlugin implements Listener {
     return uptime;
   }
 
-  public static Main getInstance() {
+  public static Mixed getInstance() {
     return instance;
   }
 }
