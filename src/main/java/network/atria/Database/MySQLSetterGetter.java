@@ -1,9 +1,6 @@
 package network.atria.Database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.UUID;
 
 public class MySQLSetterGetter {
@@ -11,77 +8,65 @@ public class MySQLSetterGetter {
   public static boolean playerExists(String uuid) {
 
     ResultSet rs = null;
-    ResultSet week_rs = null;
-    ResultSet rank_rs = null;
     PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    PreparedStatement statement3 = null;
     Connection connection = null;
-
+    final String query =
+        "SELECT UUID FROM STATS WHERE UUID = '"
+            + uuid
+            + "' UNION ALL SELECT UUID FROM RANKS WHERE UUID = '"
+            + uuid
+            + "' UNION ALL SELECT UUID FROM WEEK_STATS WHERE UUID = '"
+            + uuid
+            + "';";
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT UUID FROM STATS WHERE UUID= '" + uuid + "'");
-      statement2 =
-          connection.prepareStatement("SELECT UUID FROM WEEK_STATS WHERE UUID= '" + uuid + "'");
-      statement3 = connection.prepareStatement("SELECT UUID FROM RANKS WHERE UUID= '" + uuid + "'");
-
+      statement = connection.prepareStatement(query);
       rs = statement.executeQuery();
-      week_rs = statement2.executeQuery();
-      rank_rs = statement3.executeQuery();
 
-      return (rs.next()
-          && rs.getString("UUID") != null
-          && week_rs.next()
-          && week_rs.getString("UUID") != null
-          && rank_rs.next()
-          && rank_rs.getString("UUID") != null);
+      return (rs.next() && rs.getString("UUID") != null);
     } catch (SQLException e) {
       e.printStackTrace();
       return false;
     } finally {
       closeStatement(statement);
-      closeStatement(statement2);
-      closeStatement(statement3);
       closeResultSet(rs);
-      closeResultSet(week_rs);
-      closeResultSet(rank_rs);
       close(connection);
     }
   }
 
   public static void createPlayer(String uuid) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    PreparedStatement statement3 = null;
+    Statement statement = null;
     Connection connection = null;
+    final String query =
+        "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
+            + uuid
+            + "', '0', '0', '0', '0', '0', '0', 'Null');";
+    final String query2 =
+        "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
+            + uuid
+            + "', '0', '0', '0', '0', '0', '0', 'Null');";
+    final String query3 =
+        "INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('"
+            + uuid
+            + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');";
     if (!playerExists(uuid)) {
       try {
         connection = MySQL.getHikari().getConnection();
-        statement =
-            connection.prepareStatement(
-                "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
-                    + uuid
-                    + "', '0', '0', '0', '0', '0', '0', 'Null');");
-        statement2 =
-            connection.prepareStatement(
-                "INSERT INTO WEEK_STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
-                    + uuid
-                    + "', '0', '0', '0', '0', '0', '0', 'Null');");
-        statement3 =
-            connection.prepareStatement(
-                "INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('"
-                    + uuid
-                    + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');");
-        statement.execute();
-        statement2.execute();
-        statement3.execute();
+        statement = connection.createStatement();
+        statement.addBatch(query);
+        statement.addBatch(query2);
+        statement.addBatch(query3);
 
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
-        closeStatement(statement);
-        closeStatement(statement2);
-        closeStatement(statement3);
+        try {
+          if (statement != null) {
+            statement.close();
+          }
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
         close(connection);
       }
     }
@@ -108,160 +93,34 @@ public class MySQLSetterGetter {
   }
 
   public static void setName(String uuid, String name) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    PreparedStatement statement3 = null;
+    Statement statement = null;
     Connection connection = null;
+    final String query = "UPDATE STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';";
+    final String query2 = "UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "'";
+    final String query3 = "UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';";
     if (playerExists(uuid)) {
       try {
         connection = MySQL.getHikari().getConnection();
-        statement =
-            connection.prepareStatement(
-                ("UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
-        statement2 =
-            connection.prepareStatement(
-                ("UPDATE STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
-        statement3 =
-            connection.prepareStatement(
-                ("UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';"));
-        statement.executeUpdate();
-        statement2.executeUpdate();
-        statement3.executeUpdate();
+        statement = connection.createStatement();
+        statement.addBatch(query);
+        statement.addBatch(query2);
+        statement.addBatch(query3);
+        statement.executeBatch();
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
-        closeStatement(statement);
-        closeStatement(statement2);
-        closeStatement(statement3);
+        try {
+          if (statement != null) {
+            statement.close();
+          }
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
         close(connection);
       }
     } else {
       createPlayer(uuid);
     }
-  }
-
-  public static Integer getMonuments(String uuid) {
-    int i = 0;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement("SELECT MONUMENTS FROM STATS WHERE UUID= '" + uuid + "'");
-      rs = statement.executeQuery();
-      if (rs.next()) i = rs.getInt("MONUMENTS");
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeResultSet(rs);
-      closeStatement(statement);
-      close(connection);
-    }
-    return i;
-  }
-
-  public static Integer getFlags(String uuid) {
-    int i = 0;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT FLAGS FROM STATS WHERE UUID= '" + uuid + "'");
-      rs = statement.executeQuery();
-      if (rs.next()) i = rs.getInt("FLAGS");
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeResultSet(rs);
-      close(connection);
-    }
-    return i;
-  }
-
-  public static Integer getCores(String uuid) {
-    int i = 0;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT CORES FROM STATS WHERE UUID= '" + uuid + "'");
-      rs = statement.executeQuery();
-      if (rs.next()) i = rs.getInt("CORES");
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeResultSet(rs);
-      closeStatement(statement);
-      close(connection);
-    }
-    return i;
-  }
-
-  public static Integer getWools(String uuid) {
-    int i = 0;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT WOOLS FROM STATS WHERE UUID= '" + uuid + "'");
-      rs = statement.executeQuery();
-      if (rs.next()) i = rs.getInt("WOOLS");
-      closeStatement(statement);
-      closeResultSet(rs);
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeResultSet(rs);
-      close(connection);
-    }
-    return i;
-  }
-
-  public static Integer getKills(String uuid) {
-    int i = 0;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement("SELECT KILLS FROM STATS WHERE UUID= '" + uuid + "'");
-      rs = statement.executeQuery();
-      if (rs.next()) i = rs.getInt("KILLS");
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeResultSet(rs);
-      closeStatement(statement);
-      close(connection);
-    }
-    return i;
-  }
-
-  public static Integer getDeaths(String uuid) {
-    int i = 0;
-    PreparedStatement statement = null;
-    ResultSet rs = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement("SELECT DEATHS FROM STATS WHERE UUID= '" + uuid + "'");
-      rs = statement.executeQuery();
-      if (rs.next()) i = rs.getInt("DEATHS");
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeResultSet(rs);
-      close(connection);
-    }
-    return i;
   }
 
   public static Integer getPoints(UUID uuid) {
@@ -366,181 +225,6 @@ public class MySQLSetterGetter {
       close(connection);
     }
     return i;
-  }
-
-  /* Monuments */
-
-  public static void setMonuments(String uuid, int monuments) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement(
-              "UPDATE WEEK_STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
-      statement2 =
-          connection.prepareStatement(
-              "UPDATE STATS SET MONUMENTS= '" + monuments + "' WHERE UUID= '" + uuid + "';");
-      statement.executeUpdate();
-      statement2.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeStatement(statement2);
-      close(connection);
-    }
-  }
-
-  public static void addMonuments(String uuid, int monuments) {
-    setMonuments(uuid, getMonuments(uuid) + monuments);
-  }
-
-  /* Kills */
-
-  public static void setKills(String uuid, Integer kills) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement(
-              "UPDATE WEEK_STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
-      statement2 =
-          connection.prepareStatement(
-              "UPDATE STATS SET KILLS= '" + kills + "' WHERE UUID= '" + uuid + "';");
-      statement.executeUpdate();
-      statement2.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeStatement(statement2);
-      close(connection);
-    }
-  }
-
-  public static void addKills(String uuid, Integer kills) {
-    setKills(uuid, getKills(uuid) + kills);
-  }
-
-  /* Deaths */
-
-  public static void setDeaths(String uuid, Integer deaths) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement(
-              "UPDATE WEEK_STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
-      statement2 =
-          connection.prepareStatement(
-              "UPDATE STATS SET DEATHS= '" + deaths + "' WHERE UUID= '" + uuid + "';");
-      statement.executeUpdate();
-      statement2.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeStatement(statement2);
-      close(connection);
-    }
-  }
-
-  public static void addDeaths(String uuid, Integer deaths) {
-    setDeaths(uuid, getDeaths(uuid) + deaths);
-  }
-
-  /* Wools */
-
-  public static void setWools(String uuid, Integer wools) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement(
-              "UPDATE WEEK_STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
-      statement2 =
-          connection.prepareStatement(
-              "UPDATE STATS SET WOOLS= '" + wools + "' WHERE UUID= '" + uuid + "';");
-      statement.executeUpdate();
-      statement2.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeStatement(statement2);
-      close(connection);
-    }
-  }
-
-  public static void addWools(String uuid, Integer wools) {
-    setWools(uuid, getWools(uuid) + wools);
-  }
-
-  /* Cores */
-
-  public static void setCores(String uuid, Integer cores) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement(
-              "UPDATE WEEK_STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
-      statement2 =
-          connection.prepareStatement(
-              "UPDATE STATS SET CORES= '" + cores + "' WHERE UUID= '" + uuid + "';");
-      statement.executeUpdate();
-      statement2.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeStatement(statement2);
-      close(connection);
-    }
-  }
-
-  public static void addCores(String uuid, Integer cores) {
-    setCores(uuid, getCores(uuid) + cores);
-  }
-
-  /* Flags */
-
-  public static void setFlags(String uuid, Integer flags) {
-    PreparedStatement statement = null;
-    PreparedStatement statement2 = null;
-    Connection connection = null;
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement(
-              "UPDATE WEEK_STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
-      statement2 =
-          connection.prepareStatement(
-              "UPDATE STATS SET FLAGS= '" + flags + "' WHERE UUID= '" + uuid + "';");
-
-      statement.executeUpdate();
-      statement2.executeUpdate();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      closeStatement(statement);
-      closeStatement(statement2);
-      close(connection);
-    }
-  }
-
-  public static void addFlags(String uuid, Integer flags) {
-    setFlags(uuid, getFlags(uuid) + flags);
   }
 
   /* Points */
