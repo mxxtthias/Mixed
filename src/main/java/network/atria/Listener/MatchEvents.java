@@ -37,15 +37,17 @@ public class MatchEvents implements Listener, MatchModule {
   private final HashMap<UUID, Integer> monuments = new HashMap<>();
   private final HashMap<UUID, String> result = new HashMap<>();
 
-  @EventHandler(priority = EventPriority.MONITOR)
+  @EventHandler(priority = EventPriority.HIGH)
   public void onKill(MatchPlayerDeathEvent event) {
     final MatchPlayer victim = event.getPlayer();
     MatchPlayer murder;
 
+    if (event.isTeamKill()) return;
+
     addStats(deaths, victim.getId(), 1);
     addResultMap(victim.getId());
 
-    if (event.getKiller() != null) {
+    if (event.getKiller() != null && !event.isSelfKill() && !event.isSuicide()) {
       murder = event.getKiller().getParty().getPlayer(event.getKiller().getId());
       if (murder != null) {
         if (!murder.getParty().equals(victim.getParty())) {
@@ -57,7 +59,7 @@ public class MatchEvents implements Listener, MatchModule {
     }
   }
 
-  @EventHandler(priority = EventPriority.MONITOR)
+  @EventHandler(priority = EventPriority.HIGH)
   public void ctw(PlayerWoolPlaceEvent event) {
     final MatchPlayerState player = event.getPlayer();
     addStats(points, player.getId(), 20);
@@ -65,7 +67,7 @@ public class MatchEvents implements Listener, MatchModule {
     addResultMap(player.getId());
   }
 
-  @EventHandler(priority = EventPriority.MONITOR)
+  @EventHandler(priority = EventPriority.HIGH)
   public void dtc(CoreLeakEvent event) {
     event
         .getCore()
@@ -79,7 +81,7 @@ public class MatchEvents implements Listener, MatchModule {
             });
   }
 
-  @EventHandler(priority = EventPriority.MONITOR)
+  @EventHandler(priority = EventPriority.HIGH)
   public void ctf(FlagCaptureEvent event) {
     final MatchPlayer player = event.getCarrier();
     addStats(points, player.getId(), 15);
@@ -87,7 +89,7 @@ public class MatchEvents implements Listener, MatchModule {
     addResultMap(player.getId());
   }
 
-  @EventHandler(priority = EventPriority.MONITOR)
+  @EventHandler(priority = EventPriority.HIGH)
   public void dtm(DestroyableDestroyedEvent event) {
     event
         .getDestroyable()
@@ -101,7 +103,7 @@ public class MatchEvents implements Listener, MatchModule {
             });
   }
 
-  @EventHandler
+  @EventHandler(priority = EventPriority.MONITOR)
   public void endMatch(MatchFinishEvent event) {
     sendStatsData();
     event
