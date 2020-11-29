@@ -101,6 +101,7 @@ public class MatchEvents implements Listener, MatchModule {
             });
   }
 
+  @EventHandler
   public void endMatch(MatchFinishEvent event) {
     sendStatsData();
     event
