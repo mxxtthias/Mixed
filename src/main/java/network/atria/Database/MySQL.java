@@ -3,7 +3,7 @@ package network.atria.Database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.sql.*;
-import network.atria.Main;
+import network.atria.Mixed;
 
 public class MySQL {
 
@@ -59,23 +59,23 @@ public class MySQL {
   }
 
   private String getHost() {
-    return Main.getInstance().getConfig().getString("MySQL.Host");
+    return Mixed.getInstance().getConfig().getString("MySQL.Host");
   }
 
   private String getDatabase() {
-    return Main.getInstance().getConfig().getString("MySQL.Database");
+    return Mixed.getInstance().getConfig().getString("MySQL.Database");
   }
 
   private String getUser() {
-    return Main.getInstance().getConfig().getString("MySQL.User");
+    return Mixed.getInstance().getConfig().getString("MySQL.User");
   }
 
   private String getPassword() {
-    return Main.getInstance().getConfig().getString("MySQL.Password");
+    return Mixed.getInstance().getConfig().getString("MySQL.Password");
   }
 
   private Integer getPort() {
-    return Main.getInstance().getConfig().getInt("MySQL.Port");
+    return Mixed.getInstance().getConfig().getInt("MySQL.Port");
   }
 
   public static HikariDataSource getHikari() {

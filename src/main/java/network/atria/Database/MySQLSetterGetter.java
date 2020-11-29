@@ -10,17 +10,17 @@ public class MySQLSetterGetter {
     ResultSet rs = null;
     PreparedStatement statement = null;
     Connection connection = null;
-    final String query =
-        "SELECT UUID FROM STATS WHERE UUID = '"
-            + uuid
-            + "' UNION ALL SELECT UUID FROM RANKS WHERE UUID = '"
-            + uuid
-            + "' UNION ALL SELECT UUID FROM WEEK_STATS WHERE UUID = '"
-            + uuid
-            + "';";
+    StringBuilder builder = new StringBuilder();
+    builder
+        .append("SELECT UUID FROM STATS WHERE UUID = '")
+        .append(uuid)
+        .append("' union SELECT UUID FROM RANKS WHERE UUID ='")
+        .append(uuid)
+        .append("' union SELECT UUID FROM WEEK_STATS WHERE UUID = '")
+        .append("';");
     try {
       connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement(query);
+      statement = connection.prepareStatement(builder.toString());
       rs = statement.executeQuery();
 
       return (rs.next() && rs.getString("UUID") != null);
@@ -56,6 +56,7 @@ public class MySQLSetterGetter {
         statement.addBatch(query);
         statement.addBatch(query2);
         statement.addBatch(query3);
+        statement.executeBatch();
 
       } catch (SQLException e) {
         e.printStackTrace();
