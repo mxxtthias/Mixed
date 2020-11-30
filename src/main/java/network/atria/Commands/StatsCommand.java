@@ -27,7 +27,6 @@ public class StatsCommand {
   public void stats(@Sender Player player, @Nullable String playerName) {
     if (playerName == null) {
       showStats(player, player.getName());
-
     } else {
       final Player target = Bukkit.getPlayer(playerName);
       final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
@@ -35,15 +34,15 @@ public class StatsCommand {
         if (MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
           showStats(player, offlinePlayer.getName());
         } else {
-          player.sendMessage("The player not found");
+          player.sendMessage(ChatColor.RED + "The player not found");
         }
       }
     }
   }
 
   private BigDecimal kd(int kills, int deaths) {
-    BigDecimal bd1 = new BigDecimal(kills);
-    BigDecimal bd2 = new BigDecimal(deaths);
+    final BigDecimal bd1 = new BigDecimal(kills);
+    final BigDecimal bd2 = new BigDecimal(deaths);
     BigDecimal result = null;
     try {
       result = bd1.divide(bd2, 2, RoundingMode.HALF_UP);
@@ -56,19 +55,43 @@ public class StatsCommand {
   private void showStats(Player player, String name) {
 
     final Map<String, Integer> stats = getStats(player.getUniqueId());
-    player.sendMessage(
+    final StringBuilder builder = new StringBuilder();
+    final String head_line =
         LegacyFormatUtils.horizontalLineHeading(
-            ChatColor.AQUA + name + "'s Stats", net.md_5.bungee.api.ChatColor.WHITE));
-    player.sendMessage(ChatColor.AQUA + "Kills: " + ChatColor.BLUE + stats.get("KILLS"));
-    player.sendMessage(ChatColor.AQUA + "Deaths: " + ChatColor.BLUE + stats.get("DEATHS"));
-    player.sendMessage(
-        ChatColor.AQUA + "K/D: " + ChatColor.BLUE + kd(stats.get("KILLS"), stats.get("DEATHS")));
-    player.sendMessage(ChatColor.AQUA + "Wool Placed: " + ChatColor.BLUE + stats.get("WOOLS"));
-    player.sendMessage(ChatColor.AQUA + "Cores Leaked: " + ChatColor.BLUE + stats.get("CORES"));
-    player.sendMessage(
-        ChatColor.AQUA + "Monuments Destroyed: " + ChatColor.BLUE + stats.get("MONUMENTS"));
-    player.sendMessage(ChatColor.AQUA + "Flags Captured: " + ChatColor.BLUE + stats.get("FLAGS"));
-    player.sendMessage(LegacyFormatUtils.horizontalLine(net.md_5.bungee.api.ChatColor.WHITE, 300));
+                ChatColor.AQUA + name + "'s Stats", net.md_5.bungee.api.ChatColor.WHITE)
+            + "\n";
+    final String under_line =
+        LegacyFormatUtils.horizontalLine(net.md_5.bungee.api.ChatColor.WHITE, 300);
+    final String kills = ChatColor.AQUA + "Kills: " + ChatColor.BLUE + stats.get("KILLS") + "\n";
+    final String deaths = ChatColor.AQUA + "Deaths: " + ChatColor.BLUE + stats.get("DEATHS") + "\n";
+    final String kd_rate =
+        ChatColor.AQUA
+            + "K/D: "
+            + ChatColor.BLUE
+            + kd(stats.get("KILLS"), stats.get("DEATHS"))
+            + "\n";
+    final String ctw =
+        ChatColor.AQUA + "Wool Placed: " + ChatColor.BLUE + stats.get("WOOLS") + "\n";
+    final String dtc =
+        ChatColor.AQUA + "Cores Leaked: " + ChatColor.BLUE + stats.get("CORES") + "\n";
+    final String dtm =
+        ChatColor.AQUA + "Monuments Destroyed: " + ChatColor.BLUE + stats.get("MONUMENTS") + "\n";
+    final String ctf =
+        ChatColor.AQUA + "Flags Captured: " + ChatColor.BLUE + stats.get("FLAGS") + "\n";
+
+    builder
+        .append(head_line)
+        .append(kills)
+        .append(deaths)
+        .append(kd_rate)
+        .append(ctw)
+        .append(dtc)
+        .append(dtm)
+        .append(ctf)
+        .append(under_line);
+
+    stats.clear();
+    player.sendMessage(builder.toString());
   }
 
   private Map<String, Integer> getStats(UUID uuid) {
@@ -124,7 +147,6 @@ public class StatsCommand {
         }
       }
     }
-
     return stats;
   }
 }
