@@ -1,91 +1,125 @@
 package network.atria.KillEffects;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
+import network.atria.Mixed;
 import network.atria.Util.EffectUtils;
+import network.atria.Util.KillEffectsConfig;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Vector;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 import tc.oc.pgm.api.setting.SettingKey;
 import tc.oc.pgm.api.setting.SettingValue;
 import tc.oc.pgm.events.ListenerScope;
-import tc.oc.pgm.util.chat.Sound;
 
 @ListenerScope(MatchScope.RUNNING)
 public class KillSounds extends EffectUtils implements Listener {
 
-  private void playSound(MatchPlayer player, Sound sound) {
+  private static Set<Effect> sounds;
+
+  public static Set<Effect> getSounds() {
+    return sounds;
+  }
+
+  private void addSounds() {
+    FileConfiguration config = KillEffectsConfig.getCustomConfig();
+    sounds = new HashSet<>();
+    config
+        .getConfigurationSection("KILL_SOUND")
+        .getKeys(false)
+        .parallelStream()
+        .forEach(
+            sound ->
+                sounds.add(
+                    new Effect(
+                        sound,
+                        Component.text(sound, NamedTextColor.GREEN, TextDecoration.BOLD),
+                        config.getInt("KILL_SOUND." + sound + ".points"),
+                        config.getBoolean("KILL_SOUND." + sound + ".donor"))));
+  }
+
+  private void playSound(MatchPlayer player, String key, Float pitch) {
     if (player.getSettings().getValue(SettingKey.SOUNDS).equals(SettingValue.SOUNDS_ALL)) {
-      player.playSound(sound);
+      Sound sound = Sound.sound(Key.key(key), Sound.Source.MASTER, 1f, pitch);
+      Mixed.get().getAudience().player(player.getBukkit()).playSound(sound);
     }
   }
 
   @EventHandler
   public void onMatchPlayerDeath(MatchPlayerDeathEvent e) {
     MatchPlayer killer = null;
-    final MatchPlayer victim = e.getVictim();
+    MatchPlayer victim = e.getVictim();
 
     if (e.getKiller() != null) {
       killer = e.getKiller().getParty().getPlayer(e.getKiller().getId());
+      MatchPlayer finalKiller = killer;
+      Optional<Effect> sound =
+          sounds.stream()
+              .filter(
+                  name ->
+                      name.getName()
+                          .equalsIgnoreCase(
+                              MySQLSetterGetter.getKillSound(finalKiller.getId().toString())))
+              .findFirst();
 
-      final String getSound = MySQLSetterGetter.getKillSound(killer.getId().toString());
-      final Vector death = victim.getBukkit().getLocation().toVector();
-
-      switch (getSound) {
-        case "DEFAULT":
-          if (!killer.getParty().equals(victim.getParty())) {
-            playSound(killer, new Sound("random.levelup", 1f, 1.5f));
-            playSound(killer, new Sound("mob.irongolem.hit", 1, 4f / 3f, death));
-          } else {
-            playSound(victim, new Sound("mob.irongolem.hit", death));
-          }
-          break;
-        case "HOWL":
-          if (!killer.getParty().equals(victim.getParty())) {
-            if (hasRequirePoint(killer.getId(), getRequirePoints("KILL_SOUND", "HOWL"))) {
-              playSound(killer, new Sound("mob.wolf.howl", 1f, 1f));
+      if (sound.isPresent()) {
+        switch (sound.get().getName()) {
+          case "DEFAULT":
+            if (!killer.getParty().equals(victim.getParty())) {
+              playSound(killer, "random.levelup", 1.5f);
+              playSound(killer, "mob.irongolem.hit", 4f / 3f);
             } else {
-              playSound(victim, new Sound("mob.irongolem.death", death));
+              playSound(victim, "mob.irongolem.hit", 1f);
             }
-          }
-          break;
-        case "VILLAGER":
-          if (!killer.getParty().equals(victim.getParty())) {
-            if (hasRequirePoint(killer.getId(), getRequirePoints("KILL_SOUND", "VILLAGER"))) {
-              playSound(killer, new Sound("mob.villager.death", 2f, 0.8f));
+            break;
+          case "HOWL":
+            if (!killer.getParty().equals(victim.getParty())) {
+              playSound(killer, "mob.wolf.howl", 1f);
             } else {
-              playSound(victim, new Sound("mob.irongolem.death", death));
+              playSound(victim, "mob.irongolem.death", 1f);
             }
-          }
-          break;
-        case "BOMB":
-          if (!killer.getParty().equals(victim.getParty())) {
-            if (hasRequirePoint(killer.getId(), getRequirePoints("KILL_SOUND", "BOMB"))) {
-              playSound(killer, new Sound("random.explode", 1f, 2f));
+            break;
+          case "VILLAGER":
+            if (!killer.getParty().equals(victim.getParty())) {
+              playSound(killer, "mob.villager.death", 0.8f);
             } else {
-              playSound(victim, new Sound("mob.irongolem.death", death));
+              playSound(victim, "mob.irongolem.death", 1f);
             }
-          }
-          break;
-        case "BURP":
-          if (!killer.getParty().equals(victim.getParty())) {
-            if (hasRequirePoint(killer.getId(), getRequirePoints("KILL_SOUND", "BURP"))) {
-              playSound(killer, new Sound("random.burp", 1f, 0.1f));
+            break;
+          case "BOMB":
+            if (!killer.getParty().equals(victim.getParty())) {
+              playSound(killer, "random.explode", 2f);
             } else {
-              playSound(victim, new Sound("mob.irongolem.death", death));
+              playSound(victim, "mob.irongolem.death", 1f);
             }
-          }
-          break;
+            break;
+          case "BURP":
+            if (!killer.getParty().equals(victim.getParty())) {
+              playSound(killer, "random.burp", 0.1f);
+            } else {
+              playSound(victim, "mob.irongolem.death", 1f);
+            }
+            break;
+        }
       }
     } else {
-      playSound(victim, new Sound("mob.irongolem.death"));
+      playSound(victim, "mob.irongolem.death", 1f);
     }
   }
 
   public KillSounds(Plugin plugin) {
+    addSounds();
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
 }

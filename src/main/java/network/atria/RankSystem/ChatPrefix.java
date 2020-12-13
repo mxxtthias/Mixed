@@ -9,8 +9,8 @@ import net.luckperms.api.node.types.PermissionNode;
 public class ChatPrefix {
 
   public void setPrefixPermission(UUID uuid) {
-    final LuckPerms api = LuckPermsProvider.get();
-    final User user = api.getUserManager().getUser(uuid);
+    LuckPerms api = LuckPermsProvider.get();
+    User user = api.getUserManager().getUser(uuid);
 
     if (user != null) {
       removeGroup(user, Ranks.getCurrentRank(uuid));
@@ -20,12 +20,12 @@ public class ChatPrefix {
   }
 
   private static void addGroup(User user, String groupName) {
-    final PermissionNode node = PermissionNode.builder("pgm.group." + groupName).build();
+    PermissionNode node = PermissionNode.builder("pgm.group." + groupName).build();
     user.data().add(node);
   }
 
   private static void removeGroup(User user, String groupName) {
-    final PermissionNode node = PermissionNode.builder("pgm.group." + groupName).build();
+    PermissionNode node = PermissionNode.builder("pgm.group." + groupName).build();
     user.data().remove(node);
   }
 }

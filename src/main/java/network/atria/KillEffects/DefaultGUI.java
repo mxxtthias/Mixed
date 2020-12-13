@@ -3,8 +3,11 @@ package network.atria.KillEffects;
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
 import java.util.Arrays;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import network.atria.Util.TextFormat;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -22,43 +25,69 @@ public class DefaultGUI implements Listener {
 
   public DefaultGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    gui = Bukkit.createInventory(null, 27, "Main GUI");
+    gui = Bukkit.createInventory(null, 27, TextFormat.format(Component.text(" ")));
     addIconItems();
   }
 
   private void addIconItems() {
 
-    final ItemStack close = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-    final ItemMeta meta = close.getItemMeta();
+    ItemStack close = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+    ItemMeta meta = close.getItemMeta();
 
-    meta.setDisplayName(ChatColor.RED + "Close the GUI");
+    meta.setDisplayName(
+        TextFormat.format(
+            Component.text("Close the GUI", NamedTextColor.RED, TextDecoration.BOLD)));
     close.setItemMeta(meta);
 
-    gui.setItem(10, createGuiItem(Material.REDSTONE, ChatColor.GREEN + "Kill Effects"));
-    gui.setItem(12, createGuiItem(Material.RECORD_3, ChatColor.GREEN + "Kill Sounds"));
-    gui.setItem(14, createGuiItem(Material.BOW, ChatColor.GREEN + "Projectile Trails"));
+    gui.setItem(
+        10,
+        createGuiItem(
+            Material.REDSTONE,
+            TextFormat.format(
+                Component.text("Kill Effects", NamedTextColor.GREEN, TextDecoration.BOLD))));
+    gui.setItem(
+        12,
+        createGuiItem(
+            Material.RECORD_3,
+            TextFormat.format(
+                Component.text("Kill Sounds", NamedTextColor.GREEN, TextDecoration.BOLD))));
+    gui.setItem(
+        14,
+        createGuiItem(
+            Material.BOW,
+            TextFormat.format(
+                Component.text("Projectile Trails", NamedTextColor.GREEN, TextDecoration.BOLD))));
     gui.setItem(17, close);
   }
 
   @EventHandler
-  public void onGuiClick(final InventoryClickEvent e) {
+  public void onGuiClick(InventoryClickEvent e) {
     try {
-      if (e.getView().getTitle().equals("Main GUI")) {
+      if (e.getView().getTitle().equals(" ")) {
         e.setCancelled(true);
 
-        final ItemStack clickedItem = e.getCurrentItem();
-        final Player player = (Player) e.getWhoClicked();
-        final String getItemName = clickedItem.getItemMeta().getDisplayName();
+        ItemStack clickedItem = e.getCurrentItem();
+        Player player = (Player) e.getWhoClicked();
+        String getItemName = clickedItem.getItemMeta().getDisplayName();
 
         if (clickedItem.hasItemMeta()) {
           if (clickedItem.getItemMeta().hasDisplayName()) {
-            if (getItemName.equals(ChatColor.RED + "Close the GUI")) {
+            if (getItemName.equals(
+                TextFormat.format(
+                    Component.text("Close the GUI", NamedTextColor.RED, TextDecoration.BOLD)))) {
               player.closeInventory();
-            } else if (getItemName.equals(ChatColor.GREEN + "Kill Effects")) {
+            } else if (getItemName.equals(
+                TextFormat.format(
+                    Component.text("Kill Effects", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
               player.openInventory(KillEffectsGUI.effect);
-            } else if (getItemName.equals(ChatColor.GREEN + "Kill Sounds")) {
+            } else if (getItemName.equals(
+                TextFormat.format(
+                    Component.text("Kill Sounds", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
               player.openInventory(KillSoundsGUI.sound);
-            } else if (getItemName.equals(ChatColor.GREEN + "Projectile Trails")) {
+            } else if (getItemName.equals(
+                TextFormat.format(
+                    Component.text(
+                        "Projectile Trails", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
               player.openInventory(ProjectileGUI.projectile);
             }
           }
@@ -68,10 +97,9 @@ public class DefaultGUI implements Listener {
     }
   }
 
-  protected static ItemStack createGuiItem(
-      final Material material, final String name, final String... lore) {
-    final ItemStack item = new ItemStack(material, 1);
-    final ItemMeta meta = item.getItemMeta();
+  protected static ItemStack createGuiItem(Material material, String name, String... lore) {
+    ItemStack item = new ItemStack(material, 1);
+    ItemMeta meta = item.getItemMeta();
 
     meta.setDisplayName(name);
     meta.setLore(Arrays.asList(lore));
@@ -83,8 +111,7 @@ public class DefaultGUI implements Listener {
   @Command(
       aliases = {"effect", "sound", "projectile"},
       desc = "Open Select GUI")
-  public boolean gui(@Sender Player sender) {
+  public void gui(@Sender Player sender) {
     sender.openInventory(gui);
-    return true;
   }
 }

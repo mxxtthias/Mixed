@@ -2,19 +2,19 @@ package network.atria.KillEffects;
 
 import static java.lang.Math.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import net.minecraft.server.v1_8_R3.EnumParticle;
-import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
+import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
+import java.util.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
-import network.atria.Main;
+import network.atria.Mixed;
 import network.atria.Util.EffectUtils;
+import network.atria.Util.KillEffectsConfig;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.entity.Player;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -24,296 +24,181 @@ import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 
 public class KillEffects extends EffectUtils implements Listener {
 
+  private static Set<Effect> effects;
+  private List<Color> colors;
+
+  public static Set<Effect> getEffects() {
+    return effects;
+  }
+
+  private void addEffects() {
+    FileConfiguration config = KillEffectsConfig.getCustomConfig();
+    effects = new HashSet<>();
+
+    config
+        .getConfigurationSection("KILL_EFFECT")
+        .getKeys(false)
+        .parallelStream()
+        .forEach(
+            effect ->
+                effects.add(
+                    new Effect(
+                        effect,
+                        Component.text(effect, NamedTextColor.GREEN, TextDecoration.BOLD),
+                        config.getInt("KILL_EFFECT." + effect + ".points"),
+                        config.getBoolean("KILL_EFFECT." + effect + ".donor"))));
+  }
+
   @EventHandler
   public void onPlayerDeath(MatchPlayerDeathEvent e) {
 
+    Particles_1_8 api = Mixed.get().getParticles();
     MatchPlayer murder = null;
-    final MatchPlayer victim = e.getVictim();
+    MatchPlayer victim = e.getVictim();
 
     if (e.getKiller() != null) {
       murder = e.getKiller().getParty().getPlayer(e.getKiller().getId());
-      final String getEffect = MySQLSetterGetter.getKillEffect(murder.getId().toString());
+      Location location = victim.getBukkit().getLocation();
+      if (murder != null) {
+        MatchPlayer finalMurder1 = murder;
+        Optional<Effect> effect =
+            effects.stream()
+                .filter(
+                    name ->
+                        name.getName()
+                            .equalsIgnoreCase(
+                                MySQLSetterGetter.getKillEffect(finalMurder1.getId().toString())))
+                .findFirst();
 
-      switch (getEffect) {
-        case "BLOOD":
-          if (hasRequirePoint(murder.getId(), getRequirePoints("KILL_EFFECT", "BLOOD"))
-              || hasDonorRank(murder.getBukkit().getPlayer())) {
-            final Location location = victim.getBukkit().getLocation();
+        if (effect.isPresent()) {
+          switch (effect.get().getName()) {
+            case "BLOOD":
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.BLOCK_CRACK()
+                      .of(Material.REDSTONE_BLOCK)
+                      .packet(true, location, 0.75D, 1.5D, 0.75D, 0.1D, 100));
+              break;
 
-            createCustomEffect(
-                EnumParticle.BLOCK_CRACK,
-                location,
-                0.75F,
-                1.5F,
-                0.75F,
-                0.01F,
-                50,
-                getData(),
-                murder.getBukkit().getPlayer());
+            case "HEART":
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.HEART().packet(true, location, 0.75D, 0.75D, 0.75D, 0.01D, 80));
+              break;
 
-            createCustomEffect(
-                EnumParticle.BLOCK_CRACK,
-                location,
-                0.75F,
-                1F,
-                0.75F,
-                0.01F,
-                50,
-                getData(),
-                murder.getBukkit().getPlayer());
-          }
-          break;
+            case "SMOKE":
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.SMOKE_LARGE().packet(true, location, 0.75D, 1.2D, 0.75D, 0.1D, 70));
+              break;
 
-        case "HEART":
-          if (hasDonorRank(murder.getBukkit().getPlayer())) {
-            final Location location = victim.getBukkit().getLocation();
+            case "FLAME":
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.FLAME().packet(true, location, 0.75D, 1.2D, 0.75D, 0.1D, 100));
+              break;
+            case "RAINBOW":
+              double maxheight = 7;
 
-            createCustomEffect(
-                EnumParticle.HEART,
-                location,
-                0.75F,
-                0.75F,
-                0.75F,
-                0.01F,
-                80,
-                null,
-                murder.getBukkit().getPlayer());
-          }
-          break;
+              for (double y = 0; y < maxheight; y += 0.05) {
+                double radius = 2;
+                double x = Math.sin(y * radius);
+                double z = cos(y * radius);
 
-        case "SMOKE":
-          if (hasDonorRank(murder.getBukkit().getPlayer())) {
-            final Location location = victim.getBukkit().getLocation();
+                Object packet =
+                    api.REDSTONE()
+                        .packetColored(
+                            true,
+                            (float) (location.getX() + x),
+                            (float) (location.getY() + y),
+                            (float) (location.getZ() + z),
+                            colors.get(new Random().nextInt(colors.size())));
 
-            createCustomEffect(
-                EnumParticle.SMOKE_LARGE,
-                location,
-                0.75F,
-                1.2F,
-                0.75F,
-                0.1F,
-                70,
-                null,
-                murder.getBukkit().getPlayer());
-          }
-          break;
-
-        case "FLAME":
-          if (hasRequirePoint(murder.getId(), getRequirePoints("KILL_EFFECT", "FLAME"))
-              || hasDonorRank(murder.getBukkit().getPlayer())) {
-            final Location location = victim.getBukkit().getLocation();
-
-            createCustomEffect(
-                EnumParticle.FLAME,
-                location,
-                0.75F,
-                1.2F,
-                0.75F,
-                0.01F,
-                100,
-                null,
-                murder.getBukkit().getPlayer());
-          }
-          break;
-
-        case "RAINBOW":
-          if (hasRequirePoint(murder.getId(), getRequirePoints("KILL_EFFECT", "RAINBOW"))
-              || hasDonorRank(murder.getBukkit().getPlayer())) {
-            final Location location = victim.getBukkit().getLocation();
-
-            final double radius = 2;
-            final double maxheight = 7;
-
-            for (double y = 0; y < maxheight; y += 0.05) {
-
-              final double x = Math.sin(y * radius);
-              final double z = cos(y * radius);
-
-              createCustomEffectRainbow(
-                  (float) (location.getX() + x),
-                  (float) (location.getY() + y),
-                  (float) (location.getZ() + z),
-                  0F,
-                  0F,
-                  0F,
-                  0.01F,
-                  50,
-                  murder.getBukkit().getPlayer());
-            }
-          }
-          break;
-
-        case "DONOR":
-          if (murder.getBukkit().hasPermission("pgm.group.donor")) {
-
-            final double radius = 1.2d;
-            final Location Location = victim.getBukkit().getLocation().add(0.0d, 2.5d, 0.0d);
-            final int point = 30;
-
-            for (int i = 0; i < point; i++) {
-              final double circle = 2 * Math.PI * i / point;
-              final Location ring =
-                  Location.clone().add(radius * Math.sin(circle), 0.0d, radius * cos(circle));
-
-              createCustomEffectRainbow(
-                  (float) ring.getX(),
-                  (float) ring.getY(),
-                  (float) ring.getZ(),
-                  0F,
-                  0F,
-                  0F,
-                  0.01F,
-                  50,
-                  murder.getBukkit().getPlayer());
-            }
-
-            createCustomEffect(
-                EnumParticle.SPELL_MOB,
-                victim.getBukkit().getLocation(),
-                0.5f,
-                0.5f,
-                0.5f,
-                0.001f,
-                80,
-                null,
-                murder.getBukkit().getPlayer());
-          }
-          break;
-
-        case "SPHERE":
-          if (murder.getBukkit().hasPermission("pgm.group.donor")) {
-            final MatchPlayer killer = murder;
-            new BukkitRunnable() {
-              double phi = 0;
-
-              public void run() {
-                phi += Math.PI / 10;
-
-                for (double theta = 0; theta <= 2 * Math.PI; theta += Math.PI / 40) {
-                  final double r = 2;
-                  final double x = r * cos(theta) * sin(phi);
-                  final double y = r * cos(phi) + 1.5;
-                  final double z = r * sin(theta) * sin(phi);
-
-                  Location location = victim.getBukkit().getLocation();
-                  location.add(x, y, z);
-
-                  createCustomEffect(
-                      EnumParticle.CRIT_MAGIC,
-                      location,
-                      0f,
-                      0f,
-                      0f,
-                      0.1f,
-                      1,
-                      null,
-                      killer.getBukkit().getPlayer());
-
-                  location.subtract(x, y, z);
-                }
-                if (phi > 2 * Math.PI) {
-                  this.cancel();
-                }
+                api.createPlayerConnection(murder.getBukkit()).sendPacket(packet);
               }
-            }.runTaskTimer(Main.getInstance(), 0, 1);
-          }
-          break;
+              break;
 
-        case "MAGIC":
-          if (murder.getBukkit().hasPermission("pgm.group.donor")) {
+            case "DONOR":
+              double radius = 1.2d;
+              Location Location = victim.getBukkit().getLocation().add(0.0d, 2.5d, 0.0d);
+              int point = 30;
 
-            final Location location = victim.getBukkit().getLocation();
-            createCustomEffect(
-                EnumParticle.SPELL_WITCH,
-                location,
-                0.5f,
-                1f,
-                0.5f,
-                0.1f,
-                100,
-                null,
-                murder.getBukkit().getPlayer());
+              for (int i = 0; i < point; i++) {
+                double circle = 2 * Math.PI * i / point;
+                Location ring =
+                    Location.clone().add(radius * Math.sin(circle), 0.0d, radius * cos(circle));
+                Object packet =
+                    api.REDSTONE()
+                        .packetColored(
+                            true,
+                            ring.getX(),
+                            ring.getY(),
+                            ring.getZ(),
+                            colors.get(new Random().nextInt(colors.size())));
+
+                api.createPlayerConnection(murder.getBukkit()).sendPacket(packet);
+              }
+
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.SPELL_MOB().packet(true, location, 0.5D, 0.5D, 0.5D, 0.001D, 80));
+              break;
+            case "SPHERE":
+              MatchPlayer finalMurder = murder;
+              new BukkitRunnable() {
+                double phi = 0;
+
+                public void run() {
+                  phi += Math.PI / 10;
+
+                  for (double theta = 0; theta <= 2 * Math.PI; theta += Math.PI / 40) {
+                    double r = 2;
+                    double x = r * cos(theta) * sin(phi);
+                    double y = r * cos(phi) + 1.5;
+                    double z = r * sin(theta) * sin(phi);
+
+                    Location location = victim.getBukkit().getLocation();
+                    location.add(x, y, z);
+
+                    sendEffectPacket(
+                        finalMurder.getBukkit(),
+                        api.CRIT_MAGIC().packet(true, location, 0D, 0D, 0D, 0.1D, 80));
+                    location.subtract(x, y, z);
+                  }
+                  if (phi > 2 * Math.PI) {
+                    this.cancel();
+                  }
+                }
+              }.runTaskTimer(Mixed.get(), 0, 1);
+              break;
+
+            case "MAGIC":
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.SPELL_WITCH().packet(true, location, 0.5D, 1D, 0.5D, 0.1D, 100));
+              break;
           }
-          break;
+        }
       }
     }
   }
 
-  private void createCustomEffectRainbow(
-      float x,
-      float y,
-      float z,
-      float x_offset,
-      float y_offset,
-      float z_offset,
-      float speed,
-      int amount,
-      Player player) {
+  private void addColor() {
+    colors = new ArrayList<>();
 
-    PacketPlayOutWorldParticles packet =
-        new PacketPlayOutWorldParticles(
-            EnumParticle.REDSTONE,
-            true,
-            x,
-            y,
-            z,
-            x_offset,
-            y_offset,
-            z_offset,
-            speed,
-            amount,
-            setRainbow());
-
-    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
-  }
-
-  public static int setRainbow() {
-    final List<Integer> rainbow = new ArrayList<>();
-
-    rainbow.add(Color.AQUA.asRGB());
-    rainbow.add(Color.BLUE.asRGB());
-    rainbow.add(Color.LIME.asRGB());
-    rainbow.add(Color.PURPLE.asRGB());
-    rainbow.add(Color.RED.asRGB());
-    rainbow.add(Color.WHITE.asRGB());
-    rainbow.add(Color.YELLOW.asRGB());
-
-    final int index = (new Random()).nextInt(rainbow.size());
-
-    return rainbow.get(index);
-  }
-
-  private void createCustomEffect(
-      EnumParticle particle,
-      Location location,
-      float x_offset,
-      float y_offset,
-      float z_offset,
-      float speed,
-      int amount,
-      int[] data,
-      Player player) {
-    PacketPlayOutWorldParticles packet =
-        new PacketPlayOutWorldParticles(
-            particle,
-            true,
-            (float) location.getX(),
-            (float) location.getY(),
-            (float) location.getZ(),
-            x_offset,
-            y_offset,
-            z_offset,
-            speed,
-            amount,
-            data);
-    ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
-  }
-
-  private int[] getData() {
-    return new int[] {Material.REDSTONE_BLOCK.getId(), (short) 0};
+    colors.add(Color.BLUE);
+    colors.add(Color.LIME);
+    colors.add(Color.ORANGE);
+    colors.add(Color.PURPLE);
+    colors.add(Color.AQUA);
+    colors.add(Color.YELLOW);
+    colors.add(Color.GREEN);
+    colors.add(Color.RED);
   }
 
   public KillEffects(Plugin plugin) {
+    addEffects();
+    addColor();
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
 }

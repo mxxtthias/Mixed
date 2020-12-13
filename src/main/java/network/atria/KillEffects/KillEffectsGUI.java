@@ -1,11 +1,19 @@
 package network.atria.KillEffects;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
+import network.atria.Mixed;
 import network.atria.Util.EffectUtils;
 import network.atria.Util.KillEffectsConfig;
-import org.bukkit.ChatColor;
+import network.atria.Util.TextFormat;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -18,61 +26,71 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.player.MatchPlayer;
 
 public class KillEffectsGUI extends EffectUtils implements Listener {
 
   public static Inventory effect;
-  protected String title = "Kill Effect Selector";
-  protected int size = 27;
   private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
+  protected TextComponent title =
+      Component.text("Kill Effect Select Menu", Style.style(TextDecoration.BOLD));
 
   public KillEffectsGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    effect = createGUI(size, title);
+    effect = createGUI(title);
   }
 
   @EventHandler
   public void openGUI(InventoryOpenEvent e) {
-    if (e.getView().getTitle().equals(title)) {
-      final UUID uuid = e.getPlayer().getUniqueId();
+    if (e.getView().getTitle().equals(TextFormat.format(title))) {
+      UUID uuid = e.getPlayer().getUniqueId();
       addIconItems(uuid);
     }
   }
 
   private void addIconItems(UUID uuid) {
 
-    final ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-    final ItemMeta reset_meta = reset.getItemMeta();
+    ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+    ItemMeta reset_meta = reset.getItemMeta();
 
-    reset_meta.setDisplayName(ChatColor.RED + "Reset Kill Effect");
+    reset_meta.setDisplayName(
+        TextFormat.format(Component.text("Reset Kill Effect", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
 
-    final ItemStack back = new ItemStack(Material.ARROW, 1);
-    final ItemMeta back_meta = back.getItemMeta();
+    ItemStack back = new ItemStack(Material.ARROW, 1);
+    ItemMeta back_meta = back.getItemMeta();
 
-    back_meta.setDisplayName(ChatColor.RED + "Go to previous page ➡");
+    back_meta.setDisplayName(
+        TextFormat.format(Component.text("Go to previous page ➡", NamedTextColor.RED)));
     back.setItemMeta(back_meta);
 
-    for (String effect : config.getConfigurationSection("KILL_EFFECT").getKeys(false)) {
-      final Material material =
-          Material.valueOf(config.getString("KILL_EFFECT." + effect + ".material").toUpperCase());
-      final int number = config.getInt("KILL_EFFECT." + effect + ".number");
+    config
+        .getConfigurationSection("KILL_EFFECT")
+        .getKeys(false)
+        .forEach(
+            effect -> {
+              Material material =
+                  Material.valueOf(
+                      config.getString("KILL_EFFECT." + effect + ".material").toUpperCase());
+              int number = config.getInt("KILL_EFFECT." + effect + ".number");
 
-      setItemGUI(
-          KillEffectsGUI.effect,
-          number,
-          material,
-          effect,
-          "",
-          canUseEffects(uuid, effectPoint(effect)));
-    }
+              setItemGUI(
+                  KillEffectsGUI.effect,
+                  number,
+                  material,
+                  Component.text(effect, NamedTextColor.GREEN, TextDecoration.BOLD),
+                  Component.empty(),
+                  canUseEffects(uuid, effectPoint(effect)));
+            });
+
     setItemGUI(
         effect,
         18,
         Material.GOLD_NUGGET,
-        ChatColor.GOLD + "DONOR",
-        "",
-        ChatColor.RED + "- Donor Only -");
+        Component.text("DONOR", NamedTextColor.GOLD),
+        Component.empty(),
+        Component.text("- Donor Only -", NamedTextColor.RED, TextDecoration.BOLD));
     effect.setItem(26, reset);
     effect.setItem(8, back);
   }
@@ -82,70 +100,68 @@ public class KillEffectsGUI extends EffectUtils implements Listener {
   }
 
   @EventHandler
-  public void onGuiClick(final InventoryClickEvent e) {
-    if (e.getView().getTitle().equals(title)) {
+  public void onGuiClick(InventoryClickEvent e) {
+    if (e.getView().getTitle().equals(TextFormat.format(title))) {
       e.setCancelled(true);
 
-      final ItemStack clickedItem = e.getCurrentItem();
-      final Player player = (Player) e.getWhoClicked();
-      final String getItemName = clickedItem.getItemMeta().getDisplayName();
-      final Set<String> effect = config.getConfigurationSection("KILL_EFFECT").getKeys(false);
+      ItemStack clickedItem = e.getCurrentItem();
+      Player player = (Player) e.getWhoClicked();
+      Audience audience = Mixed.get().getAudience().player(player);
 
-      if (effect.contains(getItemName)) {
-        selectEffect(player, getItemName, false);
+      Set<Effect> effects = KillEffects.getEffects();
+      Optional<Effect> effect =
+          effects.stream()
+              .filter(
+                  name ->
+                      name.getColoredName()
+                          .equalsIgnoreCase(clickedItem.getItemMeta().getDisplayName()))
+              .findFirst();
+
+      if (effect.isPresent()) {
+        selectEffect(player, effect.get());
+        player.closeInventory();
       } else {
-        switch (getItemName.substring(2)) {
+        switch (clickedItem.getItemMeta().getDisplayName().substring(2)) {
           case "Go to previous page ➡":
             player.openInventory(DefaultGUI.gui);
             break;
           case "Reset Kill Effect":
             MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
-            player.sendMessage(ChatColor.GREEN + "Reset your " + ChatColor.YELLOW + " Kill Effect");
+            audience.sendMessage(
+                Component.text("Reset your ", NamedTextColor.GREEN)
+                    .append(Component.text("Kill Effect", NamedTextColor.YELLOW)));
+            player.closeInventory();
             break;
           case "DONOR":
             if (player.hasPermission("pgm.group.donor")) {
               MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
-              player.sendMessage(
-                  ChatColor.GREEN + "You selected" + ChatColor.YELLOW + " DONOR kill effect.");
+              audience.sendMessage(
+                  Component.text("You selected", NamedTextColor.GREEN)
+                      .append(Component.text(" DONOR kill effect.", NamedTextColor.YELLOW)));
             } else {
-              player.sendMessage(ChatColor.RED + "You don't have the donor rank");
+              audience.sendMessage(
+                  Component.text("You don't have the donor rank", NamedTextColor.RED));
             }
+            player.closeInventory();
             break;
         }
       }
     }
   }
 
-  private void selectEffect(Player player, String effect, Boolean donor) {
-    final UUID uuid = player.getUniqueId();
-    final int require = getRequirePoints("KILL_EFFECT", effect);
+  private void selectEffect(Player player, Effect effect) {
+    UUID uuid = player.getUniqueId();
+    Audience audience = Mixed.get().getAudience().player(player);
+    MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
 
-    if (donor) {
-      if (hasDonorRank(player)) {
-        if (hasRequirePoint(uuid, require)) {
-          MySQLSetterGetter.setKillEffect(uuid.toString(), effect);
-          player.sendMessage(
-              ChatColor.GREEN
-                  + "You selected "
-                  + ChatColor.YELLOW
-                  + effect.toUpperCase()
-                  + " kill effect.");
-        } else {
-          player.sendMessage(ChatColor.RED + "You don't have enough points");
-        }
-      }
+    if (effect.canUseDonor(matchPlayer) || effect.hasRequirePoint(matchPlayer.getId())) {
+      MySQLSetterGetter.setKillEffect(uuid.toString(), effect.getName());
+      audience.sendMessage(
+          Component.text("You selected ", NamedTextColor.GREEN)
+              .append(Component.text(effect.getName().toUpperCase(), NamedTextColor.YELLOW))
+              .append(Component.text(" kill effect.", NamedTextColor.GREEN)));
     } else {
-      if (hasRequirePoint(uuid, require)) {
-        MySQLSetterGetter.setKillEffect(uuid.toString(), effect);
-        player.sendMessage(
-            ChatColor.GREEN
-                + "You selected "
-                + ChatColor.YELLOW
-                + effect.toUpperCase()
-                + " kill effect.");
-      } else {
-        player.sendMessage(ChatColor.RED + "You don't have enough points");
-      }
+      audience.sendMessage(Component.text("You don't have enough points.", NamedTextColor.RED));
     }
   }
 }

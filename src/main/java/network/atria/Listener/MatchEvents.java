@@ -2,12 +2,17 @@ package network.atria.Listener;
 
 import java.sql.*;
 import java.util.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQL;
 import network.atria.Database.MySQLSetterGetter;
+import network.atria.Mixed;
 import network.atria.RankSystem.ChatPrefix;
 import network.atria.RankSystem.Ranks;
+import network.atria.Util.TextFormat;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -39,7 +44,7 @@ public class MatchEvents implements Listener, MatchModule {
 
   @EventHandler(priority = EventPriority.HIGH)
   public void onKill(MatchPlayerDeathEvent event) {
-    final MatchPlayer victim = event.getPlayer();
+    MatchPlayer victim = event.getPlayer();
     MatchPlayer murder;
 
     if (event.isTeamKill()) return;
@@ -54,6 +59,7 @@ public class MatchEvents implements Listener, MatchModule {
           addStats(kills, murder.getId(), 1);
           addStats(points, murder.getId(), 5);
           addResultMap(murder.getId());
+          LevelUp(murder);
         }
       }
     }
@@ -61,10 +67,11 @@ public class MatchEvents implements Listener, MatchModule {
 
   @EventHandler(priority = EventPriority.HIGH)
   public void ctw(PlayerWoolPlaceEvent event) {
-    final MatchPlayerState player = event.getPlayer();
+    MatchPlayerState player = event.getPlayer();
     addStats(points, player.getId(), 20);
     addStats(wools, player.getId(), 1);
     addResultMap(player.getId());
+    LevelUp(player.getPlayer().get());
   }
 
   @EventHandler(priority = EventPriority.HIGH)
@@ -77,15 +84,17 @@ public class MatchEvents implements Listener, MatchModule {
             player -> {
               addStats(points, player.getId(), 25);
               addStats(cores, player.getId(), 1);
+              LevelUp(player.getPlayer().get());
               addResultMap(player.getId());
             });
   }
 
   @EventHandler(priority = EventPriority.HIGH)
   public void ctf(FlagCaptureEvent event) {
-    final MatchPlayer player = event.getCarrier();
+    MatchPlayer player = event.getCarrier();
     addStats(points, player.getId(), 15);
     addStats(flags, player.getId(), 1);
+    LevelUp(player);
     addResultMap(player.getId());
   }
 
@@ -100,64 +109,51 @@ public class MatchEvents implements Listener, MatchModule {
               addStats(monuments, player.getPlayerState().getId(), 1);
               addStats(points, player.getPlayerState().getId(), 25);
               addResultMap(player.getPlayerState().getId());
+              LevelUp(player.getPlayerState().getPlayer().get());
             });
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void endMatch(MatchFinishEvent event) {
-    sendStatsData();
     event
         .getMatch()
         .getPlayers()
         .parallelStream()
         .forEach(
             player -> {
-              MySQLSetterGetter.addPoints(player.getId().toString(), 10);
+              addStats(points, player.getId(), 10);
               LevelUp(player);
             });
+    sendStatsData();
   }
 
   private void LevelUp(MatchPlayer player) {
-    final UUID uuid = player.getId();
-    final ChatPrefix chatPrefix = new ChatPrefix();
-    final String blank = "            ";
-    final String line_1 =
-        ChatColor.YELLOW
-            + ""
-            + ChatColor.BOLD
-            + "〓〓〓〓〓〓"
-            + ChatColor.RED
-            + ""
-            + ChatColor.BOLD
-            + " Rank UP! "
-            + ChatColor.YELLOW
-            + ""
-            + ChatColor.BOLD
-            + "〓〓〓〓〓〓";
-    final String line_2 = ChatColor.YELLOW + "" + ChatColor.BOLD + "〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓";
+    UUID uuid = player.getId();
+    ChatPrefix chatPrefix = new ChatPrefix();
+    TextComponent RANK_UP =
+        TextComponent.ofChildren(
+            Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD),
+            Component.text(" Rank UP! ", NamedTextColor.RED, TextDecoration.BOLD),
+            Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD),
+            Component.newline(),
+            Component.text(Ranks.getRankCurrent(uuid).replace("_", " ").toUpperCase()),
+            Component.text(" ⇒ ", NamedTextColor.GRAY, TextDecoration.BOLD),
+            Component.text(Ranks.getRankNext(uuid)),
+            Component.newline(),
+            Component.text("〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
+
+    TextComponent BROADCAST_RANK_UP =
+        TextComponent.ofChildren(
+            Component.text(player.getPrefixedName()),
+            Component.text(" has rank up to ", NamedTextColor.RED),
+            Component.text(Ranks.getRankNext(uuid)));
 
     if (Ranks.canRankUp(uuid)) {
-      Bukkit.broadcastMessage(
-          player.getPrefixedName()
-              + ChatColor.RED
-              + " has ranked up to "
-              + ChatColor.YELLOW
-              + Ranks.getNextRank(uuid));
+      Bukkit.broadcastMessage(TextFormat.format(BROADCAST_RANK_UP));
       player
           .getBukkit()
           .playSound(player.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
-      player.getBukkit().sendMessage(line_1);
-      player
-          .getBukkit()
-          .sendMessage(
-              blank
-                  + Ranks.getRankCurrent(uuid).replace("_", " ").toUpperCase()
-                  + ChatColor.GRAY
-                  + ""
-                  + ChatColor.BOLD
-                  + " ⇒ "
-                  + Ranks.getRankNext(uuid));
-      player.getBukkit().sendMessage(line_2);
+      Mixed.get().getAudience().player(player.getId()).sendMessage(RANK_UP);
 
       chatPrefix.setPrefixPermission(uuid);
       MySQLSetterGetter.setRank(player.getId().toString(), Ranks.getNextRank(uuid));
@@ -166,8 +162,8 @@ public class MatchEvents implements Listener, MatchModule {
 
   private void addStats(HashMap<UUID, Integer> map, UUID uuid, Integer score) {
     if (map.containsKey(uuid)) {
-      final int current = map.get(uuid) != 0 ? map.get(uuid) : 0;
-      final int stats = current + score;
+      int current = map.get(uuid) != 0 ? map.get(uuid) : 0;
+      int stats = current + score;
       map.replace(uuid, stats);
     } else {
       map.put(uuid, 0);
@@ -213,11 +209,11 @@ public class MatchEvents implements Listener, MatchModule {
     Connection connection = null;
     ResultSet rs = null;
     PreparedStatement statement = null;
-    final Map<UUID, String> maps = new HashMap<>(includeMaps(uuid));
-    final Map<String, Integer> stats = new HashMap<>();
-    final String column =
+    Map<UUID, String> maps = new HashMap<>(includeMaps(uuid));
+    Map<String, Integer> stats = new HashMap<>();
+    String column =
         Arrays.toString(maps.values().toArray()).trim().replace("[", "").replace("]", "");
-    final String query =
+    String query =
         "SELECT "
             + column.substring(0, column.length() - 2)
             + " FROM STATS WHERE UUID = '"
@@ -310,7 +306,7 @@ public class MatchEvents implements Listener, MatchModule {
   }
 
   private Map<UUID, String> includeMaps(UUID uuid) {
-    final Map<UUID, String> multipleMap = new HashMap<>();
+    Map<UUID, String> multipleMap = new HashMap<>();
 
     multipleMap.put(uuid, "");
     if (!kills.isEmpty() && kills.containsKey(uuid))

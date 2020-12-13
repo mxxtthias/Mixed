@@ -10,12 +10,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import javax.annotation.Nullable;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.md_5.bungee.api.ChatColor;
 import network.atria.Database.MySQL;
 import network.atria.Database.MySQLSetterGetter;
+import network.atria.Mixed;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.util.LegacyFormatUtils;
 
 public class StatsCommand {
@@ -25,24 +32,60 @@ public class StatsCommand {
       desc = "Show Player Stats",
       usage = "[Target]")
   public void stats(@Sender Player player, @Nullable String playerName) {
+    MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
+    if (matchPlayer == null) return;
     if (playerName == null) {
-      showStats(player, player.getName());
+      showStats(matchPlayer);
     } else {
-      final Player target = Bukkit.getPlayer(playerName);
-      final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
+      Player target = Bukkit.getPlayer(playerName);
+      OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
       if (target == null) {
         if (MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
-          showStats(player, offlinePlayer.getName());
+          showStats(matchPlayer);
         } else {
-          player.sendMessage(ChatColor.RED + "The player not found");
+          Audience audience = Mixed.get().getAudience().player(matchPlayer.getId());
+          audience.sendMessage(Component.text("The player not found", NamedTextColor.RED));
         }
       }
     }
   }
 
+  private void showStats(MatchPlayer player) {
+    Map<String, Integer> stats = getStats(player.getId());
+    TextComponent.Builder component = Component.text();
+
+    component.append(
+        Component.text(
+            LegacyFormatUtils.horizontalLineHeading(player.getPrefixedName(), ChatColor.WHITE)));
+    component.append(Component.newline());
+    component.append(formatStats("Kills: ", stats.get("KILLS")));
+    component.append(formatStats("Deahs: ", stats.get("DEATHS")));
+    component
+        .append(Component.text("K/D: ", NamedTextColor.AQUA))
+        .append(
+            Component.text(
+                kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(), NamedTextColor.BLUE));
+    component.append(Component.newline());
+    component.append(formatStats("Wool Placed", stats.get("WOOLS")));
+    component.append(formatStats("Cores Leaked", stats.get("CORES")));
+    component.append(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
+    component.append(formatStats("Flag Captured: ", stats.get("FLAGS")));
+    component.append(Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
+
+    Mixed.get().getAudience().player(player.getId()).sendMessage(component.build());
+    stats.clear();
+  }
+
+  private TextComponent.Builder formatStats(String ladder, int value) {
+    return Component.text()
+        .append(Component.text(ladder, NamedTextColor.AQUA))
+        .append(Component.text(value, NamedTextColor.BLUE))
+        .append(Component.newline());
+  }
+
   private BigDecimal kd(int kills, int deaths) {
-    final BigDecimal bd1 = new BigDecimal(kills);
-    final BigDecimal bd2 = new BigDecimal(deaths);
+    BigDecimal bd1 = new BigDecimal(kills);
+    BigDecimal bd2 = new BigDecimal(deaths);
     BigDecimal result = null;
     try {
       result = bd1.divide(bd2, 2, RoundingMode.HALF_UP);
@@ -52,54 +95,12 @@ public class StatsCommand {
     return result;
   }
 
-  private void showStats(Player player, String name) {
-
-    final Map<String, Integer> stats = getStats(player.getUniqueId());
-    final StringBuilder builder = new StringBuilder();
-    final String head_line =
-        LegacyFormatUtils.horizontalLineHeading(
-                ChatColor.AQUA + name + "'s Stats", net.md_5.bungee.api.ChatColor.WHITE)
-            + "\n";
-    final String under_line =
-        LegacyFormatUtils.horizontalLine(net.md_5.bungee.api.ChatColor.WHITE, 300);
-    final String kills = ChatColor.AQUA + "Kills: " + ChatColor.BLUE + stats.get("KILLS") + "\n";
-    final String deaths = ChatColor.AQUA + "Deaths: " + ChatColor.BLUE + stats.get("DEATHS") + "\n";
-    final String kd_rate =
-        ChatColor.AQUA
-            + "K/D: "
-            + ChatColor.BLUE
-            + kd(stats.get("KILLS"), stats.get("DEATHS"))
-            + "\n";
-    final String ctw =
-        ChatColor.AQUA + "Wool Placed: " + ChatColor.BLUE + stats.get("WOOLS") + "\n";
-    final String dtc =
-        ChatColor.AQUA + "Cores Leaked: " + ChatColor.BLUE + stats.get("CORES") + "\n";
-    final String dtm =
-        ChatColor.AQUA + "Monuments Destroyed: " + ChatColor.BLUE + stats.get("MONUMENTS") + "\n";
-    final String ctf =
-        ChatColor.AQUA + "Flags Captured: " + ChatColor.BLUE + stats.get("FLAGS") + "\n";
-
-    builder
-        .append(head_line)
-        .append(kills)
-        .append(deaths)
-        .append(kd_rate)
-        .append(ctw)
-        .append(dtc)
-        .append(dtm)
-        .append(ctf)
-        .append(under_line);
-
-    stats.clear();
-    player.sendMessage(builder.toString());
-  }
-
   private Map<String, Integer> getStats(UUID uuid) {
     Connection connection = null;
     ResultSet rs = null;
     PreparedStatement statement = null;
-    final Map<String, Integer> stats = new HashMap<>();
-    final String query =
+    Map<String, Integer> stats = new HashMap<>();
+    String query =
         "SELECT KILLS, DEATHS, CORES, WOOLS, MONUMENTS, FLAGS FROM STATS WHERE UUID = '"
             + uuid.toString()
             + "';";
@@ -108,12 +109,12 @@ public class StatsCommand {
       statement = connection.prepareStatement(query);
       rs = statement.executeQuery();
       if (rs.next()) {
-        final int kills = rs.getInt("KILLS");
-        final int deaths = rs.getInt("DEATHS");
-        final int cores = rs.getInt("CORES");
-        final int wools = rs.getInt("WOOLS");
-        final int dtm = rs.getInt("MONUMENTS");
-        final int flags = rs.getInt("FLAGS");
+        int kills = rs.getInt("KILLS");
+        int deaths = rs.getInt("DEATHS");
+        int cores = rs.getInt("CORES");
+        int wools = rs.getInt("WOOLS");
+        int dtm = rs.getInt("MONUMENTS");
+        int flags = rs.getInt("FLAGS");
 
         stats.put("KILLS", kills);
         stats.put("DEATHS", deaths);

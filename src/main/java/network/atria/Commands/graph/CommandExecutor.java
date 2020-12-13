@@ -5,7 +5,9 @@ import app.ashcon.intake.InvalidUsageException;
 import app.ashcon.intake.InvocationCommandException;
 import app.ashcon.intake.bukkit.BukkitIntake;
 import app.ashcon.intake.util.auth.AuthorizationException;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import network.atria.Mixed;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -25,12 +27,21 @@ public class CommandExecutor extends BukkitIntake {
           .getDispatcher()
           .call(this.getCommand(command, args), this.getNamespace(sender));
     } catch (AuthorizationException e) {
-      sender.sendMessage(ChatColor.RED + "You don't have permission!");
+      Mixed.get()
+          .getAudience()
+          .sender(sender)
+          .sendMessage(Component.text("You don't have permission!", NamedTextColor.RED));
     } catch (InvocationCommandException e) {
       if (e.getCause() instanceof TextException) {
-        sender.sendMessage(ChatColor.RED + "Unknown Error");
+        Mixed.get()
+            .getAudience()
+            .sender(sender)
+            .sendMessage(Component.text("Unknown Error", NamedTextColor.RED));
       } else {
-        sender.sendMessage(ChatColor.RED + "Unknown Error");
+        Mixed.get()
+            .getAudience()
+            .sender(sender)
+            .sendMessage(Component.text("Unknown Error", NamedTextColor.RED));
         e.printStackTrace();
       }
     } catch (InvalidUsageException e) {

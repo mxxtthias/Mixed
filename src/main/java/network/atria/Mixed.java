@@ -1,5 +1,10 @@
 package network.atria;
 
+import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
+import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
+import com.github.fierioziy.particlenativeapi.api.utils.ParticleException;
+import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
@@ -25,18 +30,16 @@ public class Mixed extends JavaPlugin implements Listener {
 
   public static Mixed instance;
   private long uptime;
-
-  private RanksConfig ranks;
-  private KillEffectsConfig effects;
-
+  private BukkitAudiences audiences;
   private final FileConfiguration config = getConfig();
+  private Particles_1_8 particles;
 
   @Override
   public void onEnable() {
     instance = this;
 
-    ranks = new RanksConfig(this, "ranks.yml");
-    effects = new KillEffectsConfig(this, "killeffects.yml");
+    new RanksConfig(this, "ranks.yml");
+    new KillEffectsConfig(this, "killeffects.yml");
 
     config.options().copyDefaults();
     saveDefaultConfig();
@@ -44,13 +47,14 @@ public class Mixed extends JavaPlugin implements Listener {
     MySQL database = new MySQL();
     database.connect();
     database.createTables();
-
     registerCommands();
     registerEvents();
+    loadParticleAPI();
 
-    uptime = System.currentTimeMillis();
+    this.audiences = BukkitAudiences.create(this);
+    this.uptime = System.currentTimeMillis();
 
-    final BroadCastMessage broadCastMessage = new BroadCastMessage();
+    BroadCastMessage broadCastMessage = new BroadCastMessage();
     broadCastMessage.randomMessage();
 
     super.onEnable();
@@ -64,8 +68,17 @@ public class Mixed extends JavaPlugin implements Listener {
     super.onDisable();
   }
 
+  private void loadParticleAPI() {
+    try {
+      ParticleNativeAPI api = ParticleNativeCore.loadAPI(this);
+      particles = api.getParticles_1_8();
+    } catch (ParticleException e) {
+      e.printStackTrace();
+    }
+  }
+
   private void registerEvents() {
-    final PluginManager pm = Bukkit.getServer().getPluginManager();
+    PluginManager pm = Bukkit.getServer().getPluginManager();
 
     pm.registerEvents(this, this);
     new KillEffectsGUI(this);
@@ -79,16 +92,16 @@ public class Mixed extends JavaPlugin implements Listener {
   }
 
   private void registerCommands() {
-    final CommandGraph graph = new CommandGraph();
+    CommandGraph graph = new CommandGraph();
     new CommandExecutor(this, graph).register();
   }
 
   @EventHandler
   public void onJoin(PlayerJoinEvent event) {
-    final Player player = event.getPlayer();
-    final LuckPerms api = LuckPermsProvider.get();
-    final User user = api.getUserManager().getUser(player.getUniqueId());
-    final PermissionNode node = PermissionNode.builder("pgm.group.wood_iii").build();
+    Player player = event.getPlayer();
+    LuckPerms api = LuckPermsProvider.get();
+    User user = api.getUserManager().getUser(player.getUniqueId());
+    PermissionNode node = PermissionNode.builder("pgm.group.wood_iii").build();
 
     if (!MySQLSetterGetter.playerExists(player.getUniqueId().toString())) {
       MySQLSetterGetter.createPlayer(player.getUniqueId().toString());
@@ -106,7 +119,15 @@ public class Mixed extends JavaPlugin implements Listener {
     return uptime;
   }
 
-  public static Mixed getInstance() {
+  public static Mixed get() {
     return instance;
+  }
+
+  public BukkitAudiences getAudience() {
+    return this.audiences;
+  }
+
+  public Particles_1_8 getParticles() {
+    return this.particles;
   }
 }

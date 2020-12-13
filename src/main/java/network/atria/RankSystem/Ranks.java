@@ -3,16 +3,19 @@ package network.atria.RankSystem;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Util.RanksConfig;
-import org.bukkit.ChatColor;
+import network.atria.Util.TextFormat;
 
 public class Ranks {
 
   public static String getNextRank(UUID uuid) {
-    final String now = MySQLSetterGetter.getRank(uuid);
+    String now = MySQLSetterGetter.getRank(uuid);
 
-    final List<String> ranks =
+    List<String> ranks =
         new ArrayList<>(
             RanksConfig.getCustomConfig().getConfigurationSection("Ranks").getKeys(false));
 
@@ -37,17 +40,16 @@ public class Ranks {
   }
 
   public static Integer getRequirePoint(UUID uuid) {
-    final Integer next =
-        RanksConfig.getCustomConfig().getInt("Ranks." + getNextRank(uuid) + ".Points");
-    final Integer now = getCurrentPoint(uuid);
+    Integer next = RanksConfig.getCustomConfig().getInt("Ranks." + getNextRank(uuid) + ".Points");
+    Integer now = getCurrentPoint(uuid);
 
     return next - now;
   }
 
   public static boolean canRankUp(UUID uuid) {
-    final String rank = getNextRank(uuid);
-    final Integer next = RanksConfig.getCustomConfig().getInt("Ranks." + rank + ".Points");
-    final Integer now = getCurrentPoint(uuid);
+    String rank = getNextRank(uuid);
+    Integer next = RanksConfig.getCustomConfig().getInt("Ranks." + rank + ".Points");
+    Integer now = getCurrentPoint(uuid);
 
     if (rank.equalsIgnoreCase(getCurrentRank(uuid))) {
       return false;
@@ -58,42 +60,42 @@ public class Ranks {
   }
 
   public static String getRankCurrent(UUID uuid) {
-    final String current = getCurrentRank(uuid);
+    String current = getCurrentRank(uuid);
     String rank = null;
 
     switch (current) {
       case "wood_iii":
       case "wood_ii":
       case "wood_i":
-        rank = ChatColor.GOLD + "" + ChatColor.BOLD + format(current);
+        rank = format(current, NamedTextColor.GOLD);
         break;
       case "stone_iii":
       case "stone_ii":
       case "stone_i":
-        rank = ChatColor.GRAY + "" + ChatColor.BOLD + format(current);
+        rank = format(current, NamedTextColor.GRAY);
         break;
       case "iron_iii":
       case "iron_ii":
       case "iron_i":
-        rank = ChatColor.WHITE + "" + ChatColor.BOLD + format(current);
+        rank = format(current, NamedTextColor.WHITE);
         break;
       case "gold_iii":
       case "gold_ii":
       case "gold_i":
-        rank = ChatColor.YELLOW + "" + ChatColor.BOLD + format(current);
+        rank = format(current, NamedTextColor.YELLOW);
         break;
       case "emerald_iii":
       case "emerald_ii":
       case "emerald_i":
-        rank = ChatColor.GREEN + "" + ChatColor.BOLD + format(current);
+        rank = format(current, NamedTextColor.GREEN);
         break;
       case "diamond_iii":
       case "diamond_ii":
       case "diamond_i":
-        rank = ChatColor.AQUA + "" + ChatColor.BOLD + format(current);
+        rank = format(current, NamedTextColor.AQUA);
         break;
       case "obsidian":
-        rank = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + format(current);
+        rank = format(current, NamedTextColor.DARK_PURPLE);
     }
 
     return rank;
@@ -101,51 +103,55 @@ public class Ranks {
 
   /*
 
-  Designed Rank
+  Designed Effect
    */
 
   public static String getRankNext(UUID uuid) {
     String rank = null;
-    final String next = getNextRank(uuid);
+    String next = getNextRank(uuid);
 
     switch (next) {
       case "wood_iii":
       case "wood_ii":
       case "wood_i":
-        rank = ChatColor.GOLD + "" + ChatColor.BOLD + format(next);
+        rank = format(next, NamedTextColor.GOLD);
         break;
       case "stone_iii":
       case "stone_ii":
       case "stone_i":
-        rank = ChatColor.GRAY + "" + ChatColor.BOLD + format(next);
+        rank = format(next, NamedTextColor.GRAY);
         break;
       case "iron_iii":
       case "iron_ii":
       case "iron_i":
-        rank = ChatColor.WHITE + "" + ChatColor.BOLD + format(next);
+        rank = format(next, NamedTextColor.WHITE);
         break;
       case "gold_iii":
       case "gold_ii":
       case "gold_i":
-        rank = ChatColor.YELLOW + "" + ChatColor.BOLD + format(next);
+        rank = format(next, NamedTextColor.YELLOW);
         break;
       case "emerald_iii":
       case "emerald_ii":
       case "emerald_i":
-        rank = ChatColor.GREEN + "" + ChatColor.BOLD + format(next);
+        rank = format(next, NamedTextColor.GREEN);
         break;
       case "diamond_iii":
       case "diamond_ii":
       case "diamond_i":
-        rank = ChatColor.AQUA + "" + ChatColor.BOLD + format(next);
+        rank = format(next, NamedTextColor.AQUA);
         break;
       case "obsidian":
-        rank = ChatColor.DARK_PURPLE + "" + ChatColor.BOLD + format(next);
+        rank = format(next, NamedTextColor.DARK_PURPLE);
     }
     return rank;
   }
 
-  private static String format(String rank) {
+  private static String replace(String rank) {
     return rank.replace("_", " ").toUpperCase();
+  }
+
+  private static String format(String rank, NamedTextColor color) {
+    return TextFormat.format(Component.text(replace(rank), color, TextDecoration.BOLD));
   }
 }
