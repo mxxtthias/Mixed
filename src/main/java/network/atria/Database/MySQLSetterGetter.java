@@ -37,15 +37,15 @@ public class MySQLSetterGetter {
   public static void createPlayer(String uuid) {
     Statement statement = null;
     Connection connection = null;
-    final String query =
+    String query =
         "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
             + uuid
             + "', '0', '0', '0', '0', '0', '0', 'Null');";
-    final String query2 =
+    String query2 =
         "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
             + uuid
             + "', '0', '0', '0', '0', '0', '0', 'Null');";
-    final String query3 =
+    String query3 =
         "INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('"
             + uuid
             + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');";
@@ -96,9 +96,9 @@ public class MySQLSetterGetter {
   public static void setName(String uuid, String name) {
     Statement statement = null;
     Connection connection = null;
-    final String query = "UPDATE STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';";
-    final String query2 = "UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "'";
-    final String query3 = "UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';";
+    String query = "UPDATE STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';";
+    String query2 = "UPDATE WEEK_STATS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "'";
+    String query3 = "UPDATE RANKS SET NAME= '" + name + "' WHERE UUID= '" + uuid + "';";
     if (playerExists(uuid)) {
       try {
         connection = MySQL.getHikari().getConnection();

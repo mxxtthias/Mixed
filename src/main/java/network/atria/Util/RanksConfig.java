@@ -28,7 +28,7 @@ public class RanksConfig {
   public static void reloadConfig() {
     config = YamlConfiguration.loadConfiguration(configFile);
 
-    final InputStream defConfigStream = plugin.getResource(file);
+    InputStream defConfigStream = plugin.getResource(file);
     if (defConfigStream == null) {
       return;
     }

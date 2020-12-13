@@ -10,7 +10,7 @@ public class MySQL {
   private static HikariDataSource ds;
 
   public void connect() {
-    final HikariConfig hikari = new HikariConfig();
+    HikariConfig hikari = new HikariConfig();
     hikari.setJdbcUrl(
         "jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDatabase() + "?useSSL=false");
     hikari.addDataSourceProperty("user", getUser());
@@ -59,23 +59,23 @@ public class MySQL {
   }
 
   private String getHost() {
-    return Mixed.getInstance().getConfig().getString("MySQL.Host");
+    return Mixed.get().getConfig().getString("MySQL.Host");
   }
 
   private String getDatabase() {
-    return Mixed.getInstance().getConfig().getString("MySQL.Database");
+    return Mixed.get().getConfig().getString("MySQL.Database");
   }
 
   private String getUser() {
-    return Mixed.getInstance().getConfig().getString("MySQL.User");
+    return Mixed.get().getConfig().getString("MySQL.User");
   }
 
   private String getPassword() {
-    return Mixed.getInstance().getConfig().getString("MySQL.Password");
+    return Mixed.get().getConfig().getString("MySQL.Password");
   }
 
   private Integer getPort() {
-    return Mixed.getInstance().getConfig().getInt("MySQL.Port");
+    return Mixed.get().getConfig().getInt("MySQL.Port");
   }
 
   public static HikariDataSource getHikari() {

@@ -15,10 +15,6 @@ public class KillEffectsConfig {
   private static String file;
   private static Plugin plugin;
 
-  public KillEffectsConfig(Plugin plugin) {
-    this(plugin, null);
-  }
-
   public KillEffectsConfig(Plugin plugin, String fileName) {
     KillEffectsConfig.plugin = plugin;
     file = fileName;
@@ -28,7 +24,7 @@ public class KillEffectsConfig {
   public static void reloadConfig() {
     config = YamlConfiguration.loadConfiguration(configFile);
 
-    final InputStream defConfigStream = plugin.getResource(file);
+    InputStream defConfigStream = plugin.getResource(file);
     if (defConfigStream == null) {
       return;
     }

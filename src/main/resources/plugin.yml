@@ -1,4 +1,4 @@
 name: Mixed
 version: ${project.version} (git-${git.commit.id.abbrev})
 main: ${project.mainClass}
-
+softdepend: [ViaVersion]
