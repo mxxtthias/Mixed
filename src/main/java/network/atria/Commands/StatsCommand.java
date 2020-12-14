@@ -52,35 +52,36 @@ public class StatsCommand {
 
   private void showStats(MatchPlayer player) {
     Map<String, Integer> stats = getStats(player.getId());
-    TextComponent.Builder component = Component.text();
-
-    component.append(
-        Component.text(
-            LegacyFormatUtils.horizontalLineHeading(player.getPrefixedName(), ChatColor.WHITE)));
-    component.append(Component.newline());
-    component.append(formatStats("Kills: ", stats.get("KILLS")));
-    component.append(formatStats("Deahs: ", stats.get("DEATHS")));
-    component
-        .append(Component.text("K/D: ", NamedTextColor.AQUA))
-        .append(
+    TextComponent component =
+        TextComponent.ofChildren(
             Component.text(
-                kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(), NamedTextColor.BLUE));
-    component.append(Component.newline());
-    component.append(formatStats("Wool Placed", stats.get("WOOLS")));
-    component.append(formatStats("Cores Leaked", stats.get("CORES")));
-    component.append(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
+                LegacyFormatUtils.horizontalLineHeading(player.getPrefixedName(), ChatColor.WHITE)),
+            Component.newline(),
+            formatStats("Kills: ", stats.get("KILLS")),
+            formatStats("Deaths: ", stats.get("DEATHS")),
+            Component.text("K/D: ", NamedTextColor.AQUA)
+                .append(
+                    Component.text(
+                        kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
+                        NamedTextColor.BLUE)),
+            Component.newline(),
+            formatStats("Wool Placed", stats.get("WOOLS")),
+            formatStats("Cores Leaked", stats.get("CORES")),
+            formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")),
+            formatStats("Flag Captured: ", stats.get("FLAGS")),
+            Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
     component.append(formatStats("Flag Captured: ", stats.get("FLAGS")));
     component.append(Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
 
-    Mixed.get().getAudience().player(player.getId()).sendMessage(component.build());
+    Mixed.get().getAudience().player(player.getId()).sendMessage(component);
     stats.clear();
   }
 
-  private TextComponent.Builder formatStats(String ladder, int value) {
-    return Component.text()
-        .append(Component.text(ladder, NamedTextColor.AQUA))
-        .append(Component.text(value, NamedTextColor.BLUE))
-        .append(Component.newline());
+  private TextComponent formatStats(String ladder, int value) {
+    return TextComponent.ofChildren(
+        Component.text(ladder, NamedTextColor.AQUA),
+        Component.text(value, NamedTextColor.BLUE),
+        Component.newline());
   }
 
   private BigDecimal kd(int kills, int deaths) {
@@ -96,10 +97,11 @@ public class StatsCommand {
   }
 
   private Map<String, Integer> getStats(UUID uuid) {
+    Map<String, Integer> stats = new HashMap<>();
+
     Connection connection = null;
     ResultSet rs = null;
     PreparedStatement statement = null;
-    Map<String, Integer> stats = new HashMap<>();
     String query =
         "SELECT KILLS, DEATHS, CORES, WOOLS, MONUMENTS, FLAGS FROM STATS WHERE UUID = '"
             + uuid.toString()

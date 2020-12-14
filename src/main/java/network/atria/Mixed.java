@@ -116,6 +116,7 @@ public class Mixed extends JavaPlugin implements Listener {
   }
 
   public Particles_1_8 getParticles() {
-    return this.particles;
+    ParticleNativeAPI api = ParticleNativePlugin.getAPI();
+    return api.getParticles_1_8();
   }
 }

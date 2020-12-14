@@ -10,6 +10,7 @@ import network.atria.Database.MySQL;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
 import network.atria.RankSystem.ChatPrefix;
+import network.atria.RankSystem.Rank;
 import network.atria.RankSystem.Ranks;
 import network.atria.Util.TextFormat;
 import org.bukkit.Bukkit;
@@ -130,15 +131,18 @@ public class MatchEvents implements Listener, MatchModule {
   private void LevelUp(MatchPlayer player) {
     UUID uuid = player.getId();
     ChatPrefix chatPrefix = new ChatPrefix();
+    Ranks ranks = new Ranks();
+    Rank next = ranks.getNextRank(uuid);
+
     TextComponent RANK_UP =
         TextComponent.ofChildren(
             Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD),
             Component.text(" Rank UP! ", NamedTextColor.RED, TextDecoration.BOLD),
             Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD),
             Component.newline(),
-            Component.text(Ranks.getRankCurrent(uuid).replace("_", " ").toUpperCase()),
+            ranks.getRank(MySQLSetterGetter.getRank(uuid)).getColoredName(),
             Component.text(" ⇒ ", NamedTextColor.GRAY, TextDecoration.BOLD),
-            Component.text(Ranks.getRankNext(uuid)),
+            next.getColoredName(),
             Component.newline(),
             Component.text("〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
 
@@ -146,9 +150,9 @@ public class MatchEvents implements Listener, MatchModule {
         TextComponent.ofChildren(
             Component.text(player.getPrefixedName()),
             Component.text(" has rank up to ", NamedTextColor.RED),
-            Component.text(Ranks.getRankNext(uuid)));
+            next.getColoredName());
 
-    if (Ranks.canRankUp(uuid)) {
+    if (ranks.RankUP(uuid)) {
       Bukkit.broadcastMessage(TextFormat.format(BROADCAST_RANK_UP));
       player
           .getBukkit()
@@ -156,7 +160,7 @@ public class MatchEvents implements Listener, MatchModule {
       Mixed.get().getAudience().player(player.getId()).sendMessage(RANK_UP);
 
       chatPrefix.setPrefixPermission(uuid);
-      MySQLSetterGetter.setRank(player.getId().toString(), Ranks.getNextRank(uuid));
+      MySQLSetterGetter.setRank(player.getId().toString(), next.getName());
     }
   }
 
@@ -206,9 +210,6 @@ public class MatchEvents implements Listener, MatchModule {
   }
 
   private Map<String, Integer> getStats(UUID uuid) {
-    Connection connection = null;
-    ResultSet rs = null;
-    PreparedStatement statement = null;
     Map<UUID, String> maps = new HashMap<>(includeMaps(uuid));
     Map<String, Integer> stats = new HashMap<>();
     String column =
@@ -220,6 +221,9 @@ public class MatchEvents implements Listener, MatchModule {
             + uuid.toString()
             + "';";
     maps.clear();
+    Connection connection = null;
+    ResultSet rs = null;
+    PreparedStatement statement = null;
     try {
       connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement(query);
