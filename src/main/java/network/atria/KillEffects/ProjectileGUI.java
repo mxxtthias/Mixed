@@ -127,8 +127,8 @@ public class ProjectileGUI extends EffectUtils implements Listener {
             player.closeInventory();
             break;
         }
+        player.closeInventory();
       }
-      player.closeInventory();
     }
   }
 

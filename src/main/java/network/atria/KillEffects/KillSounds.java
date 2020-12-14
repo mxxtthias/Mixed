@@ -38,7 +38,6 @@ public class KillSounds extends EffectUtils implements Listener {
     config
         .getConfigurationSection("KILL_SOUND")
         .getKeys(false)
-        .parallelStream()
         .forEach(
             sound ->
                 sounds.add(
@@ -51,7 +50,7 @@ public class KillSounds extends EffectUtils implements Listener {
 
   private void playSound(MatchPlayer player, String key, Float pitch) {
     if (player.getSettings().getValue(SettingKey.SOUNDS).equals(SettingValue.SOUNDS_ALL)) {
-      Sound sound = Sound.sound(Key.key(key), Sound.Source.MASTER, 1f, pitch);
+      Sound sound = Sound.sound(Key.key(key), Sound.Source.MASTER, 2f, pitch);
       Mixed.get().getAudience().player(player.getBukkit()).playSound(sound);
     }
   }

@@ -2,9 +2,7 @@ package network.atria.KillEffects;
 
 import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
 import com.github.fierioziy.particlenativeapi.api.types.ParticleType;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -12,6 +10,7 @@ import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
 import network.atria.Util.EffectUtils;
 import network.atria.Util.KillEffectsConfig;
+import org.bukkit.Color;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -26,6 +25,7 @@ import org.bukkit.scheduler.BukkitTask;
 public class ProjectileTrails extends EffectUtils implements Listener {
 
   private static Set<Effect> projectiles;
+  private List<Color> colors;
 
   public static Set<Effect> getProjectiles() {
     return projectiles;
@@ -38,7 +38,6 @@ public class ProjectileTrails extends EffectUtils implements Listener {
     config
         .getConfigurationSection("PROJECTILE_TRAILS")
         .getKeys(false)
-        .parallelStream()
         .forEach(
             projectile ->
                 projectiles.add(
@@ -68,14 +67,42 @@ public class ProjectileTrails extends EffectUtils implements Listener {
 
         if (projectile.isPresent()) {
           switch (projectile.get().getName()) {
-            case "HEART":
+            case "HEART_TRAIL":
               playProjectileTrails(api.HEART(), arrow, player);
               break;
             case "WITCH":
-              playProjectileTrails(api.SPELL_WITCH(), arrow, player);
+              new BukkitRunnable() {
+                public void run() {
+                  if (arrow == null || arrow.isOnGround() || arrow.isDead()) cancel();
+                  Color[] witch = {Color.PURPLE, Color.FUCHSIA};
+                  Object packet =
+                      api.REDSTONE()
+                          .packetColored(
+                              true,
+                              (float) arrow.getLocation().getX(),
+                              (float) arrow.getLocation().getY(),
+                              (float) arrow.getLocation().getZ(),
+                              witch[new Random().nextInt(witch.length)]);
+                  sendEffectPacket(player, packet);
+                }
+              }.runTaskTimer(Mixed.get(), 2, 2);
               break;
             case "RAINBOW_TRAIL":
-              playProjectileTrails(api.SPELL_MOB(), arrow, player);
+              new BukkitRunnable() {
+                public void run() {
+                  if (arrow == null || arrow.isOnGround() || arrow.isDead()) cancel();
+
+                  Object packet =
+                      api.REDSTONE()
+                          .packetColored(
+                              true,
+                              (float) arrow.getLocation().getX(),
+                              (float) arrow.getLocation().getY(),
+                              (float) arrow.getLocation().getZ(),
+                              colors.get(new Random().nextInt(colors.size())));
+                  sendEffectPacket(player, packet);
+                }
+              }.runTaskTimer(Mixed.get(), 2, 2);
               break;
             case "GREEN":
               playProjectileTrails(api.VILLAGER_HAPPY(), arrow, player);
@@ -110,8 +137,26 @@ public class ProjectileTrails extends EffectUtils implements Listener {
         }.runTaskTimer(Mixed.get(), 2, 2);
   }
 
+  private void addColor() {
+    colors = new ArrayList<>();
+
+    colors.add(Color.BLUE);
+    colors.add(Color.LIME);
+    colors.add(Color.ORANGE);
+    colors.add(Color.PURPLE);
+    colors.add(Color.AQUA);
+    colors.add(Color.YELLOW);
+    colors.add(Color.GREEN);
+    colors.add(Color.RED);
+    colors.add(Color.OLIVE);
+    colors.add(Color.MAROON);
+    colors.add(Color.TEAL);
+    colors.add(Color.NAVY);
+  }
+
   public ProjectileTrails(Plugin plugin) {
     addProjectiles();
+    addColor();
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
 }

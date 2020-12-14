@@ -136,8 +136,10 @@ public class KillEffectsGUI extends EffectUtils implements Listener {
             if (player.hasPermission("pgm.group.donor")) {
               MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
               audience.sendMessage(
-                  Component.text("You selected", NamedTextColor.GREEN)
-                      .append(Component.text(" DONOR kill effect.", NamedTextColor.YELLOW)));
+                  Component.text("You selected ", NamedTextColor.GREEN)
+                      .append(
+                          Component.text("DONOR", NamedTextColor.YELLOW)
+                              .append(Component.text(" kill effect.", NamedTextColor.GREEN))));
             } else {
               audience.sendMessage(
                   Component.text("You don't have the donor rank", NamedTextColor.RED));

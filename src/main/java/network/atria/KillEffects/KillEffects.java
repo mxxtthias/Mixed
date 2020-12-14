@@ -38,7 +38,6 @@ public class KillEffects extends EffectUtils implements Listener {
     config
         .getConfigurationSection("KILL_EFFECT")
         .getKeys(false)
-        .parallelStream()
         .forEach(
             effect ->
                 effects.add(
@@ -77,13 +76,13 @@ public class KillEffects extends EffectUtils implements Listener {
                   murder.getBukkit(),
                   api.BLOCK_CRACK()
                       .of(Material.REDSTONE_BLOCK)
-                      .packet(true, location, 0.75D, 1.5D, 0.75D, 0.1D, 100));
+                      .packet(true, location, 0.5D, 1.5D, 0.5D, 0.1D, 100));
               break;
 
             case "HEART":
               sendEffectPacket(
                   murder.getBukkit(),
-                  api.HEART().packet(true, location, 0.75D, 0.75D, 0.75D, 0.01D, 80));
+                  api.HEART().packet(true, location, 0.75D, 0.85D, 0.75D, 0.01D, 50));
               break;
 
             case "SMOKE":
@@ -120,8 +119,14 @@ public class KillEffects extends EffectUtils implements Listener {
 
             case "DONOR":
               double radius = 1.2d;
-              Location Location = victim.getBukkit().getLocation().add(0.0d, 2.5d, 0.0d);
+              Location Location = victim.getBukkit().getLocation().add(0.0D, 2.5D, 0.0D);
               int point = 30;
+
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.REDSTONE()
+                      .packetColored(
+                          true, location, colors.get(new Random().nextInt(colors.size()))));
 
               for (int i = 0; i < point; i++) {
                 double circle = 2 * Math.PI * i / point;
@@ -138,10 +143,6 @@ public class KillEffects extends EffectUtils implements Listener {
 
                 api.createPlayerConnection(murder.getBukkit()).sendPacket(packet);
               }
-
-              sendEffectPacket(
-                  murder.getBukkit(),
-                  api.SPELL_MOB().packet(true, location, 0.5D, 0.5D, 0.5D, 0.001D, 80));
               break;
             case "SPHERE":
               MatchPlayer finalMurder = murder;
@@ -162,7 +163,7 @@ public class KillEffects extends EffectUtils implements Listener {
 
                     sendEffectPacket(
                         finalMurder.getBukkit(),
-                        api.CRIT_MAGIC().packet(true, location, 0D, 0D, 0D, 0.1D, 80));
+                        api.CRIT_MAGIC().packet(true, location, 0D, 0D, 0D, 0.1D, 60));
                     location.subtract(x, y, z);
                   }
                   if (phi > 2 * Math.PI) {
@@ -173,9 +174,14 @@ public class KillEffects extends EffectUtils implements Listener {
               break;
 
             case "MAGIC":
+              Color[] magic = {Color.PURPLE, Color.FUCHSIA};
               sendEffectPacket(
                   murder.getBukkit(),
-                  api.SPELL_WITCH().packet(true, location, 0.5D, 1D, 0.5D, 0.1D, 100));
+                  api.REDSTONE()
+                      .packetColored(true, location, magic[new Random().nextInt(magic.length)]));
+              sendEffectPacket(
+                  murder.getBukkit(),
+                  api.SPELL_MOB_AMBIENT().packet(false, location, 0D, 0D, 0D, 0.1D, 100));
               break;
           }
         }
@@ -194,6 +200,10 @@ public class KillEffects extends EffectUtils implements Listener {
     colors.add(Color.YELLOW);
     colors.add(Color.GREEN);
     colors.add(Color.RED);
+    colors.add(Color.OLIVE);
+    colors.add(Color.MAROON);
+    colors.add(Color.TEAL);
+    colors.add(Color.NAVY);
   }
 
   public KillEffects(Plugin plugin) {
