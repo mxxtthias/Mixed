@@ -2,8 +2,7 @@ package network.atria;
 
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
-import com.github.fierioziy.particlenativeapi.api.utils.ParticleException;
-import com.github.fierioziy.particlenativeapi.core.ParticleNativeCore;
+import com.github.fierioziy.particlenativeapi.plugin.ParticleNativePlugin;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -14,6 +13,7 @@ import network.atria.Commands.graph.CommandGraph;
 import network.atria.Database.*;
 import network.atria.KillEffects.*;
 import network.atria.Listener.MatchEvents;
+import network.atria.RankSystem.Ranks;
 import network.atria.Task.BroadCastMessage;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.RanksConfig;
@@ -32,7 +32,6 @@ public class Mixed extends JavaPlugin implements Listener {
   private long uptime;
   private BukkitAudiences audiences;
   private final FileConfiguration config = getConfig();
-  private Particles_1_8 particles;
 
   @Override
   public void onEnable() {
@@ -49,11 +48,9 @@ public class Mixed extends JavaPlugin implements Listener {
     database.createTables();
     registerCommands();
     registerEvents();
-    loadParticleAPI();
-
+    Ranks.createRank();
     this.audiences = BukkitAudiences.create(this);
     this.uptime = System.currentTimeMillis();
-
     BroadCastMessage broadCastMessage = new BroadCastMessage();
     broadCastMessage.randomMessage();
 
@@ -66,15 +63,6 @@ public class Mixed extends JavaPlugin implements Listener {
       MySQL.getHikari().close();
     }
     super.onDisable();
-  }
-
-  private void loadParticleAPI() {
-    try {
-      ParticleNativeAPI api = ParticleNativeCore.loadAPI(this);
-      particles = api.getParticles_1_8();
-    } catch (ParticleException e) {
-      e.printStackTrace();
-    }
   }
 
   private void registerEvents() {
