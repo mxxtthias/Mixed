@@ -1,4 +1,4 @@
-package network.atria.KillEffects;
+package network.atria.Effects.GUI;
 
 import java.util.Optional;
 import java.util.Set;
@@ -10,8 +10,9 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
+import network.atria.Effects.Particles.Effect;
+import network.atria.Effects.Particles.KillEffects;
 import network.atria.Mixed;
-import network.atria.Util.EffectUtils;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.TextFormat;
 import org.bukkit.DyeColor;
@@ -29,7 +30,7 @@ import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.player.MatchPlayer;
 
-public class KillEffectsGUI extends EffectUtils implements Listener {
+public class KillEffectsGUI extends CustomGUI implements Listener {
 
   public static Inventory effect;
   private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
@@ -38,7 +39,7 @@ public class KillEffectsGUI extends EffectUtils implements Listener {
 
   public KillEffectsGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    effect = createGUI(title);
+    effect = createGUI(title, 27);
   }
 
   @EventHandler
@@ -75,7 +76,7 @@ public class KillEffectsGUI extends EffectUtils implements Listener {
                       config.getString("KILL_EFFECT." + effect + ".material").toUpperCase());
               int number = config.getInt("KILL_EFFECT." + effect + ".number");
 
-              setItemGUI(
+              setItem(
                   KillEffectsGUI.effect,
                   number,
                   material,
@@ -84,7 +85,7 @@ public class KillEffectsGUI extends EffectUtils implements Listener {
                   canUseEffects(uuid, effectPoint(effect)));
             });
 
-    setItemGUI(
+    setItem(
         effect,
         18,
         Material.GOLD_NUGGET,
@@ -119,35 +120,21 @@ public class KillEffectsGUI extends EffectUtils implements Listener {
 
       if (effect.isPresent()) {
         selectEffect(player, effect.get());
-        player.closeInventory();
       } else {
-        switch (clickedItem.getItemMeta().getDisplayName().substring(2)) {
-          case "Go to previous page ➡":
-            player.openInventory(DefaultGUI.gui);
-            break;
-          case "Reset Kill Effect":
-            MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
+        if (clickedItem.getItemMeta().getDisplayName().substring(2).equalsIgnoreCase("DONOR"))
+          if (player.hasPermission("pgm.group.donor")) {
+            MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
             audience.sendMessage(
-                Component.text("Reset your ", NamedTextColor.GREEN)
-                    .append(Component.text("Kill Effect", NamedTextColor.YELLOW)));
-            player.closeInventory();
-            break;
-          case "DONOR":
-            if (player.hasPermission("pgm.group.donor")) {
-              MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
-              audience.sendMessage(
-                  Component.text("You selected ", NamedTextColor.GREEN)
-                      .append(
-                          Component.text("DONOR", NamedTextColor.YELLOW)
-                              .append(Component.text(" kill effect.", NamedTextColor.GREEN))));
-            } else {
-              audience.sendMessage(
-                  Component.text("You don't have the donor rank", NamedTextColor.RED));
-            }
-            player.closeInventory();
-            break;
-        }
+                Component.text("You selected ", NamedTextColor.GREEN)
+                    .append(
+                        Component.text("DONOR", NamedTextColor.YELLOW)
+                            .append(Component.text(" kill effect.", NamedTextColor.GREEN))));
+          } else {
+            audience.sendMessage(
+                Component.text("You don't have the donor rank", NamedTextColor.RED));
+          }
       }
+      player.closeInventory();
     }
   }
 

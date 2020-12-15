@@ -1,4 +1,4 @@
-package network.atria.KillEffects;
+package network.atria.Effects.GUI;
 
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
@@ -34,7 +34,6 @@ public class DefaultGUI implements Listener {
   }
 
   private void addIconItems(Player player) {
-
     ItemStack close = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
     ItemMeta meta = close.getItemMeta();
     HashMap<String, String> effects = getSelectingEffects(player.getUniqueId());

@@ -1,4 +1,4 @@
-package network.atria.KillEffects;
+package network.atria.Effects.Particles;
 
 import static java.lang.Math.*;
 
@@ -9,7 +9,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
-import network.atria.Util.EffectUtils;
 import network.atria.Util.KillEffectsConfig;
 import org.bukkit.Color;
 import org.bukkit.Location;
@@ -22,7 +21,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
 
-public class KillEffects extends EffectUtils implements Listener {
+public class KillEffects extends ParticleAPI implements Listener {
 
   private static Set<Effect> effects;
   private List<Color> colors;

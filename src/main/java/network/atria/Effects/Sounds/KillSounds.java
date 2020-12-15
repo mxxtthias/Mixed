@@ -1,16 +1,13 @@
-package network.atria.KillEffects;
+package network.atria.Effects.Sounds;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
-import network.atria.Mixed;
-import network.atria.Util.EffectUtils;
+import network.atria.Effects.Particles.Effect;
 import network.atria.Util.KillEffectsConfig;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
@@ -19,12 +16,10 @@ import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
-import tc.oc.pgm.api.setting.SettingKey;
-import tc.oc.pgm.api.setting.SettingValue;
 import tc.oc.pgm.events.ListenerScope;
 
 @ListenerScope(MatchScope.RUNNING)
-public class KillSounds extends EffectUtils implements Listener {
+public class KillSounds extends SoundAPI implements Listener {
 
   private static Set<Effect> sounds;
 
@@ -46,13 +41,6 @@ public class KillSounds extends EffectUtils implements Listener {
                         Component.text(sound, NamedTextColor.GREEN, TextDecoration.BOLD),
                         config.getInt("KILL_SOUND." + sound + ".points"),
                         config.getBoolean("KILL_SOUND." + sound + ".donor"))));
-  }
-
-  private void playSound(MatchPlayer player, String key, Float pitch) {
-    if (player.getSettings().getValue(SettingKey.SOUNDS).equals(SettingValue.SOUNDS_ALL)) {
-      Sound sound = Sound.sound(Key.key(key), Sound.Source.MASTER, 2f, pitch);
-      Mixed.get().getAudience().player(player.getBukkit()).playSound(sound);
-    }
   }
 
   @EventHandler

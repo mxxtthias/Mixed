@@ -1,4 +1,4 @@
-package network.atria.KillEffects;
+package network.atria.Effects.Particles;
 
 import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
 import com.github.fierioziy.particlenativeapi.api.types.ParticleType;
@@ -8,7 +8,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
-import network.atria.Util.EffectUtils;
 import network.atria.Util.KillEffectsConfig;
 import org.bukkit.Color;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,7 +21,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class ProjectileTrails extends EffectUtils implements Listener {
+public class ProjectileTrails extends ParticleAPI implements Listener {
 
   private static Set<Effect> projectiles;
   private List<Color> colors;

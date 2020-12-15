@@ -1,4 +1,4 @@
-package network.atria.KillEffects;
+package network.atria.Effects.GUI;
 
 import java.util.Optional;
 import java.util.Set;
@@ -10,11 +10,11 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
+import network.atria.Effects.Particles.Effect;
+import network.atria.Effects.Sounds.KillSounds;
 import network.atria.Mixed;
-import network.atria.Util.EffectUtils;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.TextFormat;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -24,12 +24,11 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.player.MatchPlayer;
 
-public class KillSoundsGUI extends EffectUtils implements Listener {
+public class KillSoundsGUI extends CustomGUI implements Listener {
 
   public static Inventory sound;
   private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
@@ -38,7 +37,7 @@ public class KillSoundsGUI extends EffectUtils implements Listener {
 
   public KillSoundsGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    sound = createGUI(title);
+    sound = createGUI(title, 27);
   }
 
   @EventHandler
@@ -50,20 +49,6 @@ public class KillSoundsGUI extends EffectUtils implements Listener {
   }
 
   private void addIconItems(UUID uuid) {
-    ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
-    ItemMeta reset_meta = reset.getItemMeta();
-
-    reset_meta.setDisplayName(
-        TextFormat.format(Component.text("Reset Kill Sound", NamedTextColor.RED)));
-    reset.setItemMeta(reset_meta);
-
-    ItemStack back = new ItemStack(Material.ARROW, 1);
-    ItemMeta back_meta = back.getItemMeta();
-
-    back_meta.setDisplayName(
-        TextFormat.format(Component.text("Go to previous page ➡", NamedTextColor.RED)));
-    back.setItemMeta(back_meta);
-
     config
         .getConfigurationSection("KILL_SOUND")
         .getKeys(false)
@@ -74,7 +59,7 @@ public class KillSoundsGUI extends EffectUtils implements Listener {
                       config.getString("KILL_SOUND." + sound + ".material").toUpperCase());
               int number = config.getInt("KILL_SOUND." + sound + ".number");
 
-              setItemGUI(
+              setItem(
                   KillSoundsGUI.sound,
                   number,
                   material,
@@ -82,9 +67,6 @@ public class KillSoundsGUI extends EffectUtils implements Listener {
                   Component.empty(),
                   canUseEffects(uuid, getSoundPoint(sound)));
             });
-
-    sound.setItem(26, reset);
-    sound.setItem(8, back);
   }
 
   private Integer getSoundPoint(String sound) {
@@ -113,24 +95,12 @@ public class KillSoundsGUI extends EffectUtils implements Listener {
         selectSound(player, sound.get());
         player.closeInventory();
       } else {
-        switch (clickedItem.getItemMeta().getDisplayName().substring(2)) {
-          case "Go to previous page ➡":
-            player.openInventory(DefaultGUI.gui);
-            break;
-          case "Reset Kill Sound":
-            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
-            audience.sendMessage(
-                Component.text("Reset your ", NamedTextColor.GREEN)
-                    .append(Component.text("Kill Sound", NamedTextColor.YELLOW)));
-            player.closeInventory();
-            break;
-          case "DEFAULT":
-            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
-            audience.sendMessage(
-                Component.text("You selected ", NamedTextColor.GREEN)
-                    .append(Component.text("DEFAULT Kill Sound", NamedTextColor.YELLOW)));
-            player.closeInventory();
-            break;
+        if ("DEFAULT".equals(clickedItem.getItemMeta().getDisplayName().substring(2))) {
+          MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
+          audience.sendMessage(
+              Component.text("You selected ", NamedTextColor.GREEN)
+                  .append(Component.text("DEFAULT Kill Sound", NamedTextColor.YELLOW)));
+          player.closeInventory();
         }
       }
     }
