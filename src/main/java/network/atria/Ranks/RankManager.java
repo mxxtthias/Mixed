@@ -26,7 +26,6 @@ public class RankManager {
                           RanksConfig.getCustomConfig()
                               .getString("Ranks." + section + ".Display-Name")),
                       RanksConfig.getCustomConfig().getInt("Ranks." + section + ".Points")));
-              System.out.println("Added");
             });
   }
 
