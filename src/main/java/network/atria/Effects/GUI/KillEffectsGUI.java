@@ -59,13 +59,6 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
         TextFormat.format(Component.text("Reset Kill Effect", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
 
-    ItemStack back = new ItemStack(Material.ARROW, 1);
-    ItemMeta back_meta = back.getItemMeta();
-
-    back_meta.setDisplayName(
-        TextFormat.format(Component.text("Go to previous page ➡", NamedTextColor.RED)));
-    back.setItemMeta(back_meta);
-
     config
         .getConfigurationSection("KILL_EFFECT")
         .getKeys(false)
@@ -93,7 +86,6 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
         Component.empty(),
         Component.text("- Donor Only -", NamedTextColor.RED, TextDecoration.BOLD));
     effect.setItem(26, reset);
-    effect.setItem(8, back);
   }
 
   private Integer effectPoint(String effectName) {
