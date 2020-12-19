@@ -18,8 +18,8 @@ public class BroadCastMessage {
       public void run() {
         TextComponent component =
             TextComponent.ofChildren(
-                Component.text("[", NamedTextColor.WHITE),
-                Component.text("TIP", NamedTextColor.BLUE),
+                Component.text("[", NamedTextColor.WHITE, TextDecoration.BOLD),
+                Component.text("TIP", NamedTextColor.BLUE, TextDecoration.BOLD),
                 Component.text("] ", NamedTextColor.WHITE, TextDecoration.BOLD),
                 TextFormat.formatAmpersand(random()));
         Bukkit.broadcastMessage(TextFormat.format(component));
@@ -28,7 +28,7 @@ public class BroadCastMessage {
   }
 
   private String random() {
-    List<String> messages = Mixed.get().getConfig().getStringList("Messages");
+    List<String> messages = Mixed.get().getConfig().getStringList("Tips");
     String msg;
 
     int index = (new Random()).nextInt(messages.size());
