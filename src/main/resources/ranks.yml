@@ -1,58 +1,58 @@
 Ranks:
   wood_iii:
-    Display-Name: "&6WOOD III"
+    Display-Name: '&6&lWOOD III'
     Points: 0
   wood_ii:
-    Display-Name: "&6WOOD II"
+    Display-Name: '&6&lWOOD II'
     Points: 250
   wood_i:
-    Display-Name: "&6WOOD I"
+    Display-Name: '&6&lWOOD I'
     Points: 500
   stone_iii:
-    Display-Name: "&7STONE III"
+    Display-Name: '&7&lSTONE III'
     Points: 1000
   stone_ii:
-    Display-Name: "&7STONE II"
+    Display-Name: '&7&lSTONE II'
     Points: 1500
   stone_i:
-    Display-Name: "&7STONE I"
+    Display-Name: '&7&lSTONE I'
     Points: 2000
   iron_iii:
-    Display-Name: "&fIRON III"
+    Display-Name: '&f&lIRON III'
     Points: 3000
   iron_ii:
-    Display-Name: "&fIRON II"
+    Display-Name: '&f&lIRON II'
     Points: 4000
   iron_i:
-    Display-Name: "&fIRON I"
+    Display-Name: '&f&lIRON I'
     Points: 5000
   gold_iii:
-    Display-Name: "&eGOLD III"
+    Display-Name: '&e&lGOLD III'
     Points: 6000
   gold_ii:
-    Display-Name: "&eGOLD II"
+    Display-Name: '&e&lGOLD II'
     Points: 8000
   gold_i:
-    Display-Name: "&eGOLD I"
+    Display-Name: '&e&lGOLD I'
     Points: 10000
   emerald_iii:
-    Display-Name: "&aEMERALD III"
+    Display-Name: '&a&lEMERALD III'
     Points: 12000
   emerald_ii:
-    Display-Name: "&aEMERALD II"
+    Display-Name: '&a&lEMERALD II'
     Points: 15000
   emerald_i:
-    Display-Name: "&aEMERALD I"
+    Display-Name: '&a&lEMERALD I'
     Points: 20000
   diamond_iii:
-    Display-Name: "&bDIAMOND III"
+    Display-Name: '&b&lDIAMOND III'
     Points: 30000
   diamond_ii:
-    Display-Name: "&aDIAMOND II"
+    Display-Name: '&a&lDIAMOND II'
     Points: 40000
   diamond_i:
-    Display-Name: "&aDIAMOND I"
+    Display-Name: '&a&lDIAMOND I'
     Points: 50000
   obsidian:
-    Display-Name: "&5OBSIDIAN"
+    Display-Name: '&5&lOBSIDIAN'
     Points: 100000
