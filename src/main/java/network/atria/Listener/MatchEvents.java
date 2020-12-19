@@ -9,9 +9,9 @@ import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQL;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
-import network.atria.RankSystem.ChatPrefix;
-import network.atria.RankSystem.Rank;
-import network.atria.RankSystem.Ranks;
+import network.atria.Ranks.ChatPrefix;
+import network.atria.Ranks.Rank;
+import network.atria.Ranks.RankManager;
 import network.atria.Util.TextFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -131,8 +131,8 @@ public class MatchEvents implements Listener, MatchModule {
   private void LevelUp(MatchPlayer player) {
     UUID uuid = player.getId();
     ChatPrefix chatPrefix = new ChatPrefix();
-    Ranks ranks = new Ranks();
-    Rank next = ranks.getNextRank(uuid);
+    RankManager rankManager = new RankManager();
+    Rank next = rankManager.getNextRank(uuid);
 
     TextComponent RANK_UP =
         TextComponent.ofChildren(
@@ -140,7 +140,7 @@ public class MatchEvents implements Listener, MatchModule {
             Component.text(" Rank UP! ", NamedTextColor.RED, TextDecoration.BOLD),
             Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD),
             Component.newline(),
-            ranks.getRank(MySQLSetterGetter.getRank(uuid)).getColoredName(),
+            rankManager.getRank(MySQLSetterGetter.getRank(uuid)).getColoredName(),
             Component.text(" ⇒ ", NamedTextColor.GRAY, TextDecoration.BOLD),
             next.getColoredName(),
             Component.newline(),
@@ -152,7 +152,7 @@ public class MatchEvents implements Listener, MatchModule {
             Component.text(" has rank up to ", NamedTextColor.RED),
             next.getColoredName());
 
-    if (ranks.RankUP(uuid)) {
+    if (rankManager.RankUP(uuid)) {
       Bukkit.broadcastMessage(TextFormat.format(BROADCAST_RANK_UP));
       player
           .getBukkit()

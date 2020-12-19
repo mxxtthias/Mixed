@@ -1,4 +1,4 @@
-package network.atria.RankSystem;
+package network.atria.Ranks;
 
 import java.util.UUID;
 import net.luckperms.api.LuckPerms;
@@ -12,11 +12,11 @@ public class ChatPrefix {
   public void setPrefixPermission(UUID uuid) {
     LuckPerms api = LuckPermsProvider.get();
     User user = api.getUserManager().getUser(uuid);
-    Ranks ranks = new Ranks();
+    RankManager rankManager = new RankManager();
 
     if (user != null) {
-      removeGroup(user, ranks.getRank(MySQLSetterGetter.getRank(uuid)).getName());
-      addGroup(user, ranks.getNextRank(uuid).getName());
+      removeGroup(user, rankManager.getRank(MySQLSetterGetter.getRank(uuid)).getName());
+      addGroup(user, rankManager.getNextRank(uuid).getName());
       api.getUserManager().saveUser(user);
     }
   }

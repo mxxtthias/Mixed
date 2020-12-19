@@ -11,9 +11,12 @@ import net.luckperms.api.node.types.PermissionNode;
 import network.atria.Commands.graph.CommandExecutor;
 import network.atria.Commands.graph.CommandGraph;
 import network.atria.Database.*;
-import network.atria.KillEffects.*;
+import network.atria.Effects.GUI.*;
+import network.atria.Effects.Particles.KillEffects;
+import network.atria.Effects.Particles.ProjectileTrails;
+import network.atria.Effects.Sounds.KillSounds;
 import network.atria.Listener.MatchEvents;
-import network.atria.RankSystem.Ranks;
+import network.atria.Ranks.RankManager;
 import network.atria.Task.BroadCastMessage;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.RanksConfig;
@@ -36,7 +39,6 @@ public class Mixed extends JavaPlugin implements Listener {
   @Override
   public void onEnable() {
     instance = this;
-
     new RanksConfig(this, "ranks.yml");
     new KillEffectsConfig(this, "killeffects.yml");
 
@@ -48,12 +50,12 @@ public class Mixed extends JavaPlugin implements Listener {
     database.createTables();
     registerCommands();
     registerEvents();
-    Ranks.createRank();
     this.audiences = BukkitAudiences.create(this);
     this.uptime = System.currentTimeMillis();
+    RankManager rankManager = new RankManager();
+    rankManager.createRank();
     BroadCastMessage broadCastMessage = new BroadCastMessage();
     broadCastMessage.randomMessage();
-
     super.onEnable();
   }
 
@@ -69,6 +71,7 @@ public class Mixed extends JavaPlugin implements Listener {
     PluginManager pm = Bukkit.getServer().getPluginManager();
 
     pm.registerEvents(this, this);
+    pm.registerEvents(new CustomGUI(), this);
     new KillEffectsGUI(this);
     new KillSoundsGUI(this);
     new DefaultGUI(this);

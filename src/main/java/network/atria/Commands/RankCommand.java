@@ -9,50 +9,50 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
-import network.atria.RankSystem.Rank;
-import network.atria.RankSystem.Ranks;
+import network.atria.Ranks.Rank;
+import network.atria.Ranks.RankManager;
 import org.bukkit.entity.Player;
 
-public class CheckRankCommand {
+public class RankCommand {
 
   @Command(
       aliases = {"rank"},
-      desc = "Show Currently Effect Points")
+      desc = "Show Currently your Rank and Points")
   public void rank(@Sender Player sender) {
-    Ranks ranks = new Ranks();
-
+    RankManager rankManager = new RankManager();
     UUID uuid = sender.getUniqueId();
-    Rank now = ranks.getRank(MySQLSetterGetter.getRank(uuid));
-    Rank next = ranks.getNextRank(uuid);
+    Rank NOW = rankManager.getRank(MySQLSetterGetter.getRank(uuid));
+    Rank NEXT = rankManager.getNextRank(uuid);
 
     TextComponent points =
         TextComponent.ofChildren(
             Component.text("Rank: ", NamedTextColor.DARK_AQUA),
-            now.getColoredName(),
+            NOW.getColoredName(),
             Component.newline(),
             Component.text("Your current points are ", NamedTextColor.DARK_AQUA),
             Component.text(
-                String.valueOf(now.getPoint()), NamedTextColor.AQUA, TextDecoration.BOLD));
+                MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
 
     Mixed.get().getAudience().player(sender).sendMessage(points);
 
-    if (next.getName().equalsIgnoreCase(now.getName())) {
+    if (NEXT.getName().equalsIgnoreCase(NOW.getName())) {
       TextComponent rejected =
           TextComponent.ofChildren(
-              Component.text("You can't rank up because you're "), now.getColoredName());
+              Component.text("You can't rank up because you're ", NamedTextColor.RED),
+              NOW.getColoredName());
       Mixed.get().getAudience().player(sender).sendMessage(rejected);
     } else {
-      TextComponent need =
+      TextComponent NEED =
           TextComponent.ofChildren(
               Component.text("You need ", NamedTextColor.DARK_AQUA),
               Component.text(
-                  String.valueOf(ranks.getRequirePoint(uuid)),
+                  String.valueOf(rankManager.getRequirePoint(uuid)),
                   NamedTextColor.AQUA,
                   TextDecoration.BOLD),
               Component.text(" more points to be ", NamedTextColor.DARK_AQUA),
-              ranks.getNextRank(uuid).getColoredName());
+              NEXT.getColoredName());
 
-      Mixed.get().getAudience().player(sender).sendMessage(need);
+      Mixed.get().getAudience().player(sender).sendMessage(NEED);
     }
   }
 }

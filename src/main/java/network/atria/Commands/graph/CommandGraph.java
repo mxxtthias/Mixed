@@ -2,10 +2,10 @@ package network.atria.Commands.graph;
 
 import app.ashcon.intake.bukkit.graph.BasicBukkitCommandGraph;
 import app.ashcon.intake.fluent.DispatcherNode;
-import network.atria.Commands.CheckRankCommand;
+import network.atria.Commands.RankCommand;
 import network.atria.Commands.ServerInfoCommand;
 import network.atria.Commands.StatsCommand;
-import network.atria.KillEffects.DefaultGUI;
+import network.atria.Effects.GUI.DefaultGUI;
 import network.atria.Mixed;
 
 public class CommandGraph extends BasicBukkitCommandGraph {
@@ -18,7 +18,7 @@ public class CommandGraph extends BasicBukkitCommandGraph {
     register(new ServerInfoCommand());
     register(new StatsCommand());
     register(new DefaultGUI(Mixed.get()));
-    register(new CheckRankCommand());
+    register(new RankCommand());
   }
 
   public void register(Object command, String... aliases) {
