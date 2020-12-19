@@ -15,6 +15,7 @@ import network.atria.Effects.Particles.ProjectileTrails;
 import network.atria.Mixed;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.TextFormat;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -24,6 +25,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.player.MatchPlayer;
@@ -49,6 +51,14 @@ public class ProjectileGUI extends CustomGUI implements Listener {
   }
 
   private void addIconItems(UUID uuid) {
+    ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
+    ItemMeta reset_meta = reset.getItemMeta();
+
+    reset_meta.setDisplayName(
+            TextFormat.format(Component.text("Reset Projectile Trails", NamedTextColor.RED)));
+    reset.setItemMeta(reset_meta);
+    projectile.setItem(26, reset);
+
     config
         .getConfigurationSection("PROJECTILE_TRAILS")
         .getKeys(false)

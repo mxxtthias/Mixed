@@ -58,6 +58,7 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
     reset_meta.setDisplayName(
         TextFormat.format(Component.text("Reset Kill Effect", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
+    effect.setItem(26, reset);
 
     config
         .getConfigurationSection("KILL_EFFECT")
@@ -85,7 +86,6 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
         Component.text("DONOR", NamedTextColor.GOLD),
         Component.empty(),
         Component.text("- Donor Only -", NamedTextColor.RED, TextDecoration.BOLD));
-    effect.setItem(26, reset);
   }
 
   private Integer effectPoint(String effectName) {
