@@ -24,7 +24,7 @@ public class ServerInfoCommand {
 
   @Command(
       aliases = {"site", "website"},
-      desc = "Send Atria Network's Webiste Link")
+      desc = "Send Atria Network's Website Link")
   public void site(@Sender Player sender) {
     TextComponent component =
         TextComponent.ofChildren(
