@@ -29,7 +29,6 @@ public class RankCommand {
     points.append(NOW.getColoredName());
     points.append(Component.newline());
     points.append(Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
-    points.append(Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
     points.append(
         Component.text(
             MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
