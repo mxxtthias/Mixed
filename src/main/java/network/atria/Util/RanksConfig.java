@@ -15,10 +15,6 @@ public class RanksConfig {
   private static String file;
   private static Plugin plugin;
 
-  public RanksConfig(Plugin plugin) {
-    this(plugin, null);
-  }
-
   public RanksConfig(Plugin plugin, String fileName) {
     RanksConfig.plugin = plugin;
     file = fileName;

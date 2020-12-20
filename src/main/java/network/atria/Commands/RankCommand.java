@@ -29,8 +29,9 @@ public class RankCommand {
     points.append(NOW.getColoredName());
     points.append(Component.newline());
     points.append(Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
-    points.append( Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
-    points.append(Component.text(
+    points.append(Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
+    points.append(
+        Component.text(
             MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
 
     Mixed.get().getAudience().player(sender).sendMessage(points.build());
@@ -44,8 +45,7 @@ public class RankCommand {
     } else {
       TextComponent.Builder NEED = Component.text();
       NEED.append(Component.text("You need ", NamedTextColor.DARK_AQUA));
-      NEED.append(Component.text(
-              String.valueOf(rankManager.getRequirePoint(uuid))));
+      NEED.append(Component.text(String.valueOf(rankManager.getRequirePoint(uuid))));
       NEED.append(Component.text(" more points to be ", NamedTextColor.DARK_AQUA));
       NEED.append(NEXT.getColoredName());
 

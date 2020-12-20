@@ -17,7 +17,8 @@ public class ServerInfoCommand {
   public void discord(@Sender Player sender) {
     TextComponent.Builder component = Component.text();
     component.append(Component.text("Discord: ", NamedTextColor.DARK_AQUA, TextDecoration.BOLD));
-    component.append(Component.text("https://discord.gg/X3F6S6m", NamedTextColor.AQUA, TextDecoration.BOLD));
+    component.append(
+        Component.text("https://discord.gg/X3F6S6m", NamedTextColor.AQUA, TextDecoration.BOLD));
 
     Mixed.get().getAudience().player(sender).sendMessage(component.build());
   }
@@ -28,7 +29,8 @@ public class ServerInfoCommand {
   public void site(@Sender Player sender) {
     TextComponent.Builder component = Component.text();
     component.append(Component.text("Website: ", NamedTextColor.DARK_AQUA, TextDecoration.BOLD));
-    component.append(Component.text("https://atria.network/", NamedTextColor.AQUA, TextDecoration.BOLD));
+    component.append(
+        Component.text("https://atria.network/", NamedTextColor.AQUA, TextDecoration.BOLD));
 
     Mixed.get().getAudience().player(sender).sendMessage(component.build());
   }

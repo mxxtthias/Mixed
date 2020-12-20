@@ -137,7 +137,6 @@ public class MatchEvents implements Listener, MatchModule {
     RANK_UP.append(Component.newline());
     RANK_UP.append(Component.text("〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
 
-
     TextComponent.Builder BROADCAST_RANK_UP = Component.text();
     BROADCAST_RANK_UP.append(Component.text(player.getPrefixedName()));
     BROADCAST_RANK_UP.append(Component.text(" has rank up to ", NamedTextColor.RED));
