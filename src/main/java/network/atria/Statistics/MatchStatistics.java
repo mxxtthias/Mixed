@@ -16,7 +16,6 @@ public class MatchStatistics {
         storeStatistics.getKills().get(uuid) == null
             ? new AtomicInteger()
             : storeStatistics.getKills().get(uuid);
-    if (kills == null) kills = new AtomicInteger();
     kills.incrementAndGet();
     storeStatistics.getKills().put(uuid, kills);
   }
@@ -26,7 +25,6 @@ public class MatchStatistics {
         storeStatistics.getDeaths().get(uuid) == null
             ? new AtomicInteger()
             : storeStatistics.getDeaths().get(uuid);
-    if (deaths == null) deaths = new AtomicInteger();
     deaths.incrementAndGet();
     storeStatistics.getDeaths().put(uuid, deaths);
   }
