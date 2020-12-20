@@ -15,8 +15,9 @@ import network.atria.Effects.GUI.*;
 import network.atria.Effects.Particles.KillEffects;
 import network.atria.Effects.Particles.ProjectileTrails;
 import network.atria.Effects.Sounds.KillSounds;
-import network.atria.Listener.MatchEvents;
 import network.atria.Ranks.RankManager;
+import network.atria.Statistics.MatchEvents;
+import network.atria.Statistics.MatchStatistics;
 import network.atria.Task.BroadCastMessage;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.RanksConfig;
@@ -31,8 +32,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Mixed extends JavaPlugin implements Listener {
 
-  public static Mixed instance;
+  private static Mixed instance;
   private long uptime;
+  private MatchStatistics statistics;
   private BukkitAudiences audiences;
   private final FileConfiguration config = getConfig();
 
@@ -52,6 +54,7 @@ public class Mixed extends JavaPlugin implements Listener {
     registerEvents();
     this.audiences = BukkitAudiences.create(this);
     this.uptime = System.currentTimeMillis();
+    statistics = new MatchStatistics();
     RankManager rankManager = new RankManager();
     rankManager.createRank();
     BroadCastMessage broadCastMessage = new BroadCastMessage();
@@ -121,5 +124,9 @@ public class Mixed extends JavaPlugin implements Listener {
   public Particles_1_8 getParticles() {
     ParticleNativeAPI api = ParticleNativePlugin.getAPI();
     return api.getParticles_1_8();
+  }
+
+  public MatchStatistics getStatistics() {
+    return statistics;
   }
 }

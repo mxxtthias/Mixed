@@ -38,17 +38,17 @@ public class MySQLSetterGetter {
     Statement statement = null;
     Connection connection = null;
     String query =
-        "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
+        "INSERT INTO STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, POINTS) VALUES ('"
             + uuid
-            + "', '0', '0', '0', '0', '0', '0', 'Null');";
+            + "', 'Null', '0', '0', '0', '0', '0', '0', '0');";
     String query2 =
-        "INSERT INTO STATS(UUID, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, NAME) VALUES ('"
+        "INSERT INTO WEEK_STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, POINTS) VALUES ('"
             + uuid
-            + "', '0', '0', '0', '0', '0', '0', 'Null');";
+            + "', 'Null', '0', '0', '0', '0', '0', '0', '0');";
     String query3 =
-        "INSERT INTO RANKS(UUID, NAME, POINTS, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('"
+        "INSERT INTO RANKS(UUID, NAME, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('"
             + uuid
-            + "', 'Null', '0', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');";
+            + "', 'Null', 'wood_iii', 'NONE', 'DEFAULT', 'NONE');";
     if (!playerExists(uuid)) {
       try {
         connection = MySQL.getHikari().getConnection();
@@ -132,7 +132,7 @@ public class MySQLSetterGetter {
     try {
       connection = MySQL.getHikari().getConnection();
       statement =
-          connection.prepareStatement("SELECT POINTS FROM RANKS WHERE UUID= '" + uuid + "'");
+          connection.prepareStatement("SELECT POINTS FROM STATS WHERE UUID= '" + uuid + "'");
       rs = statement.executeQuery();
       if (rs.next()) i = rs.getInt("POINTS");
     } catch (SQLException e) {
@@ -237,7 +237,7 @@ public class MySQLSetterGetter {
       connection = MySQL.getHikari().getConnection();
       statement =
           connection.prepareStatement(
-              "UPDATE RANKS SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
+              "UPDATE STATS SET POINTS= '" + points + "' WHERE UUID= '" + uuid + "';");
       statement.executeUpdate();
     } catch (SQLException e) {
       e.printStackTrace();
