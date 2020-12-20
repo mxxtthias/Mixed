@@ -16,13 +16,13 @@ public class BroadCastMessage {
     new BukkitRunnable() {
       @Override
       public void run() {
-        TextComponent component =
-            TextComponent.ofChildren(
-                Component.text("[", NamedTextColor.WHITE, TextDecoration.BOLD),
-                Component.text("TIP", NamedTextColor.BLUE, TextDecoration.BOLD),
-                Component.text("] ", NamedTextColor.WHITE, TextDecoration.BOLD),
-                TextFormat.formatAmpersand(random()));
-        Bukkit.broadcastMessage(TextFormat.format(component));
+        TextComponent.Builder component = Component.text();
+        component.append(Component.text("[", NamedTextColor.WHITE, TextDecoration.BOLD));
+        component.append(Component.text("TIP", NamedTextColor.BLUE, TextDecoration.BOLD));
+        component.append(Component.text("] ", NamedTextColor.WHITE, TextDecoration.BOLD));
+        component.append(TextFormat.formatAmpersand(random()));
+
+        Mixed.get().getAudience().players().sendMessage(component.build());
       }
     }.runTaskTimer(Mixed.get(), 0L, 20 * 60 * 5);
   }

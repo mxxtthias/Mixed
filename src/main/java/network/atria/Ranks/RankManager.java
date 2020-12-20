@@ -18,15 +18,14 @@ public class RankManager {
         .getConfigurationSection("Ranks")
         .getKeys(false)
         .forEach(
-            section -> {
-              ranks.add(
-                  new Rank(
-                      section,
-                      TextFormat.formatAmpersand(
-                          RanksConfig.getCustomConfig()
-                              .getString("Ranks." + section + ".Display-Name")),
-                      RanksConfig.getCustomConfig().getInt("Ranks." + section + ".Points")));
-            });
+            section ->
+                ranks.add(
+                    new Rank(
+                        section,
+                        TextFormat.formatAmpersand(
+                            RanksConfig.getCustomConfig()
+                                .getString("Ranks." + section + ".Display-Name")),
+                        RanksConfig.getCustomConfig().getInt("Ranks." + section + ".Points"))));
   }
 
   public Rank getNextRank(UUID uuid) {

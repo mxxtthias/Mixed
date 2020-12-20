@@ -24,35 +24,32 @@ public class RankCommand {
     Rank NOW = rankManager.getRank(MySQLSetterGetter.getRank(uuid));
     Rank NEXT = rankManager.getNextRank(uuid);
 
-    TextComponent points =
-        TextComponent.ofChildren(
-            Component.text("Rank: ", NamedTextColor.DARK_AQUA),
-            NOW.getColoredName(),
-            Component.newline(),
-            Component.text("Your current points are ", NamedTextColor.DARK_AQUA),
-            Component.text(
-                MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
+    TextComponent.Builder points = Component.text();
+    points.append(Component.text("Rank: ", NamedTextColor.DARK_AQUA));
+    points.append(NOW.getColoredName());
+    points.append(Component.newline());
+    points.append(Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
+    points.append( Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
+    points.append(Component.text(
+            MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
 
-    Mixed.get().getAudience().player(sender).sendMessage(points);
+    Mixed.get().getAudience().player(sender).sendMessage(points.build());
 
     if (NEXT.getName().equalsIgnoreCase(NOW.getName())) {
-      TextComponent rejected =
-          TextComponent.ofChildren(
-              Component.text("You can't rank up because you're ", NamedTextColor.RED),
-              NOW.getColoredName());
-      Mixed.get().getAudience().player(sender).sendMessage(rejected);
-    } else {
-      TextComponent NEED =
-          TextComponent.ofChildren(
-              Component.text("You need ", NamedTextColor.DARK_AQUA),
-              Component.text(
-                  String.valueOf(rankManager.getRequirePoint(uuid)),
-                  NamedTextColor.AQUA,
-                  TextDecoration.BOLD),
-              Component.text(" more points to be ", NamedTextColor.DARK_AQUA),
-              NEXT.getColoredName());
+      TextComponent.Builder rejected = Component.text();
+      rejected.append(Component.text("You can't rank up because you're ", NamedTextColor.RED));
+      rejected.append(NOW.getColoredName());
 
-      Mixed.get().getAudience().player(sender).sendMessage(NEED);
+      Mixed.get().getAudience().player(sender).sendMessage(rejected.build());
+    } else {
+      TextComponent.Builder NEED = Component.text();
+      NEED.append(Component.text("You need ", NamedTextColor.DARK_AQUA));
+      NEED.append(Component.text(
+              String.valueOf(rankManager.getRequirePoint(uuid))));
+      NEED.append(Component.text(" more points to be ", NamedTextColor.DARK_AQUA));
+      NEED.append(NEXT.getColoredName());
+
+      Mixed.get().getAudience().player(sender).sendMessage(NEED.build());
     }
   }
 }

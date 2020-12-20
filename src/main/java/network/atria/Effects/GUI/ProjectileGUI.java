@@ -55,7 +55,7 @@ public class ProjectileGUI extends CustomGUI implements Listener {
     ItemMeta reset_meta = reset.getItemMeta();
 
     reset_meta.setDisplayName(
-            TextFormat.format(Component.text("Reset Projectile Trails", NamedTextColor.RED)));
+        TextFormat.format(Component.text("Reset Projectile Trails", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
     projectile.setItem(26, reset);
 

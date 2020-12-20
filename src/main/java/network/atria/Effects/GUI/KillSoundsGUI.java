@@ -55,7 +55,7 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
     ItemMeta reset_meta = reset.getItemMeta();
 
     reset_meta.setDisplayName(
-            TextFormat.format(Component.text("Reset Kill Sound", NamedTextColor.RED)));
+        TextFormat.format(Component.text("Reset Kill Sound", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
     sound.setItem(26, reset);
 

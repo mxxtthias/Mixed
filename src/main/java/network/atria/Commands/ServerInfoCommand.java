@@ -15,33 +15,33 @@ public class ServerInfoCommand {
       aliases = {"discord"},
       desc = "Send Atria Network's Discord Link")
   public void discord(@Sender Player sender) {
-    TextComponent component =
-        TextComponent.ofChildren(
-            Component.text("Discord: ", NamedTextColor.DARK_AQUA, TextDecoration.BOLD),
-            Component.text("https://discord.gg/X3F6S6m", NamedTextColor.AQUA, TextDecoration.BOLD));
-    Mixed.get().getAudience().player(sender).sendMessage(component);
+    TextComponent.Builder component = Component.text();
+    component.append(Component.text("Discord: ", NamedTextColor.DARK_AQUA, TextDecoration.BOLD));
+    component.append(Component.text("https://discord.gg/X3F6S6m", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+    Mixed.get().getAudience().player(sender).sendMessage(component.build());
   }
 
   @Command(
       aliases = {"site", "website"},
       desc = "Send Atria Network's Website Link")
   public void site(@Sender Player sender) {
-    TextComponent component =
-        TextComponent.ofChildren(
-            Component.text("Website: ", NamedTextColor.DARK_AQUA, TextDecoration.BOLD),
-            Component.text("https://atria.network/", NamedTextColor.AQUA, TextDecoration.BOLD));
-    Mixed.get().getAudience().player(sender).sendMessage(component);
+    TextComponent.Builder component = Component.text();
+    component.append(Component.text("Website: ", NamedTextColor.DARK_AQUA, TextDecoration.BOLD));
+    component.append(Component.text("https://atria.network/", NamedTextColor.AQUA, TextDecoration.BOLD));
+
+    Mixed.get().getAudience().player(sender).sendMessage(component.build());
   }
 
   @Command(
       aliases = {"uptime"},
       desc = "Show Server uptime")
   public void uptime(@Sender Player sender) {
-    TextComponent component =
-        TextComponent.ofChildren(
-            Component.text("Server Uptime: ", NamedTextColor.GREEN),
-            Component.text(getUptime(), NamedTextColor.GREEN));
-    Mixed.get().getAudience().player(sender).sendMessage(component);
+    TextComponent.Builder component = Component.text();
+    component.append(Component.text("Server Uptime: ", NamedTextColor.GREEN));
+    component.append(Component.text(getUptime(), NamedTextColor.GREEN));
+
+    Mixed.get().getAudience().player(sender).sendMessage(component.build());
   }
 
   private String getUptime() {

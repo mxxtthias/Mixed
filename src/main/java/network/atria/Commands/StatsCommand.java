@@ -18,8 +18,8 @@ import net.md_5.bungee.api.ChatColor;
 import network.atria.Database.MySQL;
 import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
+import network.atria.Util.UUIDFetcher;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import tc.oc.pgm.api.PGM;
 import tc.oc.pgm.api.player.MatchPlayer;
@@ -35,53 +35,48 @@ public class StatsCommand {
     MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
     if (matchPlayer == null) return;
     if (playerName == null) {
-      showStats(matchPlayer);
+      showStats(matchPlayer, player);
     } else {
-      Player target = Bukkit.getPlayer(playerName);
-      OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(playerName);
-      if (target == null) {
-        if (MySQLSetterGetter.playerExists(offlinePlayer.getUniqueId().toString())) {
-          showStats(matchPlayer);
-        } else {
-          Audience audience = Mixed.get().getAudience().player(matchPlayer.getId());
-          audience.sendMessage(Component.text("The player not found", NamedTextColor.RED));
+      if (Bukkit.getPlayer(playerName).isOnline()) {
+        MatchPlayer target = PGM.get().getMatchManager().getPlayer(Bukkit.getPlayer(playerName));
+        if (target != null) showStats(target, player);
+      } else {
+          if (MySQLSetterGetter.playerExists(UUIDFetcher.getUUID(playerName).toString())) {
+            MatchPlayer offline = PGM.get().getMatchManager().getPlayer(UUIDFetcher.getUUID(playerName));
+            if (offline != null) showStats(offline, player);
+          } else {
+            Audience audience = Mixed.get().getAudience().player(matchPlayer.getId());
+            audience.sendMessage(Component.text("The player not found", NamedTextColor.RED));
+          }
         }
       }
     }
-  }
 
-  private void showStats(MatchPlayer player) {
+  private void showStats(MatchPlayer player, Player sender) {
     Map<String, Integer> stats = getStats(player.getId());
-    TextComponent component =
-        TextComponent.ofChildren(
-            Component.text(
-                LegacyFormatUtils.horizontalLineHeading(player.getPrefixedName(), ChatColor.WHITE)),
-            Component.newline(),
-            formatStats("Kills: ", stats.get("KILLS")),
-            formatStats("Deaths: ", stats.get("DEATHS")),
-            Component.text("K/D: ", NamedTextColor.AQUA)
-                .append(
+    TextComponent.Builder component = Component.text();
+    component.append(Component.text(
+            LegacyFormatUtils.horizontalLineHeading(player.getPrefixedName(), ChatColor.WHITE)));
+    component.append(Component.newline());
+    component.append(formatStats("Kills: ", stats.get("KILLS")));
+    component.append(formatStats("Deaths: ", stats.get("DEATHS")));
+    component.append(Component.text("K/D: ", NamedTextColor.AQUA)
+            .append(
                     Component.text(
-                        kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
-                        NamedTextColor.BLUE)),
-            Component.newline(),
-            formatStats("Wool Placed", stats.get("WOOLS")),
-            formatStats("Cores Leaked", stats.get("CORES")),
-            formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")),
-            formatStats("Flag Captured: ", stats.get("FLAGS")),
-            Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
-    component.append(formatStats("Flag Captured: ", stats.get("FLAGS")));
+                            kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
+                            NamedTextColor.BLUE)));
+    component.append(Component.newline());
+    component.append(formatStats("Wool Placed: ", stats.get("WOOLS")));
+    component.append(formatStats("Cores Leaked: ", stats.get("CORES")));
+    component.append(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
+    component.append(formatStats("Flag Captured: ", stats.get("POINTS")));
     component.append(Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
 
-    Mixed.get().getAudience().player(player.getId()).sendMessage(component);
-    stats.clear();
+    Mixed.get().getAudience().player(sender).sendMessage(component.build());
   }
 
   private TextComponent formatStats(String ladder, int value) {
-    return TextComponent.ofChildren(
-        Component.text(ladder, NamedTextColor.AQUA),
-        Component.text(value, NamedTextColor.BLUE),
-        Component.newline());
+    return Component.text().append(Component.text(ladder, NamedTextColor.AQUA)).append(Component.text(value, NamedTextColor.BLUE)).append(Component.newline()).build();
   }
 
   private BigDecimal kd(int kills, int deaths) {
