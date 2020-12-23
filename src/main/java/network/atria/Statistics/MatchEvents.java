@@ -109,13 +109,14 @@ public class MatchEvents implements Listener, MatchModule {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onMatchFinish(MatchFinishEvent event) {
+    RankManager manager = new RankManager();
     event
         .getMatch()
         .getPlayers()
         .forEach(
             player -> {
               Mixed.get().getStatistics().addPoint(player.getId(), 10);
-              RankUP(player);
+              manager.RankUP(player);
             });
     sendStatsData();
   }
