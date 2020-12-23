@@ -3,18 +3,10 @@ package network.atria.Statistics;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQL;
-import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
-import network.atria.Ranks.ChatPrefix;
-import network.atria.Ranks.Rank;
 import network.atria.Ranks.RankManager;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,7 +28,8 @@ import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
 @ListenerScope(MatchScope.RUNNING)
 public class MatchEvents implements Listener, MatchModule {
 
-  private HashMap<UUID, String> result;
+  private HashMap<UUID, String> totalMap;
+  private HashMap<UUID, String> weeklyMap;
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onMatchStart(MatchStartEvent event) {
@@ -121,77 +114,60 @@ public class MatchEvents implements Listener, MatchModule {
     sendStatsData();
   }
 
-  private void RankUP(MatchPlayer player) {
-    UUID uuid = player.getId();
-    ChatPrefix chatPrefix = new ChatPrefix();
-    RankManager rankManager = new RankManager();
-    Rank next = rankManager.getNextRank(uuid);
-
-    TextComponent.Builder RANK_UP = Component.text();
-    RANK_UP.append(Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
-    RANK_UP.append(Component.text(" Rank UP! ", NamedTextColor.RED, TextDecoration.BOLD));
-    RANK_UP.append(Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
-    RANK_UP.append(Component.newline());
-    RANK_UP.append(rankManager.getRank(MySQLSetterGetter.getRank(uuid)).getColoredName());
-    RANK_UP.append(Component.text(" ⇒ ", NamedTextColor.GRAY, TextDecoration.BOLD));
-    RANK_UP.append(next.getColoredName());
-    RANK_UP.append(Component.newline());
-    RANK_UP.append(Component.text("〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
-
-    TextComponent.Builder BROADCAST_RANK_UP = Component.text();
-    BROADCAST_RANK_UP.append(Component.text(player.getPrefixedName()));
-    BROADCAST_RANK_UP.append(Component.text(" has rank up to ", NamedTextColor.RED));
-    BROADCAST_RANK_UP.append(next.getColoredName());
-
-    if (rankManager.RankUP(uuid)) {
-      Mixed.get().getAudience().players().sendMessage(BROADCAST_RANK_UP.build());
-      player
-          .getBukkit()
-          .playSound(player.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
-      Mixed.get().getAudience().player(player.getId()).sendMessage(RANK_UP.build());
-
-      chatPrefix.setPrefixPermission(uuid);
-      MySQLSetterGetter.setRank(player.getId().toString(), next.getName());
-    }
-  }
-
   private void sendStatsData() {
-    StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
-
     Bukkit.getScheduler()
         .scheduleSyncDelayedTask(
             Mixed.get(),
             new Runnable() {
               @Override
               public void run() {
-                sortStats(store.getKills(), "KILLS");
-                sortStats(store.getDeaths(), "DEATHS");
-                sortStats(store.getWools(), "WOOLS");
-                sortStats(store.getMonuments(), "MONUMENTS");
-                sortStats(store.getCores(), "CORES");
-                sortStats(store.getFlags(), "FLAGS");
-                sortStats(store.getPoints(), "POINTS");
-                update();
+                totalStatsUpdate();
+                weeklyStatsUpdate();
               }
             },
-            10L);
+            15L);
   }
 
-  private void sortStats(Map<UUID, AtomicInteger> map, String column) {
+  private void totalStatsUpdate() {
+    StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
+    sortStats(store.getKills(), totalMap, "KILLS", "STATS");
+    sortStats(store.getDeaths(), totalMap, "DEATHS", "STATS");
+    sortStats(store.getWools(), totalMap, "WOOLS", "STATS");
+    sortStats(store.getMonuments(), totalMap, "MONUMENTS", "STATS");
+    sortStats(store.getCores(), totalMap, "CORES", "STATS");
+    sortStats(store.getFlags(), totalMap, "FLAGS", "STATS");
+    sortStats(store.getPoints(), totalMap, "POINTS", "STATS");
+    update(totalMap, "STATS");
+  }
+
+  private void weeklyStatsUpdate() {
+    StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
+    sortStats(store.getKills(), weeklyMap, "KILLS", "WEEK_STATS");
+    sortStats(store.getDeaths(), weeklyMap, "DEATHS", "WEEK_STATS");
+    sortStats(store.getWools(), weeklyMap, "WOOLS", "WEEK_STATS");
+    sortStats(store.getMonuments(), weeklyMap, "MONUMENTS", "WEEK_STATS");
+    sortStats(store.getCores(), weeklyMap, "CORES", "WEEK_STATS");
+    sortStats(store.getFlags(), weeklyMap, "FLAGS", "WEEK_STATS");
+    sortStats(store.getPoints(), weeklyMap, "POINTS", "WEEK_STATS");
+    update(weeklyMap, "WEEK_STATS");
+  }
+
+  private void sortStats(
+      Map<UUID, AtomicInteger> map, HashMap<UUID, String> result, String column, String table) {
     if (map.isEmpty()) return;
     map.entrySet().stream()
         .filter(stats -> stats.getValue().get() != 0)
         .filter(stats -> result.containsKey(stats.getKey()))
         .forEach(
             stats -> {
-              Map<String, Integer> data = getStats(stats.getKey());
+              Map<String, Integer> data = getStats(stats.getKey(), table);
               int score = stats.getValue().get() + data.get(column);
               result.put(
                   stats.getKey(), result.get(stats.getKey()) + column + " = '" + score + "', ");
             });
   }
 
-  private Map<String, Integer> getStats(UUID uuid) {
+  private Map<String, Integer> getStats(UUID uuid, String table) {
     Map<UUID, String> maps = new HashMap<>(includeMaps(uuid));
     Map<String, Integer> stats = new HashMap<>();
     String column =
@@ -199,7 +175,9 @@ public class MatchEvents implements Listener, MatchModule {
     String query =
         "SELECT "
             + column.substring(0, column.length() - 2)
-            + " FROM STATS WHERE UUID = '"
+            + " FROM "
+            + table
+            + " WHERE UUID = '"
             + uuid.toString()
             + "';";
     maps.clear();
@@ -253,17 +231,13 @@ public class MatchEvents implements Listener, MatchModule {
     return Collections.unmodifiableMap(stats);
   }
 
-  private void update() {
-    result.forEach(
+  private void update(HashMap<UUID, String> map, String table) {
+    map.forEach(
         (key, value) -> {
           Connection connection = null;
           PreparedStatement statement = null;
-          String query =
-              "UPDATE STATS SET "
-                  + value.substring(0, value.length() - 2)
-                  + " WHERE UUID = '"
-                  + key
-                  + "';";
+          String columns = value.substring(0, value.length() - 2);
+          String query = "UPDATE " + table + " SET " + columns + " WHERE UUID = '" + key + "';";
           try {
             connection = MySQL.getHikari().getConnection();
             statement = connection.prepareStatement(query);
@@ -313,9 +287,12 @@ public class MatchEvents implements Listener, MatchModule {
   }
 
   private void addResultMap(UUID uuid) {
-    if (result == null) result = new HashMap<>();
-    if (result.containsKey(uuid)) return;
-    result.put(uuid, "");
+    if (weeklyMap == null) weeklyMap = new HashMap<>();
+    if (totalMap == null) totalMap = new HashMap<>();
+    if (weeklyMap.containsKey(uuid)) return;
+    if (totalMap.containsKey(uuid)) return;
+    totalMap.put(uuid, "");
+    weeklyMap.put(uuid, "");
   }
 
   public MatchEvents(Plugin plugin) {
