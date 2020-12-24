@@ -38,9 +38,9 @@ public class MySQL {
       Statement statement = connection.createStatement();
 
       statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS STATS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, POINTS int);");
+          "CREATE TABLE IF NOT EXISTS STATS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, PLAYTIME int, POINTS int);");
       statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, POINTS int);");
+          "CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, PLAYTIME int, POINTS int);");
       statement.executeUpdate(
           "CREATE TABLE IF NOT EXISTS RANKS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), GAMERANK varchar(20), EFFECT varchar(20), SOUND varchar(20), PROJECTILE varchar(20));");
 

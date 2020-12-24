@@ -3,6 +3,7 @@ package network.atria.Statistics;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class StoreStatistics {
@@ -13,6 +14,7 @@ public class StoreStatistics {
   private final Map<UUID, AtomicInteger> monuments;
   private final Map<UUID, AtomicInteger> cores;
   private final Map<UUID, AtomicInteger> flags;
+  private final Map<UUID, AtomicInteger> playtime;
   private final Map<UUID, AtomicInteger> points;
 
   public StoreStatistics() {
@@ -22,6 +24,7 @@ public class StoreStatistics {
     this.monuments = new HashMap<>();
     this.cores = new HashMap<>();
     this.flags = new HashMap<>();
+    this.playtime = new ConcurrentHashMap<>();
     this.points = new HashMap<>();
   }
 
@@ -47,6 +50,10 @@ public class StoreStatistics {
 
   public Map<UUID, AtomicInteger> getFlags() {
     return flags;
+  }
+
+  public Map<UUID, AtomicInteger> getPlaytime() {
+    return playtime;
   }
 
   public Map<UUID, AtomicInteger> getPoints() {

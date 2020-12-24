@@ -1,14 +1,29 @@
 package network.atria.Statistics;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import network.atria.Mixed;
+import org.bukkit.Bukkit;
+import org.bukkit.scheduler.BukkitTask;
+import tc.oc.pgm.api.match.Match;
 
 public class MatchStatistics {
 
   private StoreStatistics storeStatistics;
+  private final Map<UUID, BukkitTask> playtimeTask;
+
+  public MatchStatistics() {
+    this.playtimeTask = new ConcurrentHashMap<>();
+  }
 
   public void newMatch() {
     this.storeStatistics = new StoreStatistics();
+  }
+
+  public void endMatch() {
+    clearPlaytime();
   }
 
   public void addKill(UUID uuid) {
@@ -72,6 +87,35 @@ public class MatchStatistics {
             : storeStatistics.getPoints().get(uuid);
     points.addAndGet(point);
     storeStatistics.getPoints().put(uuid, points);
+  }
+
+  public void countPlaytime(UUID uuid, Match match) {
+    storeStatistics.getPlaytime().putIfAbsent(uuid, new AtomicInteger());
+    BukkitTask task =
+        Bukkit.getScheduler()
+            .runTaskTimerAsynchronously(
+                Mixed.get(),
+                new Runnable() {
+                  @Override
+                  public void run() {
+                    if (!match.isRunning()) return;
+                    storeStatistics.getPlaytime().get(uuid).getAndIncrement();
+                  }
+                },
+                0L,
+                20L);
+    BukkitTask old = playtimeTask.put(uuid, task);
+    if (old != null) old.cancel();
+  }
+
+  public void removePlaytime(UUID uuid) {
+    BukkitTask old = playtimeTask.remove(uuid);
+    if (old != null) old.cancel();
+  }
+
+  private void clearPlaytime() {
+    playtimeTask.forEach(((uuid, bukkitTask) -> bukkitTask.cancel()));
+    playtimeTask.clear();
   }
 
   public StoreStatistics getStoreStatistics() {

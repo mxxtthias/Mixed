@@ -38,13 +38,13 @@ public class MySQLSetterGetter {
     Statement statement = null;
     Connection connection = null;
     String query =
-        "INSERT INTO STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, POINTS) VALUES ('"
+        "INSERT INTO STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, PLAYTIME, POINTS) VALUES ('"
             + uuid
-            + "', 'Null', '0', '0', '0', '0', '0', '0', '0');";
+            + "', 'Null', '0', '0', '0', '0', '0', '0', '0', '0');";
     String query2 =
-        "INSERT INTO WEEK_STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, POINTS) VALUES ('"
+        "INSERT INTO WEEK_STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, PLAYTIME, POINTS) VALUES ('"
             + uuid
-            + "', 'Null', '0', '0', '0', '0', '0', '0', '0');";
+            + "', 'Null', '0', '0', '0', '0', '0', '0', '0', '0');";
     String query3 =
         "INSERT INTO RANKS(UUID, NAME, GAMERANK, EFFECT, SOUND, PROJECTILE) VALUES ('"
             + uuid

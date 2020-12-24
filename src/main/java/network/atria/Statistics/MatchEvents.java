@@ -22,6 +22,7 @@ import tc.oc.pgm.core.CoreLeakEvent;
 import tc.oc.pgm.destroyable.DestroyableDestroyedEvent;
 import tc.oc.pgm.events.ListenerScope;
 import tc.oc.pgm.events.PlayerParticipationStartEvent;
+import tc.oc.pgm.events.PlayerParticipationStopEvent;
 import tc.oc.pgm.flag.event.FlagCaptureEvent;
 import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
 
@@ -33,12 +34,32 @@ public class MatchEvents implements Listener, MatchModule {
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onMatchStart(MatchStartEvent event) {
-    Mixed.get().getStatistics().newMatch();
+    MatchStatistics statistics = Mixed.get().getStatistics();
+
+    statistics.newMatch();
+    event
+        .getMatch()
+        .getPlayers()
+        .forEach(
+            player -> {
+              statistics.countPlaytime(player.getId(), event.getMatch());
+              addResultMap(player.getId());
+            });
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onJoinMatch(PlayerParticipationStartEvent event) {
-    addResultMap(event.getPlayer().getId());
+    if (!event.isCancelled() && event.getMatch().isRunning()) {
+      Mixed.get().getStatistics().countPlaytime(event.getPlayer().getId(), event.getMatch());
+      addResultMap(event.getPlayer().getId());
+    }
+  }
+
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onLeaveMatch(PlayerParticipationStopEvent event) {
+    if (!event.isCancelled() && event.getMatch().isRunning()) {
+      Mixed.get().getStatistics().removePlaytime(event.getPlayer().getId());
+    }
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -112,6 +133,7 @@ public class MatchEvents implements Listener, MatchModule {
               manager.RankUP(player);
             });
     sendStatsData();
+    Mixed.get().getStatistics().endMatch();
   }
 
   private void sendStatsData() {
@@ -125,7 +147,7 @@ public class MatchEvents implements Listener, MatchModule {
                 weeklyStatsUpdate();
               }
             },
-            15L);
+            20L);
   }
 
   private void totalStatsUpdate() {
@@ -137,6 +159,7 @@ public class MatchEvents implements Listener, MatchModule {
     sortStats(store.getCores(), totalMap, "CORES", "STATS");
     sortStats(store.getFlags(), totalMap, "FLAGS", "STATS");
     sortStats(store.getPoints(), totalMap, "POINTS", "STATS");
+    sortStats(store.getPlaytime(), totalMap, "PLAYTIME", "STATS");
     update(totalMap, "STATS");
   }
 
@@ -149,6 +172,7 @@ public class MatchEvents implements Listener, MatchModule {
     sortStats(store.getCores(), weeklyMap, "CORES", "WEEK_STATS");
     sortStats(store.getFlags(), weeklyMap, "FLAGS", "WEEK_STATS");
     sortStats(store.getPoints(), weeklyMap, "POINTS", "WEEK_STATS");
+    sortStats(store.getPlaytime(), weeklyMap, "PLAYTIME", "WEEK_STATS");
     update(weeklyMap, "WEEK_STATS");
   }
 
@@ -157,7 +181,6 @@ public class MatchEvents implements Listener, MatchModule {
     if (map.isEmpty()) return;
     map.entrySet().stream()
         .filter(stats -> stats.getValue().get() != 0)
-        .filter(stats -> result.containsKey(stats.getKey()))
         .forEach(
             stats -> {
               Map<String, Integer> data = getStats(stats.getKey(), table);
@@ -201,6 +224,7 @@ public class MatchEvents implements Listener, MatchModule {
         if (columns.contains("MONUMENTS")) stats.put("MONUMENTS", rs.getInt("MONUMENTS"));
         if (columns.contains("FLAGS")) stats.put("FLAGS", rs.getInt("FLAGS"));
         if (columns.contains("POINTS")) stats.put("POINTS", rs.getInt("POINTS"));
+        if (columns.contains("PLAYTIME")) stats.put("PLAYTIME", rs.getInt("PLAYTIME"));
         columns.clear();
       }
     } catch (SQLException e) {
@@ -282,6 +306,8 @@ public class MatchEvents implements Listener, MatchModule {
       multipleMap.put(uuid, multipleMap.get(uuid) + "WOOLS, ");
     if (store.getPoints().containsKey(uuid))
       multipleMap.put(uuid, multipleMap.get(uuid) + "POINTS, ");
+    if (store.getPlaytime().containsKey(uuid))
+      multipleMap.put(uuid, multipleMap.get(uuid) + "PLAYTIME, ");
 
     return Collections.unmodifiableMap(multipleMap);
   }
