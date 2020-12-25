@@ -1,6 +1,7 @@
 package network.atria.Ranks;
 
 import java.util.*;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -67,29 +68,31 @@ public class RankManager {
     UUID uuid = player.getId();
     ChatPrefix chatPrefix = new ChatPrefix();
     Rank next = getNextRank(uuid);
-
-    TextComponent.Builder RANK_UP = Component.text();
-    RANK_UP.append(Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
-    RANK_UP.append(Component.text(" Rank UP! ", NamedTextColor.RED, TextDecoration.BOLD));
-    RANK_UP.append(Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
-    RANK_UP.append(Component.newline());
-    RANK_UP.append(getRank(MySQLSetterGetter.getRank(uuid)).getColoredName());
-    RANK_UP.append(Component.text(" ⇒ ", NamedTextColor.GRAY, TextDecoration.BOLD));
-    RANK_UP.append(next.getColoredName());
-    RANK_UP.append(Component.newline());
-    RANK_UP.append(Component.text("〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
-
-    TextComponent.Builder BROADCAST_RANK_UP = Component.text();
-    BROADCAST_RANK_UP.append(Component.text(player.getPrefixedName()));
-    BROADCAST_RANK_UP.append(Component.text(" has rank up to ", NamedTextColor.RED));
-    BROADCAST_RANK_UP.append(next.getColoredName());
+    Audience audience = Mixed.get().getAudience().player(uuid);
 
     if (canRankUp(uuid)) {
+      TextComponent.Builder BROADCAST_RANK_UP = Component.text();
+      BROADCAST_RANK_UP.append(Component.text(player.getPrefixedName()));
+      BROADCAST_RANK_UP.append(Component.text(" has rank up to ", NamedTextColor.RED));
+      BROADCAST_RANK_UP.append(next.getColoredName());
       Mixed.get().getAudience().players().sendMessage(BROADCAST_RANK_UP.build());
+
       player
           .getBukkit()
           .playSound(player.getBukkit().getLocation(), Sound.LEVEL_UP, 10, (float) 0.3);
-      Mixed.get().getAudience().player(player.getId()).sendMessage(RANK_UP.build());
+
+      audience.sendMessage(
+          TextComponent.ofChildren(
+              Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD),
+              Component.text(" Rank UP! ", NamedTextColor.RED, TextDecoration.BOLD),
+              Component.text("〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD)));
+      audience.sendMessage(
+          TextComponent.ofChildren(
+              getRank(MySQLSetterGetter.getRank(uuid)).getColoredName(),
+              Component.text(" ⇒ ", NamedTextColor.GRAY, TextDecoration.BOLD),
+              next.getColoredName()));
+      audience.sendMessage(
+          Component.text("〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓", NamedTextColor.YELLOW, TextDecoration.BOLD));
 
       chatPrefix.setPrefixPermission(uuid);
       MySQLSetterGetter.setRank(player.getId().toString(), next.getName());

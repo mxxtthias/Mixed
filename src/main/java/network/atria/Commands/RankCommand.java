@@ -3,6 +3,7 @@ package network.atria.Commands;
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
 import java.util.UUID;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -23,17 +24,16 @@ public class RankCommand {
     UUID uuid = sender.getUniqueId();
     Rank NOW = rankManager.getRank(MySQLSetterGetter.getRank(uuid));
     Rank NEXT = rankManager.getNextRank(uuid);
+    Audience audience = Mixed.get().getAudience().player(sender);
 
-    TextComponent.Builder points = Component.text();
-    points.append(Component.text("Rank: ", NamedTextColor.DARK_AQUA));
-    points.append(NOW.getColoredName());
-    points.append(Component.newline());
-    points.append(Component.text("Your current points are ", NamedTextColor.DARK_AQUA));
-    points.append(
-        Component.text(
-            MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD));
-
-    Mixed.get().getAudience().player(sender).sendMessage(points.build());
+    audience.sendMessage(
+        TextComponent.ofChildren(
+            Component.text("Rank: ", NamedTextColor.DARK_AQUA), NOW.getColoredName()));
+    audience.sendMessage(
+        TextComponent.ofChildren(
+            Component.text("Your current points are ", NamedTextColor.DARK_AQUA),
+            Component.text(
+                MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD)));
 
     if (NEXT.getName().equalsIgnoreCase(NOW.getName())) {
       TextComponent.Builder rejected = Component.text();
@@ -44,7 +44,11 @@ public class RankCommand {
     } else {
       TextComponent.Builder NEED = Component.text();
       NEED.append(Component.text("You need ", NamedTextColor.DARK_AQUA));
-      NEED.append(Component.text(String.valueOf(rankManager.getRequirePoint(uuid))));
+      NEED.append(
+          Component.text(
+              String.valueOf(rankManager.getRequirePoint(uuid)),
+              NamedTextColor.AQUA,
+              TextDecoration.BOLD));
       NEED.append(Component.text(" more points to be ", NamedTextColor.DARK_AQUA));
       NEED.append(NEXT.getColoredName());
 

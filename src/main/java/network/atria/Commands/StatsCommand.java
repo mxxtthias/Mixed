@@ -58,33 +58,28 @@ public class StatsCommand {
         player != null
             ? player.getPrefixedName()
             : TextFormat.format(Component.text(Fetcher.getName(uuid), NamedTextColor.DARK_AQUA));
-    TextComponent.Builder component = Component.text();
-    component.append(
+    Audience audience = Mixed.get().getAudience().player(sender);
+    audience.sendMessage(
         Component.text(LegacyFormatUtils.horizontalLineHeading(prefixedName, ChatColor.WHITE)));
-    component.append(Component.newline());
-    component.append(formatStats("Kills: ", stats.get("KILLS")));
-    component.append(formatStats("Deaths: ", stats.get("DEATHS")));
-    component.append(
+    audience.sendMessage(formatStats("Kills: ", stats.get("KILLS")));
+    audience.sendMessage(formatStats("Deaths: ", stats.get("DEATHS")));
+    audience.sendMessage(
         Component.text("K/D: ", NamedTextColor.AQUA)
             .append(
                 Component.text(
                     kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
                     NamedTextColor.BLUE)));
-    component.append(Component.newline());
-    component.append(formatStats("Wool Placed: ", stats.get("WOOLS")));
-    component.append(formatStats("Cores Leaked: ", stats.get("CORES")));
-    component.append(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
-    component.append(formatStats("Flag Captured: ", stats.get("FLAGS")));
-    component.append(Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
-
-    Mixed.get().getAudience().player(sender.getUniqueId()).sendMessage(component.build());
+    audience.sendMessage(formatStats("Wool Placed: ", stats.get("WOOLS")));
+    audience.sendMessage(formatStats("Cores Leaked: ", stats.get("CORES")));
+    audience.sendMessage(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
+    audience.sendMessage(formatStats("Flag Captured: ", stats.get("FLAGS")));
+    audience.sendMessage(Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
   }
 
   private TextComponent formatStats(String ladder, int value) {
     return Component.text()
         .append(Component.text(ladder, NamedTextColor.AQUA))
         .append(Component.text(value, NamedTextColor.BLUE))
-        .append(Component.newline())
         .build();
   }
 
