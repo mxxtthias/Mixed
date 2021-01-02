@@ -126,7 +126,7 @@ public class MatchEvents implements Listener, MatchModule {
     RankManager manager = new RankManager();
     event
         .getMatch()
-        .getPlayers()
+        .getParticipants()
         .forEach(
             player -> {
               Mixed.get().getStatistics().addPoint(player.getId(), 10);
@@ -140,13 +140,10 @@ public class MatchEvents implements Listener, MatchModule {
     Bukkit.getScheduler()
         .scheduleSyncDelayedTask(
             Mixed.get(),
-            new Runnable() {
-              @Override
-              public void run() {
-                totalStatsUpdate();
-                weeklyStatsUpdate();
-              }
-            },
+                () -> {
+                  totalStatsUpdate();
+                  weeklyStatsUpdate();
+                },
             20L);
   }
 
@@ -181,6 +178,7 @@ public class MatchEvents implements Listener, MatchModule {
     if (map.isEmpty()) return;
     map.entrySet().stream()
         .filter(stats -> stats.getValue().get() != 0)
+        .filter(stats -> result.containsKey(stats.getKey()))
         .forEach(
             stats -> {
               Map<String, Integer> data = getStats(stats.getKey(), table);
