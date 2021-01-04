@@ -1,5 +1,7 @@
 package network.atria.Effects.GUI;
 
+import static net.kyori.adventure.text.Component.text;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,8 +50,7 @@ public class CustomGUI implements Listener {
     ItemStack back = new ItemStack(Material.ARROW, 1);
     ItemMeta back_meta = back.getItemMeta();
 
-    back_meta.setDisplayName(
-        TextFormat.format(Component.text("Go to previous page ➡", NamedTextColor.RED)));
+    back_meta.setDisplayName(TextFormat.format(text("Go to previous page ➡", NamedTextColor.RED)));
     back.setItemMeta(back_meta);
 
     gui.setItem(8, back);
@@ -59,12 +60,12 @@ public class CustomGUI implements Listener {
     int current = MySQLSetterGetter.getPoints(uuid);
 
     if (current >= require) {
-      return Component.text("✔ Unlocked", NamedTextColor.GREEN, TextDecoration.BOLD);
+      return text("✔ Unlocked", NamedTextColor.GREEN, TextDecoration.BOLD);
     } else {
       return TextComponent.ofChildren(
-          Component.text("✖ ", NamedTextColor.RED, TextDecoration.BOLD),
-          Component.text(formatPoints(require)),
-          Component.text(" is required", NamedTextColor.RED, TextDecoration.BOLD));
+          text("✖ ", NamedTextColor.RED, TextDecoration.BOLD),
+          text(formatPoints(require)),
+          text(" is required", NamedTextColor.RED, TextDecoration.BOLD));
     }
   }
 
@@ -113,7 +114,7 @@ public class CustomGUI implements Listener {
   }
 
   private static String format(String rank, NamedTextColor color) {
-    return TextFormat.format(Component.text(rank, color, TextDecoration.BOLD));
+    return TextFormat.format(text(rank, color, TextDecoration.BOLD));
   }
 
   @EventHandler
@@ -123,20 +124,18 @@ public class CustomGUI implements Listener {
             .getTitle()
             .equalsIgnoreCase(
                 TextFormat.format(
-                    Component.text("Kill Effect Select Menu", Style.style(TextDecoration.BOLD))))
+                    text("Kill Effect Select Menu", Style.style(TextDecoration.BOLD))))
+        || event
+            .getView()
+            .getTitle()
+            .equalsIgnoreCase(
+                TextFormat.format(text("Kill Sound Select Menu", Style.style(TextDecoration.BOLD))))
         || event
             .getView()
             .getTitle()
             .equalsIgnoreCase(
                 TextFormat.format(
-                    Component.text("Kill Sound Select Menu", Style.style(TextDecoration.BOLD))))
-        || event
-            .getView()
-            .getTitle()
-            .equalsIgnoreCase(
-                TextFormat.format(
-                    Component.text(
-                        "Projectile Trails Select Menu", Style.style(TextDecoration.BOLD))))) {
+                    text("Projectile Trails Select Menu", Style.style(TextDecoration.BOLD))))) {
       event.setCancelled(true);
 
       ItemStack clickedItem = event.getCurrentItem();
@@ -151,22 +150,22 @@ public class CustomGUI implements Listener {
           case "Reset Kill Effect":
             MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
             audience.sendMessage(
-                Component.text("Reset your ", NamedTextColor.GREEN)
-                    .append(Component.text("Kill Effect", NamedTextColor.YELLOW)));
+                text("Reset your ", NamedTextColor.GREEN)
+                    .append(text("Kill Effect", NamedTextColor.YELLOW)));
             player.closeInventory();
             break;
           case "Reset Kill Sound":
             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
             audience.sendMessage(
-                Component.text("Reset your ", NamedTextColor.GREEN)
-                    .append(Component.text("Kill Sound", NamedTextColor.YELLOW)));
+                text("Reset your ", NamedTextColor.GREEN)
+                    .append(text("Kill Sound", NamedTextColor.YELLOW)));
             player.closeInventory();
             break;
           case "Reset Projectile Trails":
             MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
             audience.sendMessage(
-                Component.text("Reset your ", NamedTextColor.GREEN)
-                    .append(Component.text("Projectile Trails", NamedTextColor.YELLOW)));
+                text("Reset your ", NamedTextColor.GREEN)
+                    .append(text("Projectile Trails", NamedTextColor.YELLOW)));
             player.closeInventory();
             break;
         }

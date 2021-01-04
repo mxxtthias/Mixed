@@ -1,10 +1,12 @@
 package network.atria.Effects.GUI;
 
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -34,8 +36,7 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
 
   public static Inventory sound;
   private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
-  protected TextComponent title =
-      Component.text("Kill Sound Select Menu", Style.style(TextDecoration.BOLD));
+  protected TextComponent title = text("Kill Sound Select Menu", Style.style(TextDecoration.BOLD));
 
   public KillSoundsGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -54,8 +55,7 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
     ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
     ItemMeta reset_meta = reset.getItemMeta();
 
-    reset_meta.setDisplayName(
-        TextFormat.format(Component.text("Reset Kill Sound", NamedTextColor.RED)));
+    reset_meta.setDisplayName(TextFormat.format(text("Reset Kill Sound", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
     sound.setItem(26, reset);
 
@@ -73,8 +73,8 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
                   KillSoundsGUI.sound,
                   number,
                   material,
-                  Component.text(sound, NamedTextColor.GREEN, TextDecoration.BOLD),
-                  Component.empty(),
+                  text(sound, NamedTextColor.GREEN, TextDecoration.BOLD),
+                  empty(),
                   canUseEffects(uuid, getSoundPoint(sound)));
             });
   }
@@ -108,8 +108,8 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
         if ("DEFAULT".equals(clickedItem.getItemMeta().getDisplayName().substring(2))) {
           MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
           audience.sendMessage(
-              Component.text("You selected ", NamedTextColor.GREEN)
-                  .append(Component.text("DEFAULT Kill Sound", NamedTextColor.YELLOW)));
+              text("You selected ", NamedTextColor.GREEN)
+                  .append(text("DEFAULT Kill Sound", NamedTextColor.YELLOW)));
           player.closeInventory();
         }
       }
@@ -124,11 +124,11 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
     if (sound.canUseDonor(matchPlayer) || sound.hasRequirePoint(matchPlayer.getId())) {
       MySQLSetterGetter.setKillSound(uuid.toString(), sound.getName());
       audience.sendMessage(
-          Component.text("You selected ", NamedTextColor.GREEN)
-              .append(Component.text(sound.getName().toUpperCase(), NamedTextColor.YELLOW))
-              .append(Component.text(" kill sound.", NamedTextColor.GREEN)));
+          text("You selected ", NamedTextColor.GREEN)
+              .append(text(sound.getName().toUpperCase(), NamedTextColor.YELLOW))
+              .append(text(" kill sound.", NamedTextColor.GREEN)));
     } else {
-      audience.sendMessage(Component.text("You don't have enough points.", NamedTextColor.RED));
+      audience.sendMessage(text("You don't have enough points.", NamedTextColor.RED));
     }
   }
 }

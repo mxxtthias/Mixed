@@ -1,11 +1,12 @@
 package network.atria.Commands;
 
+import static net.kyori.adventure.text.Component.text;
+
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import network.atria.Database.MySQLSetterGetter;
@@ -26,33 +27,24 @@ public class RankCommand {
     Rank NEXT = rankManager.getNextRank(uuid);
     Audience audience = Mixed.get().getAudience().player(sender);
 
+    audience.sendMessage(text("Rank: ", NamedTextColor.DARK_AQUA).append(NOW.getColoredName()));
     audience.sendMessage(
-        TextComponent.ofChildren(
-            Component.text("Rank: ", NamedTextColor.DARK_AQUA), NOW.getColoredName()));
-    audience.sendMessage(
-        TextComponent.ofChildren(
-            Component.text("Your current points are ", NamedTextColor.DARK_AQUA),
-            Component.text(
-                MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD)));
+        text()
+            .append(text("You now have ", NamedTextColor.DARK_AQUA))
+            .append(
+                text(MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD))
+            .append(text(" points", NamedTextColor.DARK_AQUA)));
 
     if (NEXT.getName().equalsIgnoreCase(NOW.getName())) {
-      TextComponent.Builder rejected = Component.text();
-      rejected.append(Component.text("You can't rank up because you're ", NamedTextColor.RED));
-      rejected.append(NOW.getColoredName());
-
-      Mixed.get().getAudience().player(sender).sendMessage(rejected.build());
+      audience.sendMessage(Component.text("You cannot rank up now!", NamedTextColor.RED));
     } else {
-      TextComponent.Builder NEED = Component.text();
-      NEED.append(Component.text("You need ", NamedTextColor.DARK_AQUA));
-      NEED.append(
-          Component.text(
-              String.valueOf(rankManager.getRequirePoint(uuid)),
-              NamedTextColor.AQUA,
-              TextDecoration.BOLD));
-      NEED.append(Component.text(" more points to be ", NamedTextColor.DARK_AQUA));
-      NEED.append(NEXT.getColoredName());
-
-      Mixed.get().getAudience().player(sender).sendMessage(NEED.build());
+      audience.sendMessage(
+          text()
+              .append(text("You need ", NamedTextColor.DARK_AQUA))
+              .append(
+                  text(rankManager.getRequirePoint(uuid), NamedTextColor.AQUA, TextDecoration.BOLD))
+              .append(text(" more points to be ", NamedTextColor.DARK_AQUA))
+              .append(NEXT.getColoredName()));
     }
   }
 }

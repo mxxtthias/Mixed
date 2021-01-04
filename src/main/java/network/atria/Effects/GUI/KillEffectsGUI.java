@@ -1,10 +1,12 @@
 package network.atria.Effects.GUI;
 
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -34,8 +36,7 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
 
   public static Inventory effect;
   private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
-  protected TextComponent title =
-      Component.text("Kill Effect Select Menu", Style.style(TextDecoration.BOLD));
+  protected TextComponent title = text("Kill Effect Select Menu", Style.style(TextDecoration.BOLD));
 
   public KillEffectsGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -55,8 +56,7 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
     ItemStack reset = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
     ItemMeta reset_meta = reset.getItemMeta();
 
-    reset_meta.setDisplayName(
-        TextFormat.format(Component.text("Reset Kill Effect", NamedTextColor.RED)));
+    reset_meta.setDisplayName(TextFormat.format(text("Reset Kill Effect", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
     effect.setItem(26, reset);
 
@@ -74,8 +74,8 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
                   KillEffectsGUI.effect,
                   number,
                   material,
-                  Component.text(effect, NamedTextColor.GREEN, TextDecoration.BOLD),
-                  Component.empty(),
+                  text(effect, NamedTextColor.GREEN, TextDecoration.BOLD),
+                  empty(),
                   canUseEffects(uuid, effectPoint(effect)));
             });
 
@@ -83,9 +83,9 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
         effect,
         18,
         Material.GOLD_NUGGET,
-        Component.text("DONOR", NamedTextColor.GOLD),
-        Component.empty(),
-        Component.text("- Donor Only -", NamedTextColor.RED, TextDecoration.BOLD));
+        text("DONOR", NamedTextColor.GOLD),
+        empty(),
+        text("- Donor Only -", NamedTextColor.RED, TextDecoration.BOLD));
   }
 
   private Integer effectPoint(String effectName) {
@@ -112,21 +112,19 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
 
       if (effect.isPresent()) {
         selectEffect(player, effect.get());
-      } else {
-        if (clickedItem.getItemMeta().getDisplayName().substring(2).equalsIgnoreCase("DONOR"))
-          if (player.hasPermission("pgm.group.donor")) {
-            MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
-            audience.sendMessage(
-                Component.text("You selected ", NamedTextColor.GREEN)
-                    .append(
-                        Component.text("DONOR", NamedTextColor.YELLOW)
-                            .append(Component.text(" kill effect.", NamedTextColor.GREEN))));
-          } else {
-            audience.sendMessage(
-                Component.text("You don't have the donor rank", NamedTextColor.RED));
-          }
-      }
-      player.closeInventory();
+        player.closeInventory();
+      } else if (clickedItem.getItemMeta().getDisplayName().substring(2).equalsIgnoreCase("DONOR"))
+        if (player.hasPermission("pgm.group.donor")) {
+          MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
+          audience.sendMessage(
+              text("You selected ", NamedTextColor.GREEN)
+                  .append(
+                      text("DONOR", NamedTextColor.YELLOW)
+                          .append(text(" kill effect.", NamedTextColor.GREEN))));
+          player.closeInventory();
+        } else {
+          audience.sendMessage(text("You don't have the donor rank", NamedTextColor.RED));
+        }
     }
   }
 
@@ -138,11 +136,11 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
     if (effect.canUseDonor(matchPlayer) || effect.hasRequirePoint(matchPlayer.getId())) {
       MySQLSetterGetter.setKillEffect(uuid.toString(), effect.getName());
       audience.sendMessage(
-          Component.text("You selected ", NamedTextColor.GREEN)
-              .append(Component.text(effect.getName().toUpperCase(), NamedTextColor.YELLOW))
-              .append(Component.text(" kill effect.", NamedTextColor.GREEN)));
+          text("You selected ", NamedTextColor.GREEN)
+              .append(text(effect.getName().toUpperCase(), NamedTextColor.YELLOW))
+              .append(text(" kill effect.", NamedTextColor.GREEN)));
     } else {
-      audience.sendMessage(Component.text("You don't have enough points.", NamedTextColor.RED));
+      audience.sendMessage(text("You don't have enough points.", NamedTextColor.RED));
     }
   }
 }

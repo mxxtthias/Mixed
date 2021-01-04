@@ -1,5 +1,8 @@
 package network.atria.Effects.GUI;
 
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -55,7 +58,7 @@ public class ProjectileGUI extends CustomGUI implements Listener {
     ItemMeta reset_meta = reset.getItemMeta();
 
     reset_meta.setDisplayName(
-        TextFormat.format(Component.text("Reset Projectile Trails", NamedTextColor.RED)));
+        TextFormat.format(text("Reset Projectile Trails", NamedTextColor.RED)));
     reset.setItemMeta(reset_meta);
     projectile.setItem(26, reset);
 
@@ -76,7 +79,7 @@ public class ProjectileGUI extends CustomGUI implements Listener {
                   number,
                   material,
                   Component.text(projectile, NamedTextColor.GREEN, TextDecoration.BOLD),
-                  Component.empty(),
+                  empty(),
                   canUseEffects(uuid, getProjectilePoint(projectile)));
             });
   }

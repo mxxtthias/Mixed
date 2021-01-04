@@ -1,5 +1,7 @@
 package network.atria.Commands;
 
+import static net.kyori.adventure.text.Component.text;
+
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
 import java.math.BigDecimal;
@@ -8,7 +10,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import javax.annotation.Nullable;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -60,26 +64,26 @@ public class StatsCommand {
             : TextFormat.format(Component.text(Fetcher.getName(uuid), NamedTextColor.DARK_AQUA));
     Audience audience = Mixed.get().getAudience().player(sender);
     audience.sendMessage(
-        Component.text(LegacyFormatUtils.horizontalLineHeading(prefixedName, ChatColor.WHITE)));
+        text(LegacyFormatUtils.horizontalLineHeading(prefixedName, ChatColor.WHITE)));
     audience.sendMessage(formatStats("Kills: ", stats.get("KILLS")));
     audience.sendMessage(formatStats("Deaths: ", stats.get("DEATHS")));
     audience.sendMessage(
-        Component.text("K/D: ", NamedTextColor.AQUA)
+        text("K/D: ", NamedTextColor.AQUA)
             .append(
-                Component.text(
+                text(
                     kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
                     NamedTextColor.BLUE)));
     audience.sendMessage(formatStats("Wool Placed: ", stats.get("WOOLS")));
     audience.sendMessage(formatStats("Cores Leaked: ", stats.get("CORES")));
     audience.sendMessage(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
     audience.sendMessage(formatStats("Flag Captured: ", stats.get("FLAGS")));
-    audience.sendMessage(Component.text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
+    audience.sendMessage(text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
   }
 
   private TextComponent formatStats(String ladder, int value) {
-    return Component.text()
-        .append(Component.text(ladder, NamedTextColor.AQUA))
-        .append(Component.text(value, NamedTextColor.BLUE))
+    return text()
+        .append(text(ladder, NamedTextColor.AQUA))
+        .append(text(value, NamedTextColor.BLUE))
         .build();
   }
 

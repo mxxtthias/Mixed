@@ -1,5 +1,8 @@
 package network.atria.Effects.GUI;
 
+import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
+
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
 import java.sql.Connection;
@@ -27,10 +30,11 @@ import org.bukkit.plugin.Plugin;
 public class DefaultGUI implements Listener {
 
   public static Inventory gui;
+  private ItemMeta meta;
 
   public DefaultGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
-    gui = Bukkit.createInventory(null, 27, TextFormat.format(Component.text(" ")));
+    gui = Bukkit.createInventory(null, 27, TextFormat.format(text(" ")));
   }
 
   private void addIconItems(Player player) {
@@ -39,37 +43,33 @@ public class DefaultGUI implements Listener {
     HashMap<String, String> effects = getSelectingEffects(player.getUniqueId());
 
     meta.setDisplayName(
-        TextFormat.format(
-            Component.text("Close the GUI", NamedTextColor.RED, TextDecoration.BOLD)));
+        TextFormat.format(text("Close the GUI", NamedTextColor.RED, TextDecoration.BOLD)));
     close.setItemMeta(meta);
 
     gui.setItem(
         10,
         createGuiItem(
             Material.REDSTONE,
-            TextFormat.format(
-                Component.text("Kill Effects", NamedTextColor.GREEN, TextDecoration.BOLD)),
-            Component.empty(),
-            Component.text("Now: ", NamedTextColor.GRAY)
-                .append(Component.text(effects.get("EFFECT"), NamedTextColor.GREEN))));
+            TextFormat.format(text("Kill Effects", NamedTextColor.GREEN, TextDecoration.BOLD)),
+            empty(),
+            text("Now: ", NamedTextColor.GRAY)
+                .append(text(effects.get("EFFECT"), NamedTextColor.GREEN))));
     gui.setItem(
         12,
         createGuiItem(
             Material.RECORD_3,
-            TextFormat.format(
-                Component.text("Kill Sounds", NamedTextColor.GREEN, TextDecoration.BOLD)),
-            Component.empty(),
-            Component.text("Now: ", NamedTextColor.GRAY)
-                .append(Component.text(effects.get("SOUND"), NamedTextColor.GREEN))));
+            TextFormat.format(text("Kill Sounds", NamedTextColor.GREEN, TextDecoration.BOLD)),
+            empty(),
+            text("Now: ", NamedTextColor.GRAY)
+                .append(text(effects.get("SOUND"), NamedTextColor.GREEN))));
     gui.setItem(
         14,
         createGuiItem(
             Material.BOW,
-            TextFormat.format(
-                Component.text("Projectile Trails", NamedTextColor.GREEN, TextDecoration.BOLD)),
-            Component.empty(),
-            Component.text("Now: ", NamedTextColor.GRAY)
-                .append(Component.text(effects.get("PROJECTILE"), NamedTextColor.GREEN))));
+            TextFormat.format(text("Projectile Trails", NamedTextColor.GREEN, TextDecoration.BOLD)),
+            empty(),
+            text("Now: ", NamedTextColor.GRAY)
+                .append(text(effects.get("PROJECTILE"), NamedTextColor.GREEN))));
     gui.setItem(17, close);
   }
 
@@ -87,20 +87,19 @@ public class DefaultGUI implements Listener {
           if (clickedItem.getItemMeta().hasDisplayName()) {
             if (getItemName.equals(
                 TextFormat.format(
-                    Component.text("Close the GUI", NamedTextColor.RED, TextDecoration.BOLD)))) {
+                    text("Close the GUI", NamedTextColor.RED, TextDecoration.BOLD)))) {
               player.closeInventory();
             } else if (getItemName.equals(
                 TextFormat.format(
-                    Component.text("Kill Effects", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
+                    text("Kill Effects", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
               player.openInventory(KillEffectsGUI.effect);
             } else if (getItemName.equals(
                 TextFormat.format(
-                    Component.text("Kill Sounds", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
+                    text("Kill Sounds", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
               player.openInventory(KillSoundsGUI.sound);
             } else if (getItemName.equals(
                 TextFormat.format(
-                    Component.text(
-                        "Projectile Trails", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
+                    text("Projectile Trails", NamedTextColor.GREEN, TextDecoration.BOLD)))) {
               player.openInventory(ProjectileGUI.projectile);
             }
           }
