@@ -18,7 +18,6 @@ import network.atria.Effects.Sounds.KillSounds;
 import network.atria.Ranks.RankManager;
 import network.atria.Statistics.MatchEvents;
 import network.atria.Statistics.MatchStatistics;
-import network.atria.Task.BroadCastMessage;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.RanksConfig;
 import org.bukkit.Bukkit;
@@ -57,8 +56,6 @@ public class Mixed extends JavaPlugin implements Listener {
     statistics = new MatchStatistics();
     RankManager rankManager = new RankManager();
     rankManager.createRank();
-    BroadCastMessage broadCastMessage = new BroadCastMessage();
-    broadCastMessage.randomMessage();
     super.onEnable();
   }
 
