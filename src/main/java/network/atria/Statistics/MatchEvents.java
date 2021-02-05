@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import network.atria.Database.MySQL;
+import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
 import network.atria.Ranks.RankManager;
 import org.bukkit.Bukkit;
@@ -138,39 +139,41 @@ public class MatchEvents implements Listener, MatchModule {
 
   private void sendStatsData() {
     Bukkit.getScheduler()
-        .scheduleSyncDelayedTask(
+        .runTaskLaterAsynchronously(
             Mixed.get(),
-                () -> {
-                  totalStatsUpdate();
-                  weeklyStatsUpdate();
-                },
-            20L);
+            () -> {
+              totalStatsUpdate();
+              weeklyStatsUpdate();
+            },
+            10L);
   }
 
   private void totalStatsUpdate() {
     StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
-    sortStats(store.getKills(), totalMap, "KILLS", "STATS");
-    sortStats(store.getDeaths(), totalMap, "DEATHS", "STATS");
-    sortStats(store.getWools(), totalMap, "WOOLS", "STATS");
-    sortStats(store.getMonuments(), totalMap, "MONUMENTS", "STATS");
-    sortStats(store.getCores(), totalMap, "CORES", "STATS");
-    sortStats(store.getFlags(), totalMap, "FLAGS", "STATS");
-    sortStats(store.getPoints(), totalMap, "POINTS", "STATS");
-    sortStats(store.getPlaytime(), totalMap, "PLAYTIME", "STATS");
+    String table = "STATS";
+    sortStats(store.getKills(), totalMap, "KILLS", table);
+    sortStats(store.getDeaths(), totalMap, "DEATHS", table);
+    sortStats(store.getWools(), totalMap, "WOOLS", table);
+    sortStats(store.getMonuments(), totalMap, "MONUMENTS", table);
+    sortStats(store.getCores(), totalMap, "CORES", table);
+    sortStats(store.getFlags(), totalMap, "FLAGS", table);
+    sortStats(store.getPoints(), totalMap, "POINTS", table);
+    sortStats(store.getPlaytime(), totalMap, "PLAYTIME", table);
     update(totalMap, "STATS");
   }
 
   private void weeklyStatsUpdate() {
     StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
-    sortStats(store.getKills(), weeklyMap, "KILLS", "WEEK_STATS");
-    sortStats(store.getDeaths(), weeklyMap, "DEATHS", "WEEK_STATS");
-    sortStats(store.getWools(), weeklyMap, "WOOLS", "WEEK_STATS");
-    sortStats(store.getMonuments(), weeklyMap, "MONUMENTS", "WEEK_STATS");
-    sortStats(store.getCores(), weeklyMap, "CORES", "WEEK_STATS");
-    sortStats(store.getFlags(), weeklyMap, "FLAGS", "WEEK_STATS");
-    sortStats(store.getPoints(), weeklyMap, "POINTS", "WEEK_STATS");
-    sortStats(store.getPlaytime(), weeklyMap, "PLAYTIME", "WEEK_STATS");
-    update(weeklyMap, "WEEK_STATS");
+    String table = "WEEK_STATS";
+    sortStats(store.getKills(), weeklyMap, "KILLS", table);
+    sortStats(store.getDeaths(), weeklyMap, "DEATHS", table);
+    sortStats(store.getWools(), weeklyMap, "WOOLS", table);
+    sortStats(store.getMonuments(), weeklyMap, "MONUMENTS", table);
+    sortStats(store.getCores(), weeklyMap, "CORES", table);
+    sortStats(store.getFlags(), weeklyMap, "FLAGS", table);
+    sortStats(store.getPoints(), weeklyMap, "POINTS", table);
+    sortStats(store.getPlaytime(), weeklyMap, "PLAYTIME", table);
+    update(weeklyMap, table);
   }
 
   private void sortStats(
@@ -194,20 +197,19 @@ public class MatchEvents implements Listener, MatchModule {
     String column =
         Arrays.toString(maps.values().toArray()).trim().replace("[", "").replace("]", "");
     String query =
-        "SELECT "
-            + column.substring(0, column.length() - 2)
-            + " FROM "
-            + table
-            + " WHERE UUID = '"
-            + uuid.toString()
-            + "';";
+        "SELECT " + column.substring(0, column.length() - 2) + " FROM " + table + " WHERE UUID = ?";
     maps.clear();
     Connection connection = null;
     ResultSet rs = null;
     PreparedStatement statement = null;
+
+    if (table.equalsIgnoreCase("WEEK_STATS")
+        && !MySQLSetterGetter.playerExist_in_weekly_table(uuid))
+      MySQLSetterGetter.create_weekly_table(uuid);
     try {
       connection = MySQL.getHikari().getConnection();
       statement = connection.prepareStatement(query);
+      statement.setString(1, uuid.toString());
       rs = statement.executeQuery();
       if (rs.next()) {
         Set<String> columns = new HashSet<>();
