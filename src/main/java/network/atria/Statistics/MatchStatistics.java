@@ -1,8 +1,8 @@
 package network.atria.Statistics;
 
+import com.google.common.collect.Maps;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import network.atria.Manager.UserProfileManager;
 import network.atria.Mixed;
@@ -15,10 +15,12 @@ import tc.oc.pgm.api.player.MatchPlayer;
 public class MatchStatistics {
 
   private final Map<UUID, BukkitTask> playtimeTask;
+  private final Map<UUID, AtomicInteger> playtime;
   private final UserProfileManager manager;
 
   public MatchStatistics() {
-    this.playtimeTask = new ConcurrentHashMap<>();
+    this.playtimeTask = Maps.newConcurrentMap();
+    this.playtime = Maps.newConcurrentMap();
     this.manager = Mixed.get().getProfileManager();
   }
 
@@ -106,8 +108,7 @@ public class MatchStatistics {
   }
 
   public void countPlaytime(UUID uuid, Match match) {
-    UserProfile profile = manager.getProfile(uuid);
-    AtomicInteger count = new AtomicInteger(0);
+    playtime.putIfAbsent(uuid, new AtomicInteger());
 
     BukkitTask task =
         Bukkit.getScheduler()
@@ -115,9 +116,7 @@ public class MatchStatistics {
                 Mixed.get(),
                 () -> {
                   if (!match.isRunning()) return;
-                  profile.setPlaytime(profile.getPlaytime() + count.incrementAndGet());
-                  profile.setWeekly_playtime(
-                      profile.getWeekly_playtime() + count.incrementAndGet());
+                  playtime.get(uuid).incrementAndGet();
                 },
                 0L,
                 20L);
@@ -127,11 +126,29 @@ public class MatchStatistics {
 
   public void removePlaytime(UUID uuid) {
     BukkitTask old = playtimeTask.remove(uuid);
+    UserProfile profile = manager.getProfile(uuid);
+
+    profile.setPlaytime(profile.getPlaytime() + playtime.get(uuid).get());
+    profile.setWeekly_playtime(profile.getWeekly_playtime() + playtime.get(uuid).get());
+
+    playtime.remove(uuid);
     if (old != null) old.cancel();
   }
 
   private void clearPlaytime() {
+    playtime.forEach(
+        ((uuid, atomicInteger) -> {
+          UserProfile profile = manager.getProfile(uuid);
+
+          profile.setPlaytime(profile.getPlaytime() + atomicInteger.get());
+          profile.setWeekly_playtime(profile.getWeekly_playtime() + atomicInteger.get());
+        }));
+    playtime.clear();
     playtimeTask.forEach(((uuid, bukkitTask) -> bukkitTask.cancel()));
     playtimeTask.clear();
+  }
+
+  public Map<UUID, AtomicInteger> getPlaytime() {
+    return playtime;
   }
 }

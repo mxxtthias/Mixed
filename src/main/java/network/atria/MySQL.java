@@ -37,11 +37,11 @@ public class MySQL {
       Statement statement = connection.createStatement();
 
       statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS STATS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, PLAYTIME int, POINTS int, WINS int, LOSES int);");
+          "CREATE TABLE IF NOT EXISTS STATS(UUID varchar(36) NOT NULL PRIMARY KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, PLAYTIME int, POINTS int, WINS int, LOSES int);");
       statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, PLAYTIME int, WINS int, LOSES int);");
+          "CREATE TABLE IF NOT EXISTS WEEK_STATS(UUID varchar(36) NOT NULL PRIMARY KEY, NAME varchar(20), KILLS int, DEATHS int, FLAGS int, CORES int, WOOLS int, MONUMENTS int, PLAYTIME int, WINS int, LOSES int);");
       statement.executeUpdate(
-          "CREATE TABLE IF NOT EXISTS RANKS(UUID varchar(36) NOT NULL UNIQUE KEY, NAME varchar(20), GAMERANK varchar(20), EFFECT varchar(20), SOUND varchar(20), PROJECTILE varchar(20));");
+          "CREATE TABLE IF NOT EXISTS RANKS(UUID varchar(36) NOT NULL PRIMARY KEY, NAME varchar(20), GAMERANK varchar(20), EFFECT varchar(20), SOUND varchar(20), PROJECTILE varchar(20));");
 
       statement.close();
     } catch (SQLException e) {
@@ -70,14 +70,17 @@ public class MySQL {
     public static void update(String table, String column, String value, UUID uuid) {
       PreparedStatement statement = null;
       Connection connection = null;
-      String sql = "UPDATE ? SET ? = ? WHERE UUID = ?";
+      StringBuilder sql = new StringBuilder();
+      sql.append("UPDATE ")
+          .append(table)
+          .append(" SET ")
+          .append(column)
+          .append(" = ? WHERE UUID = ?");
       try {
         connection = MySQL.get().getHikari().getConnection();
-        statement = connection.prepareStatement(sql);
-        statement.setString(1, table);
-        statement.setString(2, column);
-        statement.setString(3, value);
-        statement.setString(4, uuid.toString());
+        statement = connection.prepareStatement(sql.toString());
+        statement.setString(1, value);
+        statement.setString(2, uuid.toString());
       } catch (SQLException e) {
         e.printStackTrace();
       } finally {
