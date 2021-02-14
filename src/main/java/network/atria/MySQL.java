@@ -206,7 +206,7 @@ public class MySQL {
         connection = MySQL.get().getHikari().getConnection();
         statement =
             connection.prepareStatement(
-                "INSERT INTO WEEK_STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, PLAYTIME) VALUES (?, ?, '0', '0', '0', '0', '0', '0', '0');");
+                "INSERT INTO WEEK_STATS(UUID, NAME, KILLS, DEATHS, FLAGS, CORES, WOOLS, MONUMENTS, PLAYTIME, WINS, LOSES) VALUES (?, ?, '0', '0', '0', '0', '0', '0', '0', '0', '0');");
         statement.setString(1, uuid.toString());
         statement.setString(2, name);
         statement.execute();

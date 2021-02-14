@@ -2,6 +2,7 @@ package network.atria.Util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.bukkit.ChatColor;
 
 public class TextFormat {
 
@@ -9,11 +10,15 @@ public class TextFormat {
     return LegacyComponentSerializer.legacySection().serialize(component);
   }
 
-  public static Component formatSection(String input) {
-    return LegacyComponentSerializer.legacySection().deserialize(input);
+  public static String format(String content) {
+    return ChatColor.stripColor(content);
   }
 
-  public static Component formatAmpersand(String input) {
-    return LegacyComponentSerializer.legacyAmpersand().deserialize(input);
+  public static Component formatAmpersand(String content) {
+    return LegacyComponentSerializer.legacyAmpersand().deserialize(content);
+  }
+
+  public static Component formatSection(String content) {
+    return LegacyComponentSerializer.legacySection().deserialize(content);
   }
 }
