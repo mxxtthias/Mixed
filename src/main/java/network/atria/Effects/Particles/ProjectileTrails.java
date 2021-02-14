@@ -2,6 +2,7 @@ package network.atria.Effects.Particles;
 
 import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
 import com.github.fierioziy.particlenativeapi.api.types.ParticleType;
+import com.google.common.collect.Lists;
 import java.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -19,33 +20,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+import tc.oc.pgm.api.PGM;
+import tc.oc.pgm.api.player.MatchPlayer;
+import tc.oc.pgm.api.setting.SettingKey;
+import tc.oc.pgm.api.setting.SettingValue;
 
 public class ProjectileTrails extends ParticleAPI implements Listener {
 
-  private static Set<Effect> projectiles;
-  private List<Color> colors;
-
-  public static Set<Effect> getProjectiles() {
-    return projectiles;
-  }
-
-  private void addProjectiles() {
-    FileConfiguration config = KillEffectsConfig.getCustomConfig();
-    projectiles = new HashSet<>();
-
-    config
-        .getConfigurationSection("PROJECTILE_TRAILS")
-        .getKeys(false)
-        .forEach(
-            projectile ->
-                projectiles.add(
-                    new Effect(
-                        projectile,
-                        Component.text(projectile, NamedTextColor.GREEN, TextDecoration.BOLD),
-                        config.getInt("PROJECTILE_TRAILS." + projectile + ".points"),
-                        config.getBoolean("PROJECTILE_TRAILS." + projectile + ".donor"))));
-  }
+  private static List<Color> colors;
 
   @EventHandler
   public void onProjectileEffect(ProjectileLaunchEvent event) {
@@ -53,6 +35,9 @@ public class ProjectileTrails extends ParticleAPI implements Listener {
     if (arrow.getShooter() instanceof Player) {
       if (arrow instanceof Arrow) {
         Player player = ((Player) arrow.getShooter()).getPlayer();
+        MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
+        if (matchPlayer.getSettings().getValue(SettingKey.EFFECTS).equals(SettingValue.EFFECTS_OFF))
+          return;
         Particles_1_8 api = Mixed.get().getParticles();
         Optional<Effect> projectile =
             projectiles.stream()
@@ -137,7 +122,7 @@ public class ProjectileTrails extends ParticleAPI implements Listener {
   }
 
   private void addColor() {
-    colors = new ArrayList<>();
+    colors = Lists.newArrayList();
 
     colors.add(Color.BLUE);
     colors.add(Color.LIME);

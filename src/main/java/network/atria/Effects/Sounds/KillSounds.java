@@ -16,49 +16,21 @@ import org.bukkit.plugin.Plugin;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
+import tc.oc.pgm.api.setting.SettingKey;
+import tc.oc.pgm.api.setting.SettingValue;
 import tc.oc.pgm.events.ListenerScope;
 
 @ListenerScope(MatchScope.RUNNING)
 public class KillSounds extends SoundAPI implements Listener {
 
-  private static Set<Effect> sounds;
-
-  public static Set<Effect> getSounds() {
-    return sounds;
-  }
-
-  private void addSounds() {
-    FileConfiguration config = KillEffectsConfig.getCustomConfig();
-    sounds = new HashSet<>();
-    config
-        .getConfigurationSection("KILL_SOUND")
-        .getKeys(false)
-        .forEach(
-            sound ->
-                sounds.add(
-                    new Effect(
-                        sound,
-                        Component.text(sound, NamedTextColor.GREEN, TextDecoration.BOLD),
-                        config.getInt("KILL_SOUND." + sound + ".points"),
-                        config.getBoolean("KILL_SOUND." + sound + ".donor"))));
-  }
-
   @EventHandler
   public void onMatchPlayerDeath(MatchPlayerDeathEvent e) {
-    MatchPlayer killer = null;
+    MatchPlayer killer;
     MatchPlayer victim = e.getVictim();
 
     if (e.getKiller() != null) {
       killer = e.getKiller().getParty().getPlayer(e.getKiller().getId());
-      MatchPlayer finalKiller = killer;
-      Optional<Effect> sound =
-          sounds.stream()
-              .filter(
-                  name ->
-                      name.getName()
-                          .equalsIgnoreCase(
-                              MySQLSetterGetter.getKillSound(finalKiller.getId().toString())))
-              .findFirst();
+      if (!killer.getSettings().getValue(SettingKey.SOUNDS).equals(SettingValue.SOUNDS_ALL)) return;
 
       if (sound.isPresent()) {
         switch (sound.get().getName()) {
@@ -106,7 +78,6 @@ public class KillSounds extends SoundAPI implements Listener {
   }
 
   public KillSounds(Plugin plugin) {
-    addSounds();
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
 }

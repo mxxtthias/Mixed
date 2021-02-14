@@ -1,61 +1,36 @@
 package network.atria.Effects.Particles;
 
-import static java.lang.Math.*;
-
 import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
 import java.util.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
 import network.atria.Util.KillEffectsConfig;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
+import tc.oc.pgm.api.setting.SettingKey;
+import tc.oc.pgm.api.setting.SettingValue;
 
 public class KillEffects extends ParticleAPI implements Listener {
 
-  private static Set<Effect> effects;
-  private List<Color> colors;
-
-  public static Set<Effect> getEffects() {
-    return effects;
-  }
-
-  private void addEffects() {
-    FileConfiguration config = KillEffectsConfig.getCustomConfig();
-    effects = new HashSet<>();
-
-    config
-        .getConfigurationSection("KILL_EFFECT")
-        .getKeys(false)
-        .forEach(
-            effect ->
-                effects.add(
-                    new Effect(
-                        effect,
-                        Component.text(effect, NamedTextColor.GREEN, TextDecoration.BOLD),
-                        config.getInt("KILL_EFFECT." + effect + ".points"),
-                        config.getBoolean("KILL_EFFECT." + effect + ".donor"))));
-  }
+  private static List<Color> colors;
 
   @EventHandler
   public void onPlayerDeath(MatchPlayerDeathEvent e) {
 
     Particles_1_8 api = Mixed.get().getParticles();
-    MatchPlayer murder = null;
+    MatchPlayer murder;
     MatchPlayer victim = e.getVictim();
 
     if (e.getKiller() != null) {
       murder = e.getKiller().getParty().getPlayer(e.getKiller().getId());
+      if (murder.getSettings().getValue(SettingKey.EFFECTS).equals(SettingValue.EFFECTS_OFF))
+        return;
       Location location = victim.getBukkit().getLocation();
       if (murder != null) {
         MatchPlayer finalMurder1 = murder;
@@ -206,7 +181,6 @@ public class KillEffects extends ParticleAPI implements Listener {
   }
 
   public KillEffects(Plugin plugin) {
-    addEffects();
     addColor();
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }
