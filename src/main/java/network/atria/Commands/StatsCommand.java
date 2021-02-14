@@ -1,16 +1,17 @@
 package network.atria.Commands;
 
 import static net.kyori.adventure.text.Component.text;
+import static network.atria.MySQL.SQLQuery.*;
 
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
+import com.google.common.collect.Maps;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -19,9 +20,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
-import network.atria.Database.MySQL;
-import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
+import network.atria.MySQL;
+import network.atria.UserProfile.UserProfile;
 import network.atria.Util.Fetcher;
 import network.atria.Util.TextFormat;
 import org.bukkit.Bukkit;
@@ -44,7 +45,7 @@ public class StatsCommand {
     } else if (Bukkit.getPlayer(playerName) != null) {
       MatchPlayer target = PGM.get().getMatchManager().getPlayer(Bukkit.getPlayer(playerName));
       if (target != null) showStats(target.getId(), player);
-    } else if (MySQLSetterGetter.playerExists(Fetcher.getUUID(playerName).toString())) {
+    } else if (MySQL.SQLQuery.playerExists(Fetcher.getUUID(playerName))) {
       showStats(Fetcher.getUUID(playerName), player);
     } else {
       Audience audience = Mixed.get().getAudience().player(matchPlayer.getId());
@@ -53,7 +54,7 @@ public class StatsCommand {
   }
 
   private void showStats(UUID uuid, Player sender) {
-    Map<String, Integer> stats = getStats(uuid);
+    Map<String, Integer> stats;
     MatchPlayer player =
         PGM.get().getMatchManager().getPlayer(uuid) != null
             ? PGM.get().getMatchManager().getPlayer(uuid)
@@ -61,22 +62,42 @@ public class StatsCommand {
     String prefixedName =
         player != null
             ? player.getPrefixedName()
-            : TextFormat.format(Component.text(Fetcher.getName(uuid), NamedTextColor.DARK_AQUA));
+            : TextFormat.format(text(Fetcher.getName(uuid), NamedTextColor.DARK_AQUA));
     Audience audience = Mixed.get().getAudience().player(sender);
-    audience.sendMessage(
-        text(LegacyFormatUtils.horizontalLineHeading(prefixedName, ChatColor.WHITE)));
-    audience.sendMessage(formatStats("Kills: ", stats.get("KILLS")));
-    audience.sendMessage(formatStats("Deaths: ", stats.get("DEATHS")));
-    audience.sendMessage(
-        text("K/D: ", NamedTextColor.AQUA)
-            .append(
-                text(
-                    kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
-                    NamedTextColor.BLUE)));
-    audience.sendMessage(formatStats("Wool Placed: ", stats.get("WOOLS")));
-    audience.sendMessage(formatStats("Cores Leaked: ", stats.get("CORES")));
-    audience.sendMessage(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
-    audience.sendMessage(formatStats("Flag Captured: ", stats.get("FLAGS")));
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(uuid);
+
+    if (profile != null) {
+      audience.sendMessage(
+          text(LegacyFormatUtils.horizontalLineHeading(prefixedName, ChatColor.WHITE)));
+      audience.sendMessage(formatStats("Kills: ", profile.getKills()));
+      audience.sendMessage(formatStats("Deaths: ", profile.getDeaths()));
+      audience.sendMessage(
+          text("K/D: ", NamedTextColor.AQUA)
+              .append(
+                  text(
+                      kd(profile.getKills(), profile.getDeaths()).doubleValue(),
+                      NamedTextColor.BLUE)));
+      audience.sendMessage(formatStats("Wool Placed: ", profile.getWools()));
+      audience.sendMessage(formatStats("Cores Leaked: ", profile.getCores()));
+      audience.sendMessage(formatStats("Monuments Destroyed: ", profile.getMonuments()));
+      audience.sendMessage(formatStats("Flag Captured: ", profile.getFlags()));
+    } else {
+      stats = getStats(uuid);
+      audience.sendMessage(
+          text(LegacyFormatUtils.horizontalLineHeading(prefixedName, ChatColor.WHITE)));
+      audience.sendMessage(formatStats("Kills: ", stats.get("KILLS")));
+      audience.sendMessage(formatStats("Deaths: ", stats.get("DEATHS")));
+      audience.sendMessage(
+          text("K/D: ", NamedTextColor.AQUA)
+              .append(
+                  text(
+                      kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
+                      NamedTextColor.BLUE)));
+      audience.sendMessage(formatStats("Wool Placed: ", stats.get("WOOLS")));
+      audience.sendMessage(formatStats("Cores Leaked: ", stats.get("CORES")));
+      audience.sendMessage(formatStats("Monuments Destroyed: ", stats.get("MONUMENTS")));
+      audience.sendMessage(formatStats("Flag Captured: ", stats.get("FLAGS")));
+    }
     audience.sendMessage(text(LegacyFormatUtils.horizontalLine(ChatColor.WHITE, 300)));
   }
 
@@ -90,7 +111,7 @@ public class StatsCommand {
   private BigDecimal kd(int kills, int deaths) {
     BigDecimal bd1 = new BigDecimal(kills);
     BigDecimal bd2 = new BigDecimal(deaths);
-    BigDecimal result = null;
+    BigDecimal result;
     try {
       result = bd1.divide(bd2, 2, RoundingMode.HALF_UP);
     } catch (ArithmeticException e) {
@@ -100,58 +121,33 @@ public class StatsCommand {
   }
 
   private Map<String, Integer> getStats(UUID uuid) {
-    Map<String, Integer> stats = new HashMap<>();
-
+    Map<String, Integer> stats = Maps.newHashMap();
     Connection connection = null;
     ResultSet rs = null;
     PreparedStatement statement = null;
     String query =
-        "SELECT KILLS, DEATHS, CORES, WOOLS, MONUMENTS, FLAGS FROM STATS WHERE UUID = '"
-            + uuid.toString()
-            + "';";
+        "SELECT KILLS, DEATHS, CORES, WOOLS, MONUMENTS, FLAGS, WINS, LOSES FROM STATS WHERE UUID = ?";
     try {
-      connection = MySQL.getHikari().getConnection();
+      connection = MySQL.get().getHikari().getConnection();
       statement = connection.prepareStatement(query);
+      statement.setString(1, uuid.toString());
       rs = statement.executeQuery();
       if (rs.next()) {
-        int kills = rs.getInt("KILLS");
-        int deaths = rs.getInt("DEATHS");
-        int cores = rs.getInt("CORES");
-        int wools = rs.getInt("WOOLS");
-        int dtm = rs.getInt("MONUMENTS");
-        int flags = rs.getInt("FLAGS");
-
-        stats.put("KILLS", kills);
-        stats.put("DEATHS", deaths);
-        stats.put("CORES", cores);
-        stats.put("WOOLS", wools);
-        stats.put("MONUMENTS", dtm);
-        stats.put("FLAGS", flags);
+        stats.put("KILLS", rs.getInt("KILLS"));
+        stats.put("DEATHS", rs.getInt("DEATHS"));
+        stats.put("CORES", rs.getInt("CORES"));
+        stats.put("WOOLS", rs.getInt("WOOLS"));
+        stats.put("MONUMENTS", rs.getInt("MONUMENTS"));
+        stats.put("FLAGS", rs.getInt("FLAGS"));
+        stats.put("WINS", rs.getInt("WINS"));
+        stats.put("LOSES", rs.getInt("LOSES"));
       }
     } catch (SQLException e) {
       e.printStackTrace();
     } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      if (rs != null) {
-        try {
-          rs.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      if (statement != null) {
-        try {
-          statement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
+      closeConnection(connection);
+      closeStatement(statement);
+      closeResultSet(rs);
     }
     return stats;
   }

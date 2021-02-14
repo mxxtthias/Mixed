@@ -5,18 +5,24 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
-import network.atria.Database.MySQLSetterGetter;
+import network.atria.Manager.RankManager;
+import network.atria.Mixed;
+import network.atria.MySQL;
+import network.atria.UserProfile.UserProfile;
 
-public class ChatPrefix {
+public class setGroup {
 
   public void setPrefixPermission(UUID uuid) {
     LuckPerms api = LuckPermsProvider.get();
     User user = api.getUserManager().getUser(uuid);
     RankManager rankManager = new RankManager();
 
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(uuid);
     if (user != null) {
-      removeGroup(user, rankManager.getRank(MySQLSetterGetter.getRank(uuid)).getName());
+      removeGroup(user, profile.getRank().getName());
       addGroup(user, rankManager.getNextRank(uuid).getName());
+      profile.setRank(rankManager.getNextRank(uuid));
+      MySQL.SQLQuery.update("RANKS", "GAMERANK", rankManager.getNextRank(uuid).getName(), uuid);
       api.getUserManager().saveUser(user);
     }
   }

@@ -4,17 +4,17 @@ import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQLSetterGetter;
 import network.atria.Effects.Particles.Effect;
-import network.atria.Effects.Particles.KillEffects;
+import network.atria.Manager.EffectManager;
 import network.atria.Mixed;
+import network.atria.MySQL;
+import network.atria.UserProfile.UserProfile;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.TextFormat;
 import org.bukkit.DyeColor;
@@ -29,14 +29,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-import tc.oc.pgm.api.PGM;
-import tc.oc.pgm.api.player.MatchPlayer;
 
 public class KillEffectsGUI extends CustomGUI implements Listener {
 
   public static Inventory effect;
-  private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
   protected TextComponent title = text("Kill Effect Select Menu", Style.style(TextDecoration.BOLD));
+  private final FileConfiguration config = KillEffectsConfig.getCustomConfig();
 
   public KillEffectsGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -100,44 +98,41 @@ public class KillEffectsGUI extends CustomGUI implements Listener {
       ItemStack clickedItem = e.getCurrentItem();
       Player player = (Player) e.getWhoClicked();
       Audience audience = Mixed.get().getAudience().player(player);
+      UserProfile profile = Mixed.get().getProfileManager().getProfile(player.getUniqueId());
 
-      Set<Effect> effects = KillEffects.getEffects();
-      Optional<Effect> effect =
-          effects.stream()
-              .filter(
-                  name ->
-                      name.getColoredName()
-                          .equalsIgnoreCase(clickedItem.getItemMeta().getDisplayName()))
-              .findFirst();
-
-      if (effect.isPresent()) {
-        selectEffect(player, effect.get());
+      if (clickedItem.getType() == Material.AIR) return;
+      Optional<Effect> killeffect =
+          Mixed.get()
+              .getEffectManager()
+              .findEffect(TextFormat.format(clickedItem.getItemMeta().getDisplayName()));
+      if (killeffect.isPresent()) {
+        selectEffect(player, killeffect.get());
         player.closeInventory();
-      } else if (clickedItem.getItemMeta().getDisplayName().substring(2).equalsIgnoreCase("DONOR"))
-        if (player.hasPermission("pgm.group.donor")) {
-          MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "DONOR");
-          audience.sendMessage(
-              text("You selected ", NamedTextColor.GREEN)
-                  .append(
-                      text("DONOR", NamedTextColor.YELLOW)
-                          .append(text(" kill effect.", NamedTextColor.GREEN))));
-          player.closeInventory();
-        } else {
-          audience.sendMessage(text("You don't have the donor rank", NamedTextColor.RED));
-        }
+      } else if (TextFormat.format(clickedItem.getItemMeta().getDisplayName())
+              .equalsIgnoreCase("DONOR")
+          && player.hasPermission("pgm.group.donor")) {
+        MySQL.SQLQuery.update("RANKS", "EFFECT", "DONOR", player.getUniqueId());
+        profile.setKilleffect(new Effect("DONOR", text("DONOR", NamedTextColor.GOLD), 0, true));
+        audience.sendMessage(
+            text("You selected ", NamedTextColor.GREEN)
+                .append(text("DONOR", NamedTextColor.YELLOW))
+                .append(text(" kill effect.", NamedTextColor.GREEN)));
+        player.closeInventory();
+      }
     }
   }
 
   private void selectEffect(Player player, Effect effect) {
-    UUID uuid = player.getUniqueId();
     Audience audience = Mixed.get().getAudience().player(player);
-    MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
+    EffectManager manager = Mixed.get().getEffectManager();
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(player.getUniqueId());
 
-    if (effect.canUseDonor(matchPlayer) || effect.hasRequirePoint(matchPlayer.getId())) {
-      MySQLSetterGetter.setKillEffect(uuid.toString(), effect.getName());
+    if (effect.canUseDonor() || manager.hasRequirePoint(effect, player.getUniqueId())) {
+      MySQL.SQLQuery.update("RANKS", "EFFECT", effect.getName(), player.getUniqueId());
+      profile.setKilleffect(effect);
       audience.sendMessage(
           text("You selected ", NamedTextColor.GREEN)
-              .append(text(effect.getName().toUpperCase(), NamedTextColor.YELLOW))
+              .append(effect.getColoredName())
               .append(text(" kill effect.", NamedTextColor.GREEN)));
     } else {
       audience.sendMessage(text("You don't have enough points.", NamedTextColor.RED));

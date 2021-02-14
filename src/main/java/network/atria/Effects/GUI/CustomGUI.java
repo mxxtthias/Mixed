@@ -2,7 +2,7 @@ package network.atria.Effects.GUI;
 
 import static net.kyori.adventure.text.Component.text;
 
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -12,8 +12,10 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQLSetterGetter;
+import network.atria.Effects.Particles.Effect;
 import network.atria.Mixed;
+import network.atria.MySQL;
+import network.atria.UserProfile.UserProfile;
 import network.atria.Util.TextFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -35,7 +37,7 @@ public class CustomGUI implements Listener {
       Inventory gui, int number, Material material, Component name, Component... lores) {
     ItemStack item = new ItemStack(material, 1);
     ItemMeta meta = item.getItemMeta();
-    List<String> lore = new ArrayList<>();
+    List<String> lore = Lists.newArrayList();
     Arrays.stream(lores).forEachOrdered(x -> lore.add(TextFormat.format(x)));
     meta.setDisplayName(TextFormat.format(name));
     meta.setLore(lore);
@@ -57,9 +59,8 @@ public class CustomGUI implements Listener {
   }
 
   public TextComponent canUseEffects(UUID uuid, Integer require) {
-    int current = MySQLSetterGetter.getPoints(uuid);
-
-    if (current >= require) {
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(uuid);
+    if (profile.getPoints() >= require) {
       return text("✔ Unlocked", NamedTextColor.GREEN, TextDecoration.BOLD);
     } else {
       return TextComponent.ofChildren(
@@ -141,28 +142,33 @@ public class CustomGUI implements Listener {
       ItemStack clickedItem = event.getCurrentItem();
       Player player = (Player) event.getWhoClicked();
       Audience audience = Mixed.get().getAudience().player(player);
+      UserProfile profile = Mixed.get().getProfileManager().getProfile(player.getUniqueId());
 
+      if (clickedItem.getType() == Material.AIR) return;
       if (clickedItem.hasItemMeta()) {
-        switch (clickedItem.getItemMeta().getDisplayName().substring(2)) {
+        switch (TextFormat.format(clickedItem.getItemMeta().getDisplayName())) {
           case "Go to previous page ➡":
             player.openInventory(DefaultGUI.gui);
             break;
           case "Reset Kill Effect":
-            MySQLSetterGetter.setKillEffect(player.getUniqueId().toString(), "NONE");
+            MySQL.SQLQuery.update("RANKS", "EFFECT", "NONE", player.getUniqueId());
+            profile.setKilleffect(new Effect("NONE", text("NONE"), 0, false));
             audience.sendMessage(
                 text("Reset your ", NamedTextColor.GREEN)
                     .append(text("Kill Effect", NamedTextColor.YELLOW)));
             player.closeInventory();
             break;
           case "Reset Kill Sound":
-            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
+            MySQL.SQLQuery.update("RANKS", "SOUND", "NONE", player.getUniqueId());
+            profile.setKillsound(new Effect("NONE", text("NONE"), 0, false));
             audience.sendMessage(
                 text("Reset your ", NamedTextColor.GREEN)
                     .append(text("Kill Sound", NamedTextColor.YELLOW)));
             player.closeInventory();
             break;
           case "Reset Projectile Trails":
-            MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "NONE");
+            MySQL.SQLQuery.update("RANKS", "PROJECTILE", "NONE", player.getUniqueId());
+            profile.setProjectile(new Effect("NONE", text("NONE"), 0, false));
             audience.sendMessage(
                 text("Reset your ", NamedTextColor.GREEN)
                     .append(text("Projectile Trails", NamedTextColor.YELLOW)));

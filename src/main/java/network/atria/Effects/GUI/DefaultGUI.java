@@ -5,15 +5,12 @@ import static net.kyori.adventure.text.Component.text;
 
 import app.ashcon.intake.Command;
 import app.ashcon.intake.bukkit.parametric.annotation.Sender;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQL;
+import network.atria.Mixed;
+import network.atria.UserProfile.UserProfile;
 import network.atria.Util.TextFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
@@ -30,7 +27,6 @@ import org.bukkit.plugin.Plugin;
 public class DefaultGUI implements Listener {
 
   public static Inventory gui;
-  private ItemMeta meta;
 
   public DefaultGUI(Plugin plugin) {
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -40,36 +36,32 @@ public class DefaultGUI implements Listener {
   private void addIconItems(Player player) {
     ItemStack close = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.RED.getData());
     ItemMeta meta = close.getItemMeta();
-    HashMap<String, String> effects = getSelectingEffects(player.getUniqueId());
 
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(player.getUniqueId());
     meta.setDisplayName(
         TextFormat.format(text("Close the GUI", NamedTextColor.RED, TextDecoration.BOLD)));
     close.setItemMeta(meta);
-
     gui.setItem(
         10,
         createGuiItem(
             Material.REDSTONE,
             TextFormat.format(text("Kill Effects", NamedTextColor.GREEN, TextDecoration.BOLD)),
             empty(),
-            text("Now: ", NamedTextColor.GRAY)
-                .append(text(effects.get("EFFECT"), NamedTextColor.GREEN))));
+            text("Now: ", NamedTextColor.GRAY).append(profile.getKilleffect().getColoredName())));
     gui.setItem(
         12,
         createGuiItem(
             Material.RECORD_3,
             TextFormat.format(text("Kill Sounds", NamedTextColor.GREEN, TextDecoration.BOLD)),
             empty(),
-            text("Now: ", NamedTextColor.GRAY)
-                .append(text(effects.get("SOUND"), NamedTextColor.GREEN))));
+            text("Now: ", NamedTextColor.GRAY).append(profile.getKillsound().getColoredName())));
     gui.setItem(
         14,
         createGuiItem(
             Material.BOW,
             TextFormat.format(text("Projectile Trails", NamedTextColor.GREEN, TextDecoration.BOLD)),
             empty(),
-            text("Now: ", NamedTextColor.GRAY)
-                .append(text(effects.get("PROJECTILE"), NamedTextColor.GREEN))));
+            text("Now: ", NamedTextColor.GRAY).append(profile.getProjectile().getColoredName())));
     gui.setItem(17, close);
   }
 
@@ -120,53 +112,6 @@ public class DefaultGUI implements Listener {
     item.setItemMeta(meta);
 
     return item;
-  }
-
-  private HashMap<String, String> getSelectingEffects(UUID uuid) {
-    final HashMap<String, String> effects = new HashMap<>();
-    ResultSet rs = null;
-    PreparedStatement statement = null;
-    Connection connection = null;
-
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement =
-          connection.prepareStatement(
-              "SELECT EFFECT, SOUND, PROJECTILE FROM RANKS WHERE UUID = '"
-                  + uuid.toString()
-                  + "';");
-      rs = statement.executeQuery();
-
-      if (rs.next()) {
-        effects.put("EFFECT", rs.getString("EFFECT"));
-        effects.put("SOUND", rs.getString("SOUND"));
-        effects.put("PROJECTILE", rs.getString("PROJECTILE"));
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-    if (rs != null) {
-      try {
-        rs.close();
-      } catch (SQLException throwables) {
-        throwables.printStackTrace();
-      }
-    }
-    if (connection != null) {
-      try {
-        connection.close();
-      } catch (SQLException throwables) {
-        throwables.printStackTrace();
-      }
-    }
-    if (statement != null) {
-      try {
-        statement.close();
-      } catch (SQLException throwables) {
-        throwables.printStackTrace();
-      }
-    }
-    return effects;
   }
 
   @Command(

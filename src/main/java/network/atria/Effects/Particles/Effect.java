@@ -1,10 +1,8 @@
 package network.atria.Effects.Particles;
 
-import java.util.UUID;
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
-import network.atria.Database.MySQLSetterGetter;
-import network.atria.Util.TextFormat;
-import tc.oc.pgm.api.player.MatchPlayer;
+import org.bukkit.entity.Player;
 
 public class Effect {
 
@@ -24,19 +22,47 @@ public class Effect {
     return this.Name;
   }
 
-  public String getColoredName() {
-    return TextFormat.format(this.coloredName);
+  public Component getColoredName() {
+    return this.coloredName;
   }
 
   public Integer getPoint() {
     return this.point;
   }
 
-  public boolean canUseDonor(MatchPlayer player) {
-    return this.donor && player.getBukkit().hasPermission("pgm.group.donor");
+  public boolean canUseDonor() {
+    return this.donor;
   }
 
-  public boolean hasRequirePoint(UUID uuid) {
-    return MySQLSetterGetter.getPoints(uuid) >= this.point;
+  public boolean canUseDonorOnly(Player player) {
+    return this.donor && player.hasPermission("pgm.group.donor");
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Effect effect = (Effect) o;
+    return Name.equals(effect.Name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(Name);
+  }
+
+  @Override
+  public String toString() {
+    return "Effect{"
+        + "Name='"
+        + Name
+        + '\''
+        + ", coloredName="
+        + coloredName
+        + ", point="
+        + point
+        + ", donor="
+        + donor
+        + '}';
   }
 }

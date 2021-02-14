@@ -1,5 +1,6 @@
 package network.atria.Ranks;
 
+import java.util.Objects;
 import net.kyori.adventure.text.Component;
 
 public class Rank {
@@ -24,5 +25,31 @@ public class Rank {
 
   public int getPoint() {
     return point;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Rank rank = (Rank) o;
+    return Objects.equals(Name, rank.Name);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(Name);
+  }
+
+  @Override
+  public String toString() {
+    return "Rank{"
+        + "Name='"
+        + Name
+        + '\''
+        + ", coloredName="
+        + coloredName
+        + ", point="
+        + point
+        + '}';
   }
 }

@@ -3,6 +3,7 @@ package network.atria;
 import com.github.fierioziy.particlenativeapi.api.ParticleNativeAPI;
 import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
 import com.github.fierioziy.particlenativeapi.plugin.ParticleNativePlugin;
+import java.util.Objects;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -10,22 +11,23 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.PermissionNode;
 import network.atria.Commands.graph.CommandExecutor;
 import network.atria.Commands.graph.CommandGraph;
-import network.atria.Database.*;
 import network.atria.Effects.GUI.*;
 import network.atria.Effects.Particles.KillEffects;
 import network.atria.Effects.Particles.ProjectileTrails;
 import network.atria.Effects.Sounds.KillSounds;
-import network.atria.Ranks.RankManager;
+import network.atria.Manager.EffectManager;
+import network.atria.Manager.RankManager;
+import network.atria.Manager.UserProfileManager;
 import network.atria.Statistics.MatchEvents;
 import network.atria.Statistics.MatchStatistics;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.RanksConfig;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,13 +37,16 @@ public class Mixed extends JavaPlugin implements Listener {
   private long uptime;
   private MatchStatistics statistics;
   private BukkitAudiences audiences;
+  private RankManager rankManager;
+  private UserProfileManager profileManager;
+  private EffectManager effectManager;
   private final FileConfiguration config = getConfig();
 
   @Override
   public void onEnable() {
     instance = this;
     new RanksConfig(this, "ranks.yml");
-    new KillEffectsConfig(this, "killeffects.yml");
+    new KillEffectsConfig(this, "effects.yml");
 
     config.options().copyDefaults();
     saveDefaultConfig();
@@ -53,17 +58,20 @@ public class Mixed extends JavaPlugin implements Listener {
     registerEvents();
     this.audiences = BukkitAudiences.create(this);
     this.uptime = System.currentTimeMillis();
-    statistics = new MatchStatistics();
-    RankManager rankManager = new RankManager();
-    rankManager.createRank();
+    this.rankManager = new RankManager();
+    this.effectManager = new EffectManager();
+    this.profileManager = new UserProfileManager();
+    this.statistics = new MatchStatistics();
     super.onEnable();
   }
 
   @Override
   public void onDisable() {
-    if (MySQL.getHikari() != null) {
-      MySQL.getHikari().close();
-    }
+    if (!profileManager.getProfiles().isEmpty())
+      profileManager.getProfiles().stream()
+          .filter(Objects::nonNull)
+          .forEach(x -> profileManager.pushProfile(x));
+    if (MySQL.get().getHikari() != null) MySQL.get().getHikari().close();
     super.onDisable();
   }
 
@@ -72,6 +80,7 @@ public class Mixed extends JavaPlugin implements Listener {
 
     pm.registerEvents(this, this);
     pm.registerEvents(new CustomGUI(), this);
+    pm.registerEvents(new UserProfileManager(), this);
     new KillEffectsGUI(this);
     new KillSoundsGUI(this);
     new DefaultGUI(this);
@@ -87,27 +96,24 @@ public class Mixed extends JavaPlugin implements Listener {
     new CommandExecutor(this, graph).register();
   }
 
-  @EventHandler
-  public void onJoin(PlayerJoinEvent event) {
-    Player player = event.getPlayer();
+  @EventHandler(priority = EventPriority.MONITOR)
+  public void onJoin(AsyncPlayerPreLoginEvent event) {
     LuckPerms api = LuckPermsProvider.get();
-    User user = api.getUserManager().getUser(player.getUniqueId());
+    User user = api.getUserManager().getUser(event.getUniqueId());
     PermissionNode node = PermissionNode.builder("pgm.group.wood_iii").build();
 
-    if (!MySQLSetterGetter.playerExists(player.getUniqueId().toString())) {
-      MySQLSetterGetter.createPlayer(player.getUniqueId().toString());
-      MySQLSetterGetter.setName(player.getUniqueId().toString(), player.getName());
-
-      user.data().add(node);
-      api.getUserManager().saveUser(user);
-    } else if (!MySQLSetterGetter.getName(player.getUniqueId().toString())
-        .equals(player.getName())) {
-      MySQLSetterGetter.setName(player.getUniqueId().toString(), player.getName());
+    if (!MySQL.SQLQuery.playerExists(event.getUniqueId())) {
+      MySQL.SQLQuery.createPlayer(event.getName(), event.getUniqueId());
     }
+
+    user.data().add(node);
+    api.getUserManager().saveUser(user);
+    profileManager.addProfile(
+        event.getUniqueId(), profileManager.createProfile(event.getName(), event.getUniqueId()));
   }
 
   public long getUptime() {
-    return uptime;
+    return this.uptime;
   }
 
   public static Mixed get() {
@@ -124,6 +130,18 @@ public class Mixed extends JavaPlugin implements Listener {
   }
 
   public MatchStatistics getStatistics() {
-    return statistics;
+    return this.statistics;
+  }
+
+  public RankManager getRankManager() {
+    return this.rankManager;
+  }
+
+  public UserProfileManager getProfileManager() {
+    return this.profileManager;
+  }
+
+  public EffectManager getEffectManager() {
+    return this.effectManager;
   }
 }

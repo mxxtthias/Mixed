@@ -9,10 +9,10 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQLSetterGetter;
+import network.atria.Manager.RankManager;
 import network.atria.Mixed;
 import network.atria.Ranks.Rank;
-import network.atria.Ranks.RankManager;
+import network.atria.UserProfile.UserProfile;
 import org.bukkit.entity.Player;
 
 public class RankCommand {
@@ -21,21 +21,21 @@ public class RankCommand {
       aliases = {"rank"},
       desc = "Show Currently your Rank and Points")
   public void rank(@Sender Player sender) {
-    RankManager rankManager = new RankManager();
     UUID uuid = sender.getUniqueId();
-    Rank NOW = rankManager.getRank(MySQLSetterGetter.getRank(uuid));
+    RankManager rankManager = Mixed.get().getRankManager();
     Rank NEXT = rankManager.getNextRank(uuid);
     Audience audience = Mixed.get().getAudience().player(sender);
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(uuid);
 
-    audience.sendMessage(text("Rank: ", NamedTextColor.DARK_AQUA).append(NOW.getColoredName()));
+    audience.sendMessage(
+        text("Rank: ", NamedTextColor.DARK_AQUA).append(profile.getRank().getColoredName()));
     audience.sendMessage(
         text()
             .append(text("You now have ", NamedTextColor.DARK_AQUA))
-            .append(
-                text(MySQLSetterGetter.getPoints(uuid), NamedTextColor.AQUA, TextDecoration.BOLD))
+            .append(text(profile.getPoints(), NamedTextColor.AQUA, TextDecoration.BOLD))
             .append(text(" points", NamedTextColor.DARK_AQUA)));
 
-    if (NEXT.getName().equalsIgnoreCase(NOW.getName())) {
+    if (NEXT.getName().equalsIgnoreCase(profile.getRank().getName())) {
       audience.sendMessage(Component.text("You cannot rank up now!", NamedTextColor.RED));
     } else {
       audience.sendMessage(

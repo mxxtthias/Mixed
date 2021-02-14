@@ -4,17 +4,17 @@ import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQLSetterGetter;
 import network.atria.Effects.Particles.Effect;
-import network.atria.Effects.Sounds.KillSounds;
+import network.atria.Manager.EffectManager;
 import network.atria.Mixed;
+import network.atria.MySQL;
+import network.atria.UserProfile.UserProfile;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.TextFormat;
 import org.bukkit.DyeColor;
@@ -29,8 +29,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-import tc.oc.pgm.api.PGM;
-import tc.oc.pgm.api.player.MatchPlayer;
 
 public class KillSoundsGUI extends CustomGUI implements Listener {
 
@@ -91,22 +89,20 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
       ItemStack clickedItem = e.getCurrentItem();
       Player player = (Player) e.getWhoClicked();
       Audience audience = Mixed.get().getAudience().player(player);
+      UserProfile profile = Mixed.get().getProfileManager().getProfile(player.getUniqueId());
 
-      Set<Effect> sounds = KillSounds.getSounds();
+      if (clickedItem.getType() == Material.AIR) return;
       Optional<Effect> sound =
-          sounds.stream()
-              .filter(
-                  name ->
-                      name.getColoredName()
-                          .equalsIgnoreCase(clickedItem.getItemMeta().getDisplayName()))
-              .findFirst();
-
+          Mixed.get()
+              .getEffectManager()
+              .findEffect(TextFormat.format(clickedItem.getItemMeta().getDisplayName()));
       if (sound.isPresent()) {
         selectSound(player, sound.get());
         player.closeInventory();
       } else {
-        if ("DEFAULT".equals(clickedItem.getItemMeta().getDisplayName().substring(2))) {
-          MySQLSetterGetter.setKillSound(player.getUniqueId().toString(), "DEFAULT");
+        if ("DEFAULT".equals(TextFormat.format(clickedItem.getItemMeta().getDisplayName()))) {
+          MySQL.SQLQuery.update("RANKS", "SOUND", "DEFAULT", player.getUniqueId());
+          profile.setKillsound(new Effect("SOUND", text("SOUND", NamedTextColor.GRAY), 0, false));
           audience.sendMessage(
               text("You selected ", NamedTextColor.GREEN)
                   .append(text("DEFAULT Kill Sound", NamedTextColor.YELLOW)));
@@ -119,13 +115,15 @@ public class KillSoundsGUI extends CustomGUI implements Listener {
   private void selectSound(Player player, Effect sound) {
     UUID uuid = player.getUniqueId();
     Audience audience = Mixed.get().getAudience().player(player);
-    MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
+    EffectManager manager = Mixed.get().getEffectManager();
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(uuid);
 
-    if (sound.canUseDonor(matchPlayer) || sound.hasRequirePoint(matchPlayer.getId())) {
-      MySQLSetterGetter.setKillSound(uuid.toString(), sound.getName());
+    if (sound.canUseDonor() || manager.hasRequirePoint(sound, uuid)) {
+      MySQL.SQLQuery.update("RANKS", "SOUND", sound.getName(), uuid);
+      profile.setKillsound(sound);
       audience.sendMessage(
           text("You selected ", NamedTextColor.GREEN)
-              .append(text(sound.getName().toUpperCase(), NamedTextColor.YELLOW))
+              .append(sound.getColoredName())
               .append(text(" kill sound.", NamedTextColor.GREEN)));
     } else {
       audience.sendMessage(text("You don't have enough points.", NamedTextColor.RED));

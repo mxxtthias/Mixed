@@ -32,7 +32,7 @@ public class ServerInfoCommand {
     Audience audience = Mixed.get().getAudience().player(sender);
     audience.sendMessage(
         text()
-            .append(text("Website: {0}", NamedTextColor.DARK_AQUA, TextDecoration.BOLD))
+            .append(text("Website: ", NamedTextColor.DARK_AQUA, TextDecoration.BOLD))
             .append(text("https://atria.network/", NamedTextColor.AQUA, TextDecoration.BOLD))
             .clickEvent(ClickEvent.openUrl("https://atria.network/")));
   }

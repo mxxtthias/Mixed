@@ -4,14 +4,9 @@ import com.github.fierioziy.particlenativeapi.api.Particles_1_8;
 import com.github.fierioziy.particlenativeapi.api.types.ParticleType;
 import com.google.common.collect.Lists;
 import java.util.*;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQLSetterGetter;
 import network.atria.Mixed;
-import network.atria.Util.KillEffectsConfig;
+import network.atria.UserProfile.UserProfile;
 import org.bukkit.Color;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -39,25 +34,17 @@ public class ProjectileTrails extends ParticleAPI implements Listener {
         if (matchPlayer.getSettings().getValue(SettingKey.EFFECTS).equals(SettingValue.EFFECTS_OFF))
           return;
         Particles_1_8 api = Mixed.get().getParticles();
-        Optional<Effect> projectile =
-            projectiles.stream()
-                .filter(
-                    name ->
-                        name.getName()
-                            .equalsIgnoreCase(
-                                MySQLSetterGetter.getProjectileTrails(
-                                    player.getUniqueId().toString())))
-                .findFirst();
+        UserProfile profile = Mixed.get().getProfileManager().getProfile(player.getUniqueId());
 
-        if (projectile.isPresent()) {
-          switch (projectile.get().getName()) {
+        if (!Mixed.get().getEffectManager().isNone(profile.getProjectile())) {
+          switch (profile.getProjectile().getName()) {
             case "HEART_TRAIL":
               playProjectileTrails(api.HEART(), arrow, player);
               break;
             case "WITCH":
               new BukkitRunnable() {
                 public void run() {
-                  if (arrow == null || arrow.isOnGround() || arrow.isDead()) cancel();
+                  if (arrow.isOnGround() || arrow.isDead()) cancel();
                   Color[] witch = {Color.PURPLE, Color.FUCHSIA};
                   Object packet =
                       api.REDSTONE()
@@ -69,12 +56,12 @@ public class ProjectileTrails extends ParticleAPI implements Listener {
                               witch[new Random().nextInt(witch.length)]);
                   sendEffectPacket(player, packet);
                 }
-              }.runTaskTimer(Mixed.get(), 2, 2);
+              }.runTaskTimer(Mixed.get(), 1, 2);
               break;
             case "RAINBOW_TRAIL":
               new BukkitRunnable() {
                 public void run() {
-                  if (arrow == null || arrow.isOnGround() || arrow.isDead()) cancel();
+                  if (arrow.isOnGround() || arrow.isDead()) cancel();
 
                   Object packet =
                       api.REDSTONE()
@@ -86,7 +73,7 @@ public class ProjectileTrails extends ParticleAPI implements Listener {
                               colors.get(new Random().nextInt(colors.size())));
                   sendEffectPacket(player, packet);
                 }
-              }.runTaskTimer(Mixed.get(), 2, 2);
+              }.runTaskTimer(Mixed.get(), 1, 2);
               break;
             case "GREEN":
               playProjectileTrails(api.VILLAGER_HAPPY(), arrow, player);
@@ -101,24 +88,26 @@ public class ProjectileTrails extends ParticleAPI implements Listener {
   }
 
   private void playProjectileTrails(ParticleType type, Projectile projectile, Player player) {
-    BukkitTask task =
-        new BukkitRunnable() {
-          public void run() {
-            if (projectile == null || projectile.isOnGround() || projectile.isDead()) cancel();
-            sendEffectPacket(
-                player,
-                type.packet(
-                    true,
-                    (float) projectile.getLocation().getX(),
-                    (float) projectile.getLocation().getY(),
-                    (float) projectile.getLocation().getZ(),
-                    0D,
-                    0D,
-                    0D,
-                    1D,
-                    15));
-          }
-        }.runTaskTimer(Mixed.get(), 2, 2);
+    new BukkitRunnable() {
+      public void run() {
+        if (projectile == null || projectile.isOnGround() || projectile.isDead()) {
+          cancel();
+          return;
+        }
+        sendEffectPacket(
+            player,
+            type.packet(
+                true,
+                (float) projectile.getLocation().getX(),
+                (float) projectile.getLocation().getY(),
+                (float) projectile.getLocation().getZ(),
+                0D,
+                0D,
+                0D,
+                1D,
+                50));
+      }
+    }.runTaskTimer(Mixed.get(), 1, 2);
   }
 
   private void addColor() {
@@ -139,7 +128,6 @@ public class ProjectileTrails extends ParticleAPI implements Listener {
   }
 
   public ProjectileTrails(Plugin plugin) {
-    addProjectiles();
     addColor();
     plugin.getServer().getPluginManager().registerEvents(this, plugin);
   }

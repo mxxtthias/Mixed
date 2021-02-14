@@ -2,12 +2,8 @@ package network.atria.Statistics;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import network.atria.Database.MySQL;
-import network.atria.Database.MySQLSetterGetter;
+import network.atria.Manager.RankManager;
 import network.atria.Mixed;
-import network.atria.Ranks.RankManager;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -16,6 +12,7 @@ import tc.oc.pgm.api.match.MatchModule;
 import tc.oc.pgm.api.match.MatchScope;
 import tc.oc.pgm.api.match.event.MatchFinishEvent;
 import tc.oc.pgm.api.match.event.MatchStartEvent;
+import tc.oc.pgm.api.party.Competitor;
 import tc.oc.pgm.api.player.MatchPlayer;
 import tc.oc.pgm.api.player.MatchPlayerState;
 import tc.oc.pgm.api.player.event.MatchPlayerDeathEvent;
@@ -30,29 +27,19 @@ import tc.oc.pgm.wool.PlayerWoolPlaceEvent;
 @ListenerScope(MatchScope.RUNNING)
 public class MatchEvents implements Listener, MatchModule {
 
-  private HashMap<UUID, String> totalMap;
-  private HashMap<UUID, String> weeklyMap;
-
   @EventHandler(priority = EventPriority.MONITOR)
   public void onMatchStart(MatchStartEvent event) {
-    MatchStatistics statistics = Mixed.get().getStatistics();
-
-    statistics.newMatch();
     event
         .getMatch()
         .getPlayers()
         .forEach(
-            player -> {
-              statistics.countPlaytime(player.getId(), event.getMatch());
-              addResultMap(player.getId());
-            });
+            player -> Mixed.get().getStatistics().countPlaytime(player.getId(), event.getMatch()));
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
   public void onJoinMatch(PlayerParticipationStartEvent event) {
     if (!event.isCancelled() && event.getMatch().isRunning()) {
       Mixed.get().getStatistics().countPlaytime(event.getPlayer().getId(), event.getMatch());
-      addResultMap(event.getPlayer().getId());
     }
   }
 
@@ -73,11 +60,9 @@ public class MatchEvents implements Listener, MatchModule {
 
     if (event.getKiller() != null && !event.isSelfKill() && !event.isSuicide()) {
       murder = event.getKiller().getParty().getPlayer(event.getKiller().getId());
-      if (murder != null) {
-        if (!murder.getParty().equals(victim.getParty())) {
-          Mixed.get().getStatistics().addKill(murder.getId());
-          Mixed.get().getStatistics().addPoint(murder.getId(), 5);
-        }
+      if (!murder.getParty().equals(victim.getParty())) {
+        Mixed.get().getStatistics().addKill(murder.getId());
+        Mixed.get().getStatistics().addPoint(murder.getId(), 5);
       }
     }
   }
@@ -86,8 +71,8 @@ public class MatchEvents implements Listener, MatchModule {
   public void onWoolCapture(PlayerWoolPlaceEvent event) {
     MatchPlayerState player = event.getPlayer();
 
-    Mixed.get().getStatistics().addPoint(player.getId(), 20);
     Mixed.get().getStatistics().addWool(player.getId());
+    Mixed.get().getStatistics().addPoint(player.getId(), 20);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -97,8 +82,8 @@ public class MatchEvents implements Listener, MatchModule {
         .getTouchingPlayers()
         .forEach(
             player -> {
-              Mixed.get().getStatistics().addPoint(player.getId(), 25);
               Mixed.get().getStatistics().addCore(player.getId());
+              Mixed.get().getStatistics().addPoint(player.getId(), 25);
             });
   }
 
@@ -106,8 +91,8 @@ public class MatchEvents implements Listener, MatchModule {
   public void onFlagCapture(FlagCaptureEvent event) {
     MatchPlayer player = event.getCarrier();
 
-    Mixed.get().getStatistics().addPoint(player.getId(), 15);
     Mixed.get().getStatistics().addFlag(player.getId());
+    Mixed.get().getStatistics().addPoint(player.getId(), 15);
   }
 
   @EventHandler(priority = EventPriority.MONITOR)
@@ -125,6 +110,22 @@ public class MatchEvents implements Listener, MatchModule {
   @EventHandler(priority = EventPriority.MONITOR)
   public void onMatchFinish(MatchFinishEvent event) {
     RankManager manager = new RankManager();
+    Collection<Competitor> winners = event.getWinners();
+
+    if (!winners.isEmpty()) {
+      event
+          .getMatch()
+          .getParticipants()
+          .forEach(
+              player -> {
+                if (winners.contains(player.getCompetitor())) {
+                  Mixed.get().getStatistics().addWins(player);
+                } else {
+                  Mixed.get().getStatistics().addLoses(player);
+                }
+              });
+    }
+
     event
         .getMatch()
         .getParticipants()
@@ -133,192 +134,7 @@ public class MatchEvents implements Listener, MatchModule {
               Mixed.get().getStatistics().addPoint(player.getId(), 10);
               manager.RankUP(player);
             });
-    sendStatsData();
     Mixed.get().getStatistics().endMatch();
-  }
-
-  private void sendStatsData() {
-    Bukkit.getScheduler()
-        .runTaskLaterAsynchronously(
-            Mixed.get(),
-            () -> {
-              totalStatsUpdate();
-              weeklyStatsUpdate();
-            },
-            10L);
-  }
-
-  private void totalStatsUpdate() {
-    StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
-    String table = "STATS";
-    sortStats(store.getKills(), totalMap, "KILLS", table);
-    sortStats(store.getDeaths(), totalMap, "DEATHS", table);
-    sortStats(store.getWools(), totalMap, "WOOLS", table);
-    sortStats(store.getMonuments(), totalMap, "MONUMENTS", table);
-    sortStats(store.getCores(), totalMap, "CORES", table);
-    sortStats(store.getFlags(), totalMap, "FLAGS", table);
-    sortStats(store.getPoints(), totalMap, "POINTS", table);
-    sortStats(store.getPlaytime(), totalMap, "PLAYTIME", table);
-    update(totalMap, "STATS");
-  }
-
-  private void weeklyStatsUpdate() {
-    StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
-    String table = "WEEK_STATS";
-    sortStats(store.getKills(), weeklyMap, "KILLS", table);
-    sortStats(store.getDeaths(), weeklyMap, "DEATHS", table);
-    sortStats(store.getWools(), weeklyMap, "WOOLS", table);
-    sortStats(store.getMonuments(), weeklyMap, "MONUMENTS", table);
-    sortStats(store.getCores(), weeklyMap, "CORES", table);
-    sortStats(store.getFlags(), weeklyMap, "FLAGS", table);
-    sortStats(store.getPoints(), weeklyMap, "POINTS", table);
-    sortStats(store.getPlaytime(), weeklyMap, "PLAYTIME", table);
-    update(weeklyMap, table);
-  }
-
-  private void sortStats(
-      Map<UUID, AtomicInteger> map, HashMap<UUID, String> result, String column, String table) {
-    if (map.isEmpty()) return;
-    map.entrySet().stream()
-        .filter(stats -> stats.getValue().get() != 0)
-        .filter(stats -> result.containsKey(stats.getKey()))
-        .forEach(
-            stats -> {
-              Map<String, Integer> data = getStats(stats.getKey(), table);
-              int score = stats.getValue().get() + data.get(column);
-              result.put(
-                  stats.getKey(), result.get(stats.getKey()) + column + " = '" + score + "', ");
-            });
-  }
-
-  private Map<String, Integer> getStats(UUID uuid, String table) {
-    Map<UUID, String> maps = new HashMap<>(includeMaps(uuid));
-    Map<String, Integer> stats = new HashMap<>();
-    String column =
-        Arrays.toString(maps.values().toArray()).trim().replace("[", "").replace("]", "");
-    String query =
-        "SELECT " + column.substring(0, column.length() - 2) + " FROM " + table + " WHERE UUID = ?";
-    maps.clear();
-    Connection connection = null;
-    ResultSet rs = null;
-    PreparedStatement statement = null;
-
-    if (table.equalsIgnoreCase("WEEK_STATS")
-        && !MySQLSetterGetter.playerExist_in_weekly_table(uuid))
-      MySQLSetterGetter.create_weekly_table(uuid);
-    try {
-      connection = MySQL.getHikari().getConnection();
-      statement = connection.prepareStatement(query);
-      statement.setString(1, uuid.toString());
-      rs = statement.executeQuery();
-      if (rs.next()) {
-        Set<String> columns = new HashSet<>();
-        ResultSetMetaData rsmd = rs.getMetaData();
-        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-          columns.add(rsmd.getColumnName(i));
-        }
-        if (columns.contains("KILLS")) stats.put("KILLS", rs.getInt("KILLS"));
-        if (columns.contains("DEATHS")) stats.put("DEATHS", rs.getInt("DEATHS"));
-        if (columns.contains("CORES")) stats.put("CORES", rs.getInt("CORES"));
-        if (columns.contains("WOOLS")) stats.put("WOOLS", rs.getInt("WOOLS"));
-        if (columns.contains("MONUMENTS")) stats.put("MONUMENTS", rs.getInt("MONUMENTS"));
-        if (columns.contains("FLAGS")) stats.put("FLAGS", rs.getInt("FLAGS"));
-        if (columns.contains("POINTS")) stats.put("POINTS", rs.getInt("POINTS"));
-        if (columns.contains("PLAYTIME")) stats.put("PLAYTIME", rs.getInt("PLAYTIME"));
-        columns.clear();
-      }
-    } catch (SQLException e) {
-      e.printStackTrace();
-    } finally {
-      if (connection != null) {
-        try {
-          connection.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      if (rs != null) {
-        try {
-          rs.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-      if (statement != null) {
-        try {
-          statement.close();
-        } catch (SQLException e) {
-          e.printStackTrace();
-        }
-      }
-    }
-    return Collections.unmodifiableMap(stats);
-  }
-
-  private void update(HashMap<UUID, String> map, String table) {
-    map.forEach(
-        (key, value) -> {
-          Connection connection = null;
-          PreparedStatement statement = null;
-          String columns = value.substring(0, value.length() - 2);
-          String query = "UPDATE " + table + " SET " + columns + " WHERE UUID = '" + key + "';";
-          try {
-            connection = MySQL.getHikari().getConnection();
-            statement = connection.prepareStatement(query);
-            statement.executeUpdate();
-          } catch (SQLException e) {
-            e.printStackTrace();
-          } finally {
-            if (connection != null) {
-              try {
-                connection.close();
-              } catch (SQLException e) {
-                e.printStackTrace();
-              }
-              if (statement != null) {
-                try {
-                  statement.close();
-                } catch (SQLException e) {
-                  e.printStackTrace();
-                }
-              }
-            }
-          }
-        });
-  }
-
-  private Map<UUID, String> includeMaps(UUID uuid) {
-    Map<UUID, String> multipleMap = new HashMap<>();
-    StoreStatistics store = Mixed.get().getStatistics().getStoreStatistics();
-
-    multipleMap.put(uuid, "");
-    if (store.getKills().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "KILLS, ");
-    if (store.getDeaths().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "DEATHS, ");
-    if (store.getCores().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "CORES, ");
-    if (store.getMonuments().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "MONUMENTS, ");
-    if (store.getFlags().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "FLAGS, ");
-    if (store.getWools().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "WOOLS, ");
-    if (store.getPoints().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "POINTS, ");
-    if (store.getPlaytime().containsKey(uuid))
-      multipleMap.put(uuid, multipleMap.get(uuid) + "PLAYTIME, ");
-
-    return Collections.unmodifiableMap(multipleMap);
-  }
-
-  private void addResultMap(UUID uuid) {
-    if (weeklyMap == null) weeklyMap = new HashMap<>();
-    if (totalMap == null) totalMap = new HashMap<>();
-    if (weeklyMap.containsKey(uuid)) return;
-    if (totalMap.containsKey(uuid)) return;
-    totalMap.put(uuid, "");
-    weeklyMap.put(uuid, "");
   }
 
   public MatchEvents(Plugin plugin) {

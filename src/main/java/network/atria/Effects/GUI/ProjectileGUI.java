@@ -4,7 +4,6 @@ import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.text;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -12,10 +11,11 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
-import network.atria.Database.MySQLSetterGetter;
 import network.atria.Effects.Particles.Effect;
-import network.atria.Effects.Particles.ProjectileTrails;
+import network.atria.Manager.EffectManager;
 import network.atria.Mixed;
+import network.atria.MySQL;
+import network.atria.UserProfile.UserProfile;
 import network.atria.Util.KillEffectsConfig;
 import network.atria.Util.TextFormat;
 import org.bukkit.DyeColor;
@@ -30,8 +30,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-import tc.oc.pgm.api.PGM;
-import tc.oc.pgm.api.player.MatchPlayer;
 
 public class ProjectileGUI extends CustomGUI implements Listener {
 
@@ -95,17 +93,13 @@ public class ProjectileGUI extends CustomGUI implements Listener {
 
       ItemStack clickedItem = event.getCurrentItem();
       Player player = (Player) event.getWhoClicked();
-      Audience audience = Mixed.get().getAudience().player(player);
+      Mixed.get().getAudience().player(player);
 
-      Set<Effect> projectiles = ProjectileTrails.getProjectiles();
+      if (clickedItem.getType() == Material.AIR) return;
       Optional<Effect> projectile =
-          projectiles.stream()
-              .filter(
-                  name ->
-                      name.getColoredName()
-                          .equalsIgnoreCase(clickedItem.getItemMeta().getDisplayName()))
-              .findFirst();
-
+          Mixed.get()
+              .getEffectManager()
+              .findEffect(TextFormat.format(clickedItem.getItemMeta().getDisplayName()));
       if (projectile.isPresent()) {
         selectProjectile(player, projectile.get());
         player.closeInventory();
@@ -116,13 +110,15 @@ public class ProjectileGUI extends CustomGUI implements Listener {
   private void selectProjectile(Player player, Effect projectile) {
     UUID uuid = player.getUniqueId();
     Audience audience = Mixed.get().getAudience().player(player);
-    MatchPlayer matchPlayer = PGM.get().getMatchManager().getPlayer(player);
+    EffectManager manager = Mixed.get().getEffectManager();
+    UserProfile profile = Mixed.get().getProfileManager().getProfile(uuid);
 
-    if (projectile.canUseDonor(matchPlayer) || projectile.hasRequirePoint(matchPlayer.getId())) {
-      MySQLSetterGetter.setProjectileTrails(uuid.toString(), projectile.getName());
+    if (projectile.canUseDonor() || manager.hasRequirePoint(projectile, uuid)) {
+      MySQL.SQLQuery.update("RANKS", "PROJECTILE", projectile.getName(), player.getUniqueId());
+      profile.setProjectile(projectile);
       audience.sendMessage(
           Component.text("You selected ", NamedTextColor.GREEN)
-              .append(Component.text(projectile.getName().toUpperCase(), NamedTextColor.YELLOW))
+              .append(projectile.getColoredName())
               .append(Component.text(" projectile trails.", NamedTextColor.GREEN)));
     } else {
       audience.sendMessage(Component.text("You don't have enough points.", NamedTextColor.RED));
