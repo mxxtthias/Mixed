@@ -88,7 +88,7 @@ public class StatsCommand {
       audience.sendMessage(formatStats("Kills: ", stats.get("KILLS")));
       audience.sendMessage(formatStats("Deaths: ", stats.get("DEATHS")));
       audience.sendMessage(
-          text("K/D: ", NamedTextColor.AQUA)
+          text("KDR: ", NamedTextColor.AQUA)
               .append(
                   text(
                       kd(stats.get("KILLS"), stats.get("DEATHS")).doubleValue(),
