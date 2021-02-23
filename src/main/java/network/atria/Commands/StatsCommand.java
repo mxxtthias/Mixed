@@ -72,7 +72,7 @@ public class StatsCommand {
       audience.sendMessage(formatStats("Kills: ", profile.getKills()));
       audience.sendMessage(formatStats("Deaths: ", profile.getDeaths()));
       audience.sendMessage(
-          text("K/D: ", NamedTextColor.AQUA)
+          text("KDR: ", NamedTextColor.AQUA)
               .append(
                   text(
                       kd(profile.getKills(), profile.getDeaths()).doubleValue(),
